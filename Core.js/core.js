@@ -60,7 +60,7 @@ class CoreChecker {
     this.MOD_DIR = mod_dir;
   }
   runMod(mod) {
-    let fileName = `${this.MOD_DIR}${mod.file}`;
+    let fileName = `${this.MOD_DIR}${mod.FILE_NAME}`;
     if (!fileName.endsWith(".js")) {
       fileName += ".js";
     }
@@ -75,10 +75,10 @@ class CoreChecker {
           try {
             const runResult = runMod();
             if (runResult.success === true) {
-              $console.info(`(core.js)Mod加载完毕:${mod.name}`);
+              $console.info(`(core.js)Mod加载完毕:${mod.MOD_NAME}`);
             } else {
               $ui.alert({
-                title: `Core.js加载[${mod.name}]失败(${runResult.code})`,
+                title: `Core.js加载[${mod.MOD_NAME}]失败(${runResult.code})`,
                 message: runResult.error_message,
                 actions: [
                   {
@@ -91,7 +91,7 @@ class CoreChecker {
             }
           } catch (error) {
             $ui.alert({
-              title: `${mod.name}加载失败(catch)`,
+              title: `${mod.MOD_NAME}加载失败(catch)`,
               message: error.message,
               actions: [
                 {
@@ -105,19 +105,14 @@ class CoreChecker {
         } else {
           $ui.alert({
             title: `该Mod不支持core.js`,
-            message: "是否用旧版加载模式？",
+            message: "请用旧版加载模式",
             actions: [
               {
-                title: "YES",
+                title: "OK",
                 disabled: false, // Optional
                 handler: function () {
                   coreMod.init();
                 }
-              },
-              {
-                title: "NO",
-                disabled: false, // Optional
-                handler: function () {}
               }
             ]
           });
@@ -127,12 +122,24 @@ class CoreChecker {
       $ui.error("不存在该文件");
     }
   }
+  checkSupportCore(mod) {}
 }
-
+class ModInfo {
+  constructor({ file, name, url, version, dec, pref, core }) {
+    this.FILE_NAME = file;
+    this.MOD_NAME = name;
+    this.URL = url;
+    this.VERSION = version;
+    this.DEC = dec;
+    this.PREF = pref;
+    this.SUPPORT_CORE = core;
+  }
+}
 module.exports = {
   Core,
   Result,
   CoreChecker,
+  ModInfo,
   // <Core.js use guide>
   _SUPPORT_COREJS_: 1,
   run: () => {
