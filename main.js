@@ -1,1 +1,2 @@
-$ui.render("main");
+const app = require("./scripts/app");
+app.run();

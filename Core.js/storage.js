@@ -1,3 +1,4 @@
+const __VERSION__ = 1;
 class Cache {
   constructor(key) {
     this.KEY = key;
@@ -198,4 +199,4 @@ class SQLite {
   }
 }
 
-module.exports = { Cache, File, Prefs, SQLite };
+module.exports = { __VERSION__, Cache, File, Prefs, SQLite };

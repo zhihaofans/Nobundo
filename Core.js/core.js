@@ -136,6 +136,7 @@ class ModInfo {
   }
 }
 module.exports = {
+  __VERSION__: CORE_VERSION,
   Core,
   Result,
   CoreChecker,

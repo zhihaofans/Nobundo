@@ -1,7 +1,10 @@
-function sayHello() {
-  $ui.alert($l10n('HELLO_WORLD'));
+const { Kernel } = require("../Core.js/kernel");
+class AppKernel extends Kernel {
+  constructor() {
+    super();
+    this.registerCoreMod();
+  }
+  init() {}
 }
 
-module.exports = {
-  sayHello: sayHello
-}
+module.exports = {};
