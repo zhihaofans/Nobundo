@@ -1,5 +1,11 @@
-class ListKit {
-  push(title, listData, didSelect) {
+class ListKit extends UiKit {
+  constructor() {
+    super({
+      title: "ListView"
+    });
+  }
+  pushString(title, listData, didSelect) {
+    this.TITLE = title;
     $ui.push({
       props: {
         title: title
@@ -20,38 +26,70 @@ class ListKit {
       ]
     });
   }
-  render(title, listData, didSelect) {
+  renderString(title, listData, didSelect) {
+    this.TITLE = title;
+    this.renderView([
+      {
+        type: "list",
+        props: {
+          autoRowHeight: true,
+          estimatedRowHeight: 10,
+          data: listData
+        },
+        layout: $layout.fill,
+        events: {
+          didSelect: didSelect
+        }
+      }
+    ]);
+  }
+}
+class UiKit {
+  constructor({ title, navButtons }) {
+    this.TITLE = title;
+    this.NAV_BUTTONS = navButtons;
+  }
+  pushView(views) {
+    $ui.push({
+      props: {
+        title: this.TITLE,
+        navButtons: this.NAV_BUTTONS
+      },
+      views: views,
+      events: {
+        appeared: function () {
+          $app.tips("这是第一次加载完毕会出现的提示");
+        },
+        shakeDetected: function () {
+          //摇一摇￼
+          $app.tips("这是第一次摇一摇会出现的提示");
+        }
+      }
+    });
+  }
+  renderView(views) {
     $ui.render({
       props: {
         id: "main",
-        title: title,
+        title: this.TITLE,
         homeIndicatorHidden: false,
         modalPresentationStyle: 0,
-        navButtons: undefined
+        navButtons: this.NAV_BUTTONS
       },
-      views: [
-        {
-          type: "list",
-          props: {
-            data: []
-          },
-          layout: $layout.fill,
-          events: {
-            didSelect: function (_sender, indexPath, _data) {}
-          }
-        }
-      ],
+      views: views,
       events: {
         appeared: function () {
-          $app.tips("右上角的按钮是更新按钮，摇一摇设备也可以触发检测更新");
+          $app.tips("这是第一次加载完毕会出现的提示");
         },
         shakeDetected: function () {
-          //摇一摇
+          //摇一摇￼
+          $app.tips("这是第一次摇一摇会出现的提示");
         }
       }
     });
   }
 }
+
 module.exports = {
-    ListKit
+  ListKit
 };
