@@ -25,8 +25,10 @@ class Http {
     return url ? result : undefined;
   }
   download(url, handler, progress) {
+    const header = { "User-Agent": this.USER_AGENT };
     $http.download({
       url: url,
+      header: header,
       showsProgress: true, // Optional, default is true
       backgroundFetch: true, // Optional, default is false
       progress: progress,

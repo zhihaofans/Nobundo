@@ -1,50 +1,4 @@
-class ListKit extends UiKit {
-  constructor() {
-    super({
-      title: "ListView"
-    });
-  }
-  pushString(title, listData, didSelect) {
-    this.TITLE = title;
-    $ui.push({
-      props: {
-        title: title
-      },
-      views: [
-        {
-          type: "list",
-          props: {
-            autoRowHeight: true,
-            estimatedRowHeight: 10,
-            data: listData
-          },
-          layout: $layout.fill,
-          events: {
-            didSelect: didSelect
-          }
-        }
-      ]
-    });
-  }
-  renderString(title, listData, didSelect) {
-    this.TITLE = title;
-    this.renderView([
-      {
-        type: "list",
-        props: {
-          autoRowHeight: true,
-          estimatedRowHeight: 10,
-          data: listData
-        },
-        layout: $layout.fill,
-        events: {
-          didSelect: didSelect
-        }
-      }
-    ]);
-  }
-}
-class UiKit {
+class ViewKit {
   constructor({ title, navButtons }) {
     this.TITLE = title;
     this.NAV_BUTTONS = navButtons;
@@ -87,6 +41,48 @@ class UiKit {
         }
       }
     });
+  }
+}
+class ListKit extends ViewKit {
+  constructor() {
+    super({
+      title: "ListView",
+      navButtons: undefined
+    });
+  }
+  pushString(title, listData, didSelect) {
+    this.TITLE = title;
+    this.pushView([
+      {
+        type: "list",
+        props: {
+          autoRowHeight: true,
+          estimatedRowHeight: 10,
+          data: listData
+        },
+        layout: $layout.fill,
+        events: {
+          didSelect: didSelect
+        }
+      }
+    ]);
+  }
+  renderString(title, listData, didSelect) {
+    this.TITLE = title;
+    this.renderView([
+      {
+        type: "list",
+        props: {
+          autoRowHeight: true,
+          estimatedRowHeight: 10,
+          data: listData
+        },
+        layout: $layout.fill,
+        events: {
+          didSelect: didSelect
+        }
+      }
+    ]);
   }
 }
 
