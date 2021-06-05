@@ -7,10 +7,11 @@ class AppKernel extends Kernel {
   constructor() {
     super(app_name);
     this.l10n(require("../strings/l10n"));
+    // Register mods
     this.registerCoreMod(new cctv(this));
   }
   init() {
-    this.error(this.REG_CORE_MOD_LIST);
+    this.error(this.REG_CORE_MOD_LIST.map(core_mod => core_mod.MOD_NAME));
     listKit.renderString(
       app_name,
       this.REG_CORE_MOD_LIST.map(core_mod => core_mod.MOD_NAME),

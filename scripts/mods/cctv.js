@@ -1,15 +1,46 @@
 const { Core } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
-  list = new uiKit.ListKit();
+  listKit = new uiKit.ListKit(),
+  alertKit = require("../../Core.js/alert");
 class Main {
   constructor(core) {
     this.core = core;
     this.kernel = core.kernel;
+    this.http = new core.$_.Http();
   }
   initView() {
     const main_view_list = ["时间线"],
-      didSelect = () => {};
-    list.pushString("CCTV客户端", main_view_list, didSelect);
+      didSelect = (sender, indexPath, data) => {
+        switch (indexPath.row) {
+          case 0:
+            this.getTimeLine();
+            break;
+        }
+      };
+    listKit.pushString("CCTV客户端", main_view_list, didSelect);
+  }
+  async getTimeLine() {
+    $ui.loading(true);
+    const number = 20,
+      page = 1,
+      api_url = `https://api.cportal.cctv.com/api/rest/articleInfo/getScrollList?n=${number}&version=1&p=${page}&app_version=810`,
+      http_result = await this.http.get(api_url);
+    $ui.loading(false);
+    if (http_result.error) {
+      this.kernel.error(http_result);
+      $ui.error(http_result.error.message);
+    } else {
+      const result_data = http_result.data,
+        time_line = result_data.itemList;
+      listKit.pushString(
+        "CCTV时间线",
+        time_line.map(news => news.itemTitle),
+        (sender, indexPath, data) => {
+          const this_news = time_line[indexPath.row];
+          this.core.AppScheme.Browser.Safari.ReadMode(this_news.detailUrl);
+        }
+      );
+    }
   }
 }
 
