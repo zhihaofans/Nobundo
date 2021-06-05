@@ -14,7 +14,6 @@ class Core {
     this.DataBase = require("./storage");
     this.Storage = require("./storage");
     this.AppScheme = require("AppScheme");
-    this.HttpLib = new this.$_.Http();
     this.MOD_NAME = mod_name ?? "core";
     this.MOD_VERSION = version ?? 1;
     this.MOD_AUTHOR = author ?? "zhihaofans";

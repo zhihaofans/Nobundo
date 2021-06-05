@@ -1,7 +1,8 @@
+const default_data = require("./default");
 class Http {
   constructor({ timeout = 5, useragent }) {
     this.TIMEOUT = timeout;
-    this.USER_AGENT = useragent;
+    this.USER_AGENT = useragent || default_data.http.user_agent;
   }
   async get(url, header) {
     const new_header = header ?? {};
