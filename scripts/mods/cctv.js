@@ -21,7 +21,7 @@ class Main {
   }
   async getTimeLine() {
     $ui.loading(true);
-    const number = 20,
+    const number = 50,
       page = 1,
       api_url = `https://api.cportal.cctv.com/api/rest/articleInfo/getScrollList?n=${number}&version=1&p=${page}&app_version=810`,
       http_result = await this.http.get(api_url);
