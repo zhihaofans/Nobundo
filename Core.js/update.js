@@ -1,10 +1,10 @@
-const Lib = require("./lib"),
+const lib = require("./lib"),
+  default_data = require("./default"),
   __VERSION__ = 1;
 class Updater {
   constructor(useragent) {
-    this.USER_AGENT =
-      useragent ?? `JSBoxMain/2.15.1 (iPhone; iOS 14.6; Scale/2.00)`;
-    this.HTTP = new Lib.Http({
+    this.USER_AGENT = useragent ?? default_data.http.user_agent;
+    this.HTTP = new lib.Http({
       timeout: 5,
       useragent: this.USER_AGENT
     });
