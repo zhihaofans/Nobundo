@@ -1,3 +1,4 @@
+const __VERSION__ = 1;
 //JSBoxDialogs: https://github.com/Gandum2077/jsbox-dialogs
 
 //UIAlert
@@ -268,6 +269,7 @@ const showPlainAlert = async (
     });
   };
 module.exports = {
+  __VERSION__,
   plainAlert,
   showPlainAlert,
   inputAlert,

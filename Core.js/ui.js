@@ -1,3 +1,4 @@
+const __VERSION__ = 1;
 class ViewKit {
   constructor({ title, navButtons }) {
     this.TITLE = title;
@@ -87,5 +88,6 @@ class ListKit extends ViewKit {
 }
 
 module.exports = {
+  __VERSION__,
   ListKit
 };

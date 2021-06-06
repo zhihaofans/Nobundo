@@ -1,0 +1,12 @@
+{
+  "core.js": "0.0.1",
+  "core": 1,
+  "ui": 1,
+  "alert": 1,
+  "default": 1,
+  "kernel": 1,
+  "lib": 1,
+  "storage": 1,
+  "ui": 1,
+  "update": 1
+}
