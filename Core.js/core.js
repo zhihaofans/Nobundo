@@ -11,9 +11,10 @@ class Core {
   }) {
     this.$$ = require("$$");
     this.$_ = require("$_");
-    this.DataBase = require("./storage");
     this.Storage = require("./storage");
     this.AppScheme = require("AppScheme");
+    this.Lib = require("./lib");
+    this.Http = this.Lib.Http;
     this.MOD_NAME = mod_name ?? "core";
     this.MOD_VERSION = version ?? 1;
     this.MOD_AUTHOR = author ?? "zhihaofans";
@@ -36,7 +37,7 @@ class Core {
     }
   }
   initSQLite() {
-    const SQLite = new this.DataBase.SQLite(this.SQLITE_FILE);
+    const SQLite = new this.Storage.SQLite(this.SQLITE_FILE);
     SQLite.createSimpleTable(this.DATABASE_ID);
     return SQLite;
   }

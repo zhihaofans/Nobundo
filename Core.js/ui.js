@@ -51,7 +51,7 @@ class ListKit extends ViewKit {
       navButtons: undefined
     });
   }
-  pushString(title, listData, didSelect) {
+  pushString(title, listData, didSelect = (sender, indexPath, data) => {}) {
     this.TITLE = title;
     this.pushView([
       {
@@ -68,7 +68,7 @@ class ListKit extends ViewKit {
       }
     ]);
   }
-  renderString(title, listData, didSelect) {
+  renderString(title, listData, didSelect = (sender, indexPath, data) => {}) {
     this.TITLE = title;
     this.renderView([
       {

@@ -1,19 +1,23 @@
-const __VERSION__ = 1,
-  { CoreChecker } = require("./core");
+const __VERSION__ = 1;
 class Kernel {
   constructor(app_name) {
     this.APP_NAME = app_name;
     this.REG_CORE_MOD_LIST = [];
   }
+  // console
+  info(id, msg) {
+    const new_msg = msg ?? id,
+      result = msg ? `${id}:${new_msg}` : new_msg;
+    $console.info(result);
+  }
+  warn(id, msg) {
+    const new_msg = msg ?? id,
+      result = msg ? `${id}:${new_msg}` : new_msg;
+    $console.warn(result);
+  }
   error(id, msg) {
-    let new_msg = msg ?? id,
-      result = "";
-    switch (typeof new_msg) {
-      case "object":
-        //new_msg = JSON.stringify(new_msg);
-        break;
-    }
-    result = msg ? `${id}:${new_msg}` : new_msg;
+    const new_msg = msg ?? id,
+      result = msg ? `${id}:${new_msg}` : new_msg;
     $console.error(result);
   }
   l10n(l10nRes) {
