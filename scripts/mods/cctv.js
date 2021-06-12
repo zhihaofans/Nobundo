@@ -1,7 +1,6 @@
 const { Core } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
-  listKit = new uiKit.ListKit(),
-  alertKit = require("../../Core.js/alert");
+  listKit = new uiKit.ListKit();
 class Main {
   constructor(core) {
     this.core = core;
