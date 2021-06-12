@@ -1,5 +1,6 @@
 const { Kernel } = require("../Core.js/kernel"),
   cctv = require("./mods/cctv"),
+  bilibili = require("./mods/bilibili"),
   ui = require("../Core.js/ui"),
   listKit = new ui.ListKit();
 const app_name = "Nobundo";
@@ -9,6 +10,7 @@ class AppKernel extends Kernel {
     this.l10n(require("../strings/l10n"));
     // Register mods
     this.registerCoreMod(new cctv(this));
+    this.registerCoreMod(new bilibili(this));
   }
   init() {
     this.error(this.REG_CORE_MOD_LIST.map(core_mod => core_mod.MOD_NAME));

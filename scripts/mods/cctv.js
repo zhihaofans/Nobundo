@@ -16,7 +16,7 @@ class Main {
             break;
         }
       };
-    listKit.pushString("CCTV客户端", main_view_list, didSelect);
+    listKit.pushString(this.core.MOD_NAME, main_view_list, didSelect);
   }
   async getTimeLine() {
     $ui.loading(true);
