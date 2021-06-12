@@ -68,14 +68,15 @@ class File {
 }
 
 class Prefs {
-  constructor(key) {
-    this.PREFS_KEY = key;
+  constructor() {}
+  getData(key) {
+    return $prefs.get(key);
   }
-  getData() {
-    return $prefs.get(this.PREFS_KEY);
+  setData(key, value) {
+    return $prefs.set(key, value);
   }
-  setData(value) {
-    return $prefs.set(this.PREFS_KEY, value);
+  exportData() {
+    return $prefs.all();
   }
 }
 
@@ -197,6 +198,27 @@ class SQLite {
       return undefined;
     }
   }
+}
+class Converter {
+  constructor(from_what, to_what) {
+    this.SOURCE_ID = {
+      CACHE: 0,
+      PREFS: 1,
+      SQLITE: 2
+    };
+    this.FROM_WHAT = from_what;
+    this.TO_WHAT = to_what;
+    this.CONVERT_TABLE = [
+      {
+        from: "demo.from.key",
+        to: "demo.to.key"
+      }
+    ];
+  }
+  setConvertTable(new_table) {
+    this.CONVERT_TABLE = new_table;
+  }
+  startConvert() {}
 }
 
 module.exports = { __VERSION__, Cache, File, Prefs, SQLite };

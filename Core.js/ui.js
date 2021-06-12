@@ -1,4 +1,33 @@
 const __VERSION__ = 1;
+class LongClickKit {
+  constructor(title) {
+    this.TITLE = title;
+    this.MENU_DEMO = {
+      title: "title",
+      items: [
+        {
+          title: "Action 1",
+          handler: (sender, indexPath) => {}
+        }
+      ]
+    };
+    this.MENU = {
+      title: title,
+      items: []
+    };
+  }
+  add({ title, handler }) {
+    this.MENU.items.push([
+      {
+        title: title,
+        handler: handler
+      }
+    ]);
+  }
+  setTitle(new_title) {
+    this.TITLE = new_title;
+  }
+}
 class ViewKit {
   constructor({ title, navButtons }) {
     this.TITLE = title;
@@ -17,7 +46,7 @@ class ViewKit {
         },
         shakeDetected: function () {
           //摇一摇￼
-          $app.tips("这是第一次摇一摇会出现的提示");
+          $app.tips("这是摇一摇会出现的提示");
         }
       }
     });
@@ -38,7 +67,7 @@ class ViewKit {
         },
         shakeDetected: function () {
           //摇一摇￼
-          $app.tips("这是第一次摇一摇会出现的提示");
+          $app.tips("这是摇一摇会出现的提示");
         }
       }
     });
@@ -68,6 +97,37 @@ class ListKit extends ViewKit {
       }
     ]);
   }
+  pushStringWithLongclick(
+    title,
+    listData,
+    didSelect = (sender, indexPath, data) => {},
+    long_click_menu
+  ) {
+    this.TITLE = title;
+    this.pushView([
+      {
+        type: "list",
+        props: {
+          autoRowHeight: true,
+          estimatedRowHeight: 10,
+          data: listData,
+          menu: long_click_menu ?? {
+            title: "Context Menu",
+            items: [
+              {
+                title: "Action 1",
+                handler: (sender, indexPath) => {}
+              }
+            ]
+          }
+        },
+        layout: $layout.fill,
+        events: {
+          didSelect: didSelect
+        }
+      }
+    ]);
+  }
   renderString(title, listData, didSelect = (sender, indexPath, data) => {}) {
     this.TITLE = title;
     this.renderView([
@@ -89,5 +149,6 @@ class ListKit extends ViewKit {
 
 module.exports = {
   __VERSION__,
-  ListKit
+  ListKit,
+  LongClickKit
 };

@@ -1,6 +1,7 @@
 const CORE_VERSION = 1;
 class Core {
   constructor({
+    mod_id,
     mod_name,
     version,
     author,
@@ -15,6 +16,7 @@ class Core {
     this.AppScheme = require("AppScheme");
     this.Lib = require("./lib");
     this.Http = this.Lib.Http;
+    this.MOD_ID = mod_id;
     this.MOD_NAME = mod_name ?? "core";
     this.MOD_VERSION = version ?? 1;
     this.MOD_AUTHOR = author ?? "zhihaofans";
