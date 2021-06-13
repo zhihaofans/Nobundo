@@ -52,7 +52,12 @@ class User {
   }
   getUserDataByServer() {
     const api_url = "http://api.bilibili.com/x/web-interface/nav",
-      httpResult = this.Http.get(api_url);
+      httpResult = this.Http.get(api_url, { cookie: this.getCookies() });
+    if (httpResult) {
+      if (httpResult.error) {
+      }
+    } else {
+    }
   }
   checkLoginStatus() {}
   isLogin() {
@@ -73,8 +78,8 @@ class Bilibili extends Core {
       need_core_version: 1,
       database_id: "bilibili"
     });
-    this.kernel = kernel;
-    this.USER = new User(this);
+    this.Kernel = kernel;
+    this.User = new User(this);
   }
   mainView() {
     const main_view_list = ["登录"],
@@ -84,8 +89,10 @@ class Bilibili extends Core {
             break;
         }
       };
-    listKit.pushString(this.core.MOD_NAME, main_view_list, didSelect);
+    listKit.pushString(this.MOD_NAME, main_view_list, didSelect);
   }
-  run() {}
+  run() {
+    this.mainView();
+  }
 }
 module.exports = Bilibili;
