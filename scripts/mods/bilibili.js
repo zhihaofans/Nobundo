@@ -59,12 +59,36 @@ class User {
     } else {
     }
   }
+  importCookies() {
+    $input.text({
+      type: $kb.text,
+      placeholder: "cookies",
+      text: "",
+      handler: function (text) {
+        if (text) {
+          this.setCookies(text);
+        } else {
+          this.Kernel.error("importCookies", "need cookies");
+        }
+      }
+    });
+  }
   checkLoginStatus() {}
   isLogin() {
     const access_key = this.getAccesskey(),
       cookies = this.getCookies(),
       uid = this.getUid();
     return access_key && cookies && uid;
+  }
+  login() {
+    $ui.menu({
+      items: ["导入access key", "导入cookie"],
+      handler: function (title, idx) {
+        switch (idx) {
+          case 0:
+        }
+      }
+    });
   }
 }
 
@@ -86,6 +110,7 @@ class Bilibili extends Core {
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
           case 0:
+            this.User.login();
             break;
         }
       };
