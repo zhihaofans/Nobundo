@@ -2,18 +2,21 @@ const { Kernel } = require("../Core.js/kernel"),
   cctv = require("./mods/cctv"),
   bilibili = require("./mods/bilibili"),
   ui = require("../Core.js/ui"),
-  listKit = new ui.ListKit();
-const app_name = "Nobundo";
+  listKit = new ui.ListKit(),
+  app_name = "Nobundo";
 class AppKernel extends Kernel {
   constructor() {
-    super(app_name);
+    super({
+      app_name,
+      use_sqlite: true
+    });
     this.l10n(require("../strings/l10n"));
+    //this.DEFAULE_SQLITE_FILE = "/mods.db";
     // Register mods
     this.registerCoreMod(new cctv(this));
     this.registerCoreMod(new bilibili(this));
   }
   init() {
-    this.error(this.REG_CORE_MOD_LIST.map(core_mod => core_mod.MOD_NAME));
     listKit.renderString(
       app_name,
       this.REG_CORE_MOD_LIST.map(core_mod => core_mod.MOD_NAME),
@@ -24,7 +27,11 @@ class AppKernel extends Kernel {
   }
 }
 const run = () => {
-  const app = new AppKernel();
-  app.init();
+  try {
+    const app = new AppKernel();
+    app.init();
+  } catch (_error) {
+    $console.error(_error);
+  }
 };
 module.exports = { run };

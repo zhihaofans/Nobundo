@@ -22,15 +22,21 @@ class AutoTask {
     this.ACCESSKEY = access_key;
     this.COOKIES = cookies;
   }
-  userCheckin() {}
-  liveCheckin() {}
-  comicCheckin() {}
+  userCheckin() {
+    // TODO
+  }
+  liveCheckin() {
+    // TODO
+  }
+  comicCheckin() {
+    // TODO
+  }
 }
 class User {
-  constructor(core) {
-    this.Core = core;
-    this.Kernel = core.kernel;
-    this.Http = new core.Http(UA.BILIBILI);
+  constructor(thiscore) {
+    this.Core = thiscore;
+    this.Kernel = thiscore.kernel;
+    this.Http = new thiscore.Http(UA.BILIBILI);
   }
   getAccesskey() {
     return this.Core.getSql("accesskey");
@@ -59,11 +65,25 @@ class User {
     } else {
     }
   }
+  importAccesskey() {
+    $input.text({
+      type: $kbType.text,
+      placeholder: "access key",
+      text: this.getAccesskey(),
+      handler: function (text) {
+        if (text) {
+          this.setAccesskey(text);
+        } else {
+          this.Kernel.error("importAccesskey", "need access key");
+        }
+      }
+    });
+  }
   importCookies() {
     $input.text({
-      type: $kb.text,
+      type: $kbType.text,
       placeholder: "cookies",
-      text: "",
+      text: this.getCookies(),
       handler: function (text) {
         if (text) {
           this.setCookies(text);
@@ -81,11 +101,14 @@ class User {
     return access_key && cookies && uid;
   }
   login() {
+    const $this = this;
     $ui.menu({
       items: ["导入access key", "导入cookie"],
       handler: function (title, idx) {
         switch (idx) {
-          case 0:
+          case 1:
+            $this.importCookies();
+            break;
         }
       }
     });
@@ -95,6 +118,7 @@ class User {
 class Bilibili extends Core {
   constructor(kernel) {
     super({
+      kernel: kernel,
       mod_name: "哔哩哔哩",
       version: "1",
       author: "zhihaofans",
@@ -102,8 +126,23 @@ class Bilibili extends Core {
       need_core_version: 1,
       database_id: "bilibili"
     });
-    this.Kernel = kernel;
     this.User = new User(this);
+  }
+  init() {
+    if (this.User.isLogin()) {
+    } else {
+      $ui.alert({
+        title: "未登录",
+        message: "",
+        actions: [
+          {
+            title: "OK",
+            disabled: false, // Optional
+            handler: function () {}
+          }
+        ]
+      });
+    }
   }
   mainView() {
     const main_view_list = ["登录"],

@@ -46,6 +46,7 @@ class Main {
 class CCTV extends Core {
   constructor(kernel) {
     super({
+      kernel: kernel,
       mod_name: "CCTV客户端",
       version: "1",
       author: "zhihaofans",
