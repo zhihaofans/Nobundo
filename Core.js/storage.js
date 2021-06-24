@@ -32,6 +32,9 @@ class File {
     });
   }
   isDirectory(path) {
+    if (!this.isExists(path)) {
+      return false;
+    }
     return this.IS_ICLOUD ? $drive.isDirectory(path) : $file.isDirectory(path);
   }
   isExists(path) {
@@ -65,6 +68,18 @@ class File {
       ? $drive.absolutePath(path)
       : $file.absolutePath(path);
   }
+  getDirByFile(path) {
+    if (this.isDirectory(path)) {
+      return path;
+    }
+    if (this.isFile(path)) {
+      const dir_path_end = path.lastIndexOf("/");
+      if (dir_path_end >= 0) {
+        return path.slice(0, dir_path_end + 1);
+      }
+    }
+    return undefined;
+  }
 }
 
 class Prefs {
@@ -88,7 +103,6 @@ class SQLite {
     return $sqlite.open(this.DATABASEFILE);
   }
   update(sql, args = undefined) {
-    this.createSimpleTable();
     const db = this.init();
     db.update({
       sql: sql,

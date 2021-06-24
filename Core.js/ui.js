@@ -27,6 +27,9 @@ class LongClickKit {
   setTitle(new_title) {
     this.TITLE = new_title;
   }
+  getData() {
+    return this.MENU;
+  }
 }
 class ViewKit {
   constructor({ title, navButtons }) {
@@ -101,7 +104,7 @@ class ListKit extends ViewKit {
     title,
     listData,
     didSelect = (sender, indexPath, data) => {},
-    long_click_menu
+    long_click_kit_data
   ) {
     this.TITLE = title;
     this.pushView([
@@ -111,7 +114,7 @@ class ListKit extends ViewKit {
           autoRowHeight: true,
           estimatedRowHeight: 10,
           data: listData,
-          menu: long_click_menu ?? {
+          menu: long_click_kit_data.getData() ?? {
             title: "Context Menu",
             items: [
               {

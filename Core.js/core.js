@@ -1,15 +1,17 @@
-const CORE_VERSION = 1;
+const CORE_VERSION = 1,
+  { Result } = require("./object");
 class Core {
   constructor({
+    kernel,
     mod_id,
     mod_name,
     version,
     author,
     need_database,
     database_id,
-    need_core_version,
-    sqlite_file
+    need_core_version
   }) {
+    this.Kernel = kernel;
     this.$$ = require("$$");
     this.$_ = require("$_");
     this.Storage = require("./storage");
@@ -23,8 +25,9 @@ class Core {
     this.NEED_CORE_VERSION = need_core_version ?? 0;
     this.NEED_DATABASE = need_database ?? false;
     this.DATABASE_ID = this.NEED_DATABASE ? database_id : undefined;
-    this.SQLITE_FILE = sqlite_file ?? "/assets/.files/mods.db";
-    this.SQLITE = this.NEED_DATABASE ? this.initSQLite() : undefined;
+    this.SQLITE_FILE = this.Kernel.DEFAULE_SQLITE_FILE || undefined;
+    this.SQLITE =
+      this.NEED_DATABASE && this.SQLITE_FILE ? this.initSQLite() : undefined;
   }
   checkCoreVersion() {
     if (CORE_VERSION === this.NEED_CORE_VERSION) {
@@ -44,20 +47,13 @@ class Core {
     return SQLite;
   }
   getSql(key) {
-    return this.SQLITE.getSimpleData(this.DATABASE_ID, key);
+    return this.SQLITE.auto(this.DATABASE_ID, key);
   }
   setSql(key, value) {
     return this.SQLITE.setSimpleData(this.DATABASE_ID, key, value);
   }
 }
-class Result {
-  constructor({ success, code, data, error_message }) {
-    this.success = success ?? false;
-    this.data = data;
-    this.code = code ?? -1;
-    this.error_message = success ? undefined : error_message;
-  }
-}
+
 class CoreChecker {
   constructor(mod_dir) {
     this.MOD_DIR = mod_dir;

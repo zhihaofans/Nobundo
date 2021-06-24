@@ -1,8 +1,12 @@
 const __VERSION__ = 1;
 class Kernel {
-  constructor(app_name) {
+  constructor({ app_name, use_sqlite = false }) {
     this.APP_NAME = app_name;
     this.REG_CORE_MOD_LIST = [];
+    if (use_sqlite) {
+      $file.mkdir("/assets/.files/");
+      this.DEFAULE_SQLITE_FILE = "/assets/.files/mods.db";
+    }
   }
   // console
   info(id, msg) {
@@ -37,7 +41,7 @@ class Kernel {
     if (typeof ModCore.run === "function") {
       this.REG_CORE_MOD_LIST.push(ModCore);
     } else {
-      this.errorLog("registerCoreMod", "ModCore.run ≠ function");
+      this.error("registerCoreMod", "ModCore.run ≠ function");
     }
   }
   pushCoreModListView() {}
