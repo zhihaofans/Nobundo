@@ -103,9 +103,12 @@ class User {
   login() {
     const $this = this;
     $ui.menu({
-      items: ["导入access key", "导入cookie"],
+      items: ["导入access key", "导入cookies"],
       handler: function (title, idx) {
         switch (idx) {
+          case 0:
+            $this.importAccesskey();
+            break;
           case 1:
             $this.importCookies();
             break;
@@ -130,7 +133,9 @@ class Bilibili extends Core {
   }
   init() {
     if (this.User.isLogin()) {
+      $ui.success("login");
     } else {
+      const $this = this;
       $ui.alert({
         title: "未登录",
         message: "",
@@ -138,7 +143,9 @@ class Bilibili extends Core {
           {
             title: "OK",
             disabled: false, // Optional
-            handler: function () {}
+            handler: function () {
+              $this.User.login();
+            }
           }
         ]
       });
@@ -156,7 +163,8 @@ class Bilibili extends Core {
     listKit.pushString(this.MOD_NAME, main_view_list, didSelect);
   }
   run() {
-    this.mainView();
+    this.init();
+    //this.mainView();
   }
 }
 module.exports = Bilibili;

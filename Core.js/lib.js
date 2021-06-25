@@ -1,12 +1,22 @@
 const default_data = require("./default");
 class Http {
-  constructor(useragent, timeout) {
+  constructor(timeout) {
     this.TIMEOUT = timeout ?? 5;
-    this.USER_AGENT = useragent ?? default_data.http.user_agent;
+    this.USER_AGENT = default_data.http.user_agent;
+    this.COOKIES = "";
+  }
+  setCookies(cookies) {
+    this.COOKIES = cookies;
+  }
+  setUA(ua) {
+    this.USER_AGENT = ua;
   }
   async get(url, header) {
     const new_header = header ?? {};
     header["User-Agent"] = this.USER_AGENT;
+    if (this.COOKIES) {
+      header["cookie"] = this.COOKIES;
+    }
     const result = await $http.get({
       url: url,
       timeout: this.TIMEOUT,
@@ -17,6 +27,9 @@ class Http {
   async post(url, postBody, header) {
     const new_header = header ?? {};
     header["User-Agent"] = this.USER_AGENT;
+    if (this.COOKIES) {
+      header["cookie"] = this.COOKIES;
+    }
     const result = await $http.post({
       url: url,
       header: new_header,
@@ -26,7 +39,7 @@ class Http {
     return url ? result : undefined;
   }
   download(url, handler, progress) {
-    const header = { "User-Agent": this.USER_AGENT };
+    const header = { "User-Agent": this.USER_AGENT, cookie: this.COOKIES };
     $http.download({
       url: url,
       header: header,
