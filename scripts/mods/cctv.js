@@ -36,7 +36,9 @@ class Main {
         time_line.map(news => news.itemTitle),
         (sender, indexPath, data) => {
           const this_news = time_line[indexPath.row];
-          this.core.AppScheme.Browser.Safari.ReadMode(this_news.detailUrl);
+          this.core.AppScheme.Browser.Safari.ReadMode(
+            `http://app.cctv.com/special/cportal/detail/arti/index.html?id=${this_news.itemID}`
+          );
         }
       );
     }
