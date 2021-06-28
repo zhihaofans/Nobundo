@@ -6,6 +6,15 @@ class Result {
     this.error_message = success ? undefined : error_message;
   }
 }
+class UserException {
+  constructor({ name, message, source }) {
+    this.name = name ?? "UserException";
+    this.message = message ?? "";
+    this.source = source ?? "user";
+  }
+}
+
 module.exports = {
-  Result
+  Result,
+  UserException
 };

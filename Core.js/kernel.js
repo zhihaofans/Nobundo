@@ -1,11 +1,33 @@
-const __VERSION__ = 1;
+const __VERSION__ = 1,
+  object = require("./object");
 class Kernel {
-  constructor({ app_name, use_sqlite = false }) {
+  constructor({ app_name, use_sqlite = false, debug_mode = false }) {
     this.APP_NAME = app_name;
+    this.DEBUG = debug_mode;
     this.REG_CORE_MOD_LIST = [];
-    if (use_sqlite) {
+    if (use_sqlite === true) {
       $file.mkdir("/assets/.files/");
       this.DEFAULE_SQLITE_FILE = "/assets/.files/mods.db";
+    }
+    if (this.isDebug()) {
+      this.kernelDebug(`appname:${app_name}`);
+      this.kernelDebug(`sqlite:${use_sqlite === true}`);
+      this.kernelDebug(`debug:${debug_mode === true}`);
+    }
+  }
+  isDebug() {
+    this.DEBUG = this.DEBUG === true;
+    return this.DEBUG === true;
+  }
+  kernelDebug(message) {
+    if (this.isDebug()) {
+      this.info("Kernel", message);
+    } else {
+      throw new object.UserException({
+        name: "Forbidden",
+        message: "need enable debug mode",
+        source: "developer"
+      });
     }
   }
   // console
@@ -42,6 +64,11 @@ class Kernel {
       this.REG_CORE_MOD_LIST.push(ModCore);
     } else {
       this.error("registerCoreMod", "ModCore.run ≠ function");
+      throw new object.UserException({
+        name: "Bug",
+        message: "register mod failed, ModCore.run  is not the function",
+        source: "mod"
+      });
     }
   }
   pushCoreModListView() {}
