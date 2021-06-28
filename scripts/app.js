@@ -1,6 +1,7 @@
 const { Kernel } = require("../Core.js/kernel"),
   cctv = require("./mods/cctv"),
   bilibili = require("./mods/bilibili"),
+  nandu = require("./mods/nandu"),
   ui = require("../Core.js/ui"),
   listKit = new ui.ListKit(),
   app_name = "Nobundo";
@@ -14,7 +15,8 @@ class AppKernel extends Kernel {
     //this.DEFAULE_SQLITE_FILE = "/mods.db";
     // Register mods
     this.registerCoreMod(new cctv(this));
-    this.registerCoreMod(new bilibili(this));
+    this.registerCoreMod(new nandu(this));
+    // this.registerCoreMod(new bilibili(this));
   }
   init() {
     listKit.renderString(
