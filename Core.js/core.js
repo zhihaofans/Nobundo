@@ -12,8 +12,7 @@ class Core {
     need_core_version
   }) {
     this.Kernel = kernel;
-    this.$$ = require("$$");
-    this.$_ = require("$_");
+    this.$_ = require("./$_");
     this.Storage = require("./storage");
     this.AppScheme = require("AppScheme");
     this.Lib = require("./lib");

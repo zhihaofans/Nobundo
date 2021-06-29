@@ -11,77 +11,6 @@ class Cache {
   }
 }
 
-class File {
-  constructor(icloud) {
-    this.IS_ICLOUD = icloud ?? false;
-  }
-  setIsIcloud(is_cloud) {
-    this.IS_ICLOUD = is_cloud;
-  }
-  open(handler, types) {
-    $drive.open({
-      handler: handler,
-      types: types
-    });
-  }
-  save(name, data, handler) {
-    $drive.save({
-      data: data,
-      name: name,
-      handler: handler
-    });
-  }
-  isDirectory(path) {
-    if (!this.isExists(path)) {
-      return false;
-    }
-    return this.IS_ICLOUD ? $drive.isDirectory(path) : $file.isDirectory(path);
-  }
-  isExists(path) {
-    return this.IS_ICLOUD ? $drive.exists(path) : $file.exists(path);
-  }
-  isFile(path) {
-    return this.isExists(path) && !this.isDirectory(path);
-  }
-  readLocal(path) {
-    return this.isFile(path) ? $file.read(path) : undefined;
-  }
-  readIcloud(path) {
-    return this.isFile(path) ? $drive.read(path) : undefined;
-  }
-  read(path) {
-    return this.IS_ICLOUD ? this.readIcloud(path) : this.readLocal;
-  }
-  write(path, data) {
-    return this.IS_ICLOUD
-      ? $drive.write({
-          data: data,
-          path: path
-        })
-      : $file.write({
-          data: data,
-          path: path
-        });
-  }
-  absolutePath(path) {
-    return this.IS_ICLOUD
-      ? $drive.absolutePath(path)
-      : $file.absolutePath(path);
-  }
-  getDirByFile(path) {
-    if (this.isDirectory(path)) {
-      return path;
-    }
-    if (this.isFile(path)) {
-      const dir_path_end = path.lastIndexOf("/");
-      if (dir_path_end >= 0) {
-        return path.slice(0, dir_path_end + 1);
-      }
-    }
-    return undefined;
-  }
-}
-
 class Prefs {
   constructor() {}
   getData(key) {
@@ -235,4 +164,10 @@ class Converter {
   startConvert() {}
 }
 
-module.exports = { __VERSION__, Cache, File, Prefs, SQLite };
+module.exports = {
+  __VERSION__,
+  Cache,
+  File: require("./$_").File,
+  Prefs,
+  SQLite
+};
