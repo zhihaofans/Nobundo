@@ -1,4 +1,5 @@
-const default_data = require("./default");
+const __VERSION__ = 1,
+  default_data = require("./default");
 class Http {
   constructor(timeout) {
     this.TIMEOUT = timeout ?? 5;
@@ -50,6 +51,4 @@ class Http {
     });
   }
 }
-module.exports = {
-  Http
-};
+module.exports = { __VERSION__, Http };

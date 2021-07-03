@@ -1,3 +1,4 @@
+const __VERSION__ = 1;
 class Result {
   constructor({ success, code, data, error_message }) {
     this.success = success ?? false;
@@ -15,6 +16,7 @@ class UserException {
 }
 
 module.exports = {
+  __VERSION__,
   Result,
   UserException
 };

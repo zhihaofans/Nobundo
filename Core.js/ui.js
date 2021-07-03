@@ -32,7 +32,8 @@ class LongClickKit {
   }
 }
 class ViewKit {
-  constructor({ title, navButtons }) {
+  constructor({ view_id, title, navButtons }) {
+    this.VIEW_ID = view_id;
     this.TITLE = title;
     this.NAV_BUTTONS = navButtons;
   }
@@ -44,10 +45,10 @@ class ViewKit {
       },
       views: views,
       events: {
-        appeared: function () {
+        appeared: () => {
           $app.tips("这是第一次加载完毕会出现的提示");
         },
-        shakeDetected: function () {
+        shakeDetected: () => {
           //摇一摇￼
           $app.tips("这是摇一摇会出现的提示");
         }
@@ -57,7 +58,7 @@ class ViewKit {
   renderView(views) {
     $ui.render({
       props: {
-        id: "main",
+        id: this.VIEW_ID ?? "main",
         title: this.TITLE,
         homeIndicatorHidden: false,
         modalPresentationStyle: 0,
@@ -65,10 +66,10 @@ class ViewKit {
       },
       views: views,
       events: {
-        appeared: function () {
+        appeared: () => {
           $app.tips("这是第一次加载完毕会出现的提示");
         },
-        shakeDetected: function () {
+        shakeDetected: () => {
           //摇一摇￼
           $app.tips("这是摇一摇会出现的提示");
         }
@@ -79,10 +80,10 @@ class ViewKit {
 class ListKit extends ViewKit {
   constructor() {
     super({
-      title: "ListView",
-      navButtons: undefined
+      title: "ListView"
     });
   }
+
   pushString(title, listData, didSelect = (sender, indexPath, data) => {}) {
     this.TITLE = title;
     this.pushView([
@@ -149,9 +150,76 @@ class ListKit extends ViewKit {
     ]);
   }
 }
+class ImageKit extends ViewKit {
+  constructor() {
+    super({
+      title: "Image"
+    });
+  }
+  showSingleUrlMenu(imageUrl) {
+    if (imageUrl) {
+      const links = $detector.link(imageUrl);
+      let imageLink = imageUrl;
+      if (links.length > 1) {
+        imageLink = imageUrl[0];
+      }
+      $ui.menu({
+        items: ["用Safari打开", "分享", "快速预览", "网页预览"],
+        handler: (title, idx) => {
+          switch (idx) {
+            case 0:
+              $app.openURL(imageLink);
+              break;
+            case 1:
+              $share.sheet([imageLink]);
+              break;
+            case 2:
+              $quicklook.open({
+                url: imageLink,
+                handler: function () {
+                  $console.info(imageLink);
+                }
+              });
+              break;
+            case 3:
+              $ui.preview({
+                title: title,
+                url: imageLink
+              });
+              break;
+          }
+        }
+      });
+    }
+  }
+  showMultUrlMenu(urlList) {
+    const view_data = [
+      {
+        type: "gallery",
+        props: {
+          items: urlList.map(u => ({
+            type: "image",
+            props: {
+              src: u
+            }
+          })),
+          interval: 3,
+          radius: 5.0
+        },
+        layout: (make, view) => {
+          make.left.right.inset(10);
+          make.centerY.equalTo(view.super);
+          make.height.equalTo(320);
+        }
+      }
+    ];
+    this.pushView(view_data);
+  }
+}
 
 module.exports = {
   __VERSION__,
   ListKit,
-  LongClickKit
+  LongClickKit,
+  ImageKit
 };

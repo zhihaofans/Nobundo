@@ -1,9 +1,11 @@
-const __VERSION__ = 5;
+const __VERSION__ = 7;
+// File
 class Console {
   auto(success = true, message) {
     success ? $console.info(message) : $console.error(message);
   }
 }
+// File
 class File {
   constructor(icloud) {
     this.IS_ICLOUD = icloud ?? false;
@@ -95,6 +97,7 @@ class File {
     return undefined;
   }
 }
+// Http
 class Http {
   constructor(timeout = 5) {
     this.TIMEOUT = timeout;
@@ -116,8 +119,21 @@ class Http {
     });
     return url ? result : undefined;
   }
+  cookieToObj(cookie) {
+    if (cookie) {
+      const cookie_obj = {};
+      cookie.split(";").map(cookie_item => {
+        const item_split = cookie_item.split("=");
+        cookie_item[item_split[0]] = item_split[1];
+      });
+      return cookie_obj;
+    } else {
+      return undefined;
+    }
+  }
 }
-class Push {
+// Notify
+class Notify {
   default(title = "标题", body = "内容", mute = true) {
     $push.schedule({
       title: title,
@@ -126,6 +142,7 @@ class Push {
     });
   }
 }
+// Share
 class Share {
   isAction() {
     return $app.env == $env.action;
@@ -172,6 +189,7 @@ class Share {
     return undefined;
   }
 }
+// Str
 class Str {
   copy(str) {
     $clipboard.copy({
@@ -199,6 +217,7 @@ class Str {
     return sourceList ? sourceList.map(x => $l10n(x)) : [];
   }
 }
+// Time
 class Time {
   getUnixTime() {
     return new Date().getTime();
@@ -211,6 +230,7 @@ class Time {
     return moment(ISO8601).tz(timezone).format("YYYY-MM-DD hh:mm:ss");
   }
 }
+// View
 class View {
   constructor() {
     this.List = {
@@ -312,7 +332,7 @@ module.exports = {
   Console,
   File,
   Http,
-  Push,
+  Notify,
   Share,
   Str,
   Time,
