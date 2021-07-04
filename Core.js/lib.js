@@ -50,5 +50,20 @@ class Http {
       handler: handler
     });
   }
+  cookieToObj(cookie) {
+    if (cookie) {
+      const cookie_result = {};
+      cookie.split(";").map(cookie_item => {
+        const item_split = cookie_item.trim().split("="),
+          item_key = item_split[0],
+          item_valve = item_split[1];
+
+        cookie_result[item_key] = item_valve;
+      });
+      return cookie_result;
+    } else {
+      return undefined;
+    }
+  }
 }
 module.exports = { __VERSION__, Http };
