@@ -1,18 +1,18 @@
 const __VERSION__ = 1,
   object = require("./object");
 class Kernel {
-  constructor({ app_name, use_sqlite = false, debug_mode = false }) {
+  constructor({ app_name, use_sqlite = false, debug = false }) {
     this.APP_NAME = app_name;
-    this.DEBUG = debug_mode;
+    this.DEBUG = debug;
     this.REG_CORE_MOD_LIST = [];
     if (use_sqlite === true) {
       $file.mkdir("/assets/.files/");
       this.DEFAULE_SQLITE_FILE = "/assets/.files/mods.db";
     }
     if (this.isDebug()) {
-      this.kernelDebug(`appname:${app_name}`);
+      this.kernelDebug(`appname:${this.APP_NAME}`);
       this.kernelDebug(`sqlite:${use_sqlite === true}`);
-      this.kernelDebug(`debug:${debug_mode === true}`);
+      this.kernelDebug(`debug:${this.DEBUG === true}`);
     }
   }
   isDebug() {
@@ -71,7 +71,6 @@ class Kernel {
       });
     }
   }
-  pushCoreModListView() {}
 }
 module.exports = {
   __VERSION__,

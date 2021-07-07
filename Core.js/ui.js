@@ -1,4 +1,4 @@
-const __VERSION__ = 1;
+const __VERSION__ = 2;
 class LongClickKit {
   constructor(title) {
     this.TITLE = title;
@@ -101,6 +101,26 @@ class ListKit extends ViewKit {
       }
     ]);
   }
+  // pushIdx() is alpha function for test
+  pushIdx(title, listData, _handler = (section, row) => {}) {
+    this.TITLE = title;
+    this.pushView([
+      {
+        type: "list",
+        props: {
+          autoRowHeight: true,
+          estimatedRowHeight: 10,
+          data: listData
+        },
+        layout: $layout.fill,
+        events: {
+          didSelect: (_sender, indexPath, _data) => {
+            _handler(indexPath.section, indexPath.row);
+          }
+        }
+      }
+    ]);
+  }
   pushStringWithLongclick(
     title,
     listData,
@@ -145,6 +165,25 @@ class ListKit extends ViewKit {
         layout: $layout.fill,
         events: {
           didSelect: didSelect
+        }
+      }
+    ]);
+  }
+  renderIdx(title, listData, _handler = (section, row) => {}) {
+    this.TITLE = title;
+    this.renderView([
+      {
+        type: "list",
+        props: {
+          autoRowHeight: true,
+          estimatedRowHeight: 10,
+          data: listData
+        },
+        layout: $layout.fill,
+        events: {
+          didSelect: (_sender, indexPath, _data) => {
+            _handler(indexPath.section, indexPath.row);
+          }
         }
       }
     ]);
@@ -216,10 +255,24 @@ class ImageKit extends ViewKit {
     this.pushView(view_data);
   }
 }
+class InputKit {
+  constructor() {
+    this.name = "name";
+  }
+  text({ placeholder, text, handler }) {
+    $input.text({
+      type: $kbType.text,
+      placeholder,
+      text,
+      handler
+    });
+  }
+}
 
 module.exports = {
   __VERSION__,
   ListKit,
   LongClickKit,
-  ImageKit
+  ImageKit,
+  InputKit
 };

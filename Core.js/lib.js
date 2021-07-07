@@ -14,9 +14,9 @@ class Http {
   }
   async get(url, header) {
     const new_header = header ?? {};
-    header["User-Agent"] = this.USER_AGENT;
+    new_header["User-Agent"] = this.USER_AGENT;
     if (this.COOKIES) {
-      header["cookie"] = this.COOKIES;
+      new_header["cookie"] = this.COOKIES;
     }
     const result = await $http.get({
       url: url,
