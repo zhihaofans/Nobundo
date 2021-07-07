@@ -52,7 +52,7 @@ class CCTV extends Core {
       mod_name: "CCTV客户端",
       version: "1",
       author: "zhihaofans",
-      need_database: true,
+      need_database: false,
       need_core_version: 1,
       database_id: "cctv_app"
     });
