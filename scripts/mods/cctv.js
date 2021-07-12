@@ -36,6 +36,7 @@ class Main {
         time_line.map(news => news.itemTitle),
         (sender, indexPath, data) => {
           const this_news = time_line[indexPath.row];
+          this.kernel.info(this_news);
           this.core.AppScheme.Browser.Safari.ReadMode(
             `http://app.cctv.com/special/cportal/detail/arti/index.html?id=${this_news.itemID}`
           );

@@ -99,7 +99,7 @@ class User {
     this.Data = new UserData(core);
     this.Http = new core.Http();
     this.Http.setUA(UA.BILIBILI);
-    this.Http.setCookies(this.Data.COOKIES);
+    this.Http.setCookies(this.Data.cookies);
   }
   async getUserDataByServer() {
     $ui.loading(true);
