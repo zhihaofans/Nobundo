@@ -2,6 +2,7 @@ const { Kernel } = require("../Core.js/kernel"),
   cctv = require("./mods/cctv"),
   bilibili = require("./mods/bilibili"),
   nandu = require("./mods/nandu"),
+  haobuye = require("./mods/haobuye"),
   ui = require("../Core.js/ui"),
   listKit = new ui.ListKit(),
   app_name = "Nobundo";
@@ -18,6 +19,7 @@ class AppKernel extends Kernel {
     this.registerCoreMod(new cctv(this));
     this.registerCoreMod(new nandu(this));
     this.registerCoreMod(new bilibili(this));
+    this.registerCoreMod(new haobuye(this));
   }
   init() {
     listKit.renderIdx(
