@@ -1,6 +1,15 @@
 const { Core } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
+class UserData {
+  constructor(core) {
+    this.core = core;
+    this.kernel = core.kernel;
+    this.http = new core.$_.Http();
+    this.sqlite = this.core.SQLITE;
+  }
+  getCookies() {}
+}
 class BossPage {
   constructor(core) {
     this.core = core;
@@ -18,7 +27,17 @@ class BossPage {
         Accept: "application/json, text/javascript, */*; q=0.01",
         Cookie: cookies
       };
-    const postResult = await this.http.post(url, postData, header);
+    const httpResult = await this.http.post(url, postData, header);
+    $ui.loading(false);
+    if (httpResult.error) {
+      this.kernel.error(httpResult);
+      $ui.error(httpResult.error.message);
+    } else {
+      $ui.alert({
+        title: "result",
+        message: httpResult.data
+      });
+    }
   }
 }
 
