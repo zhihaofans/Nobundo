@@ -8,7 +8,7 @@ class Main {
     this.http = new core.$_.Http();
   }
   init() {
-    const main_view_list = ["example 1"],
+    const mainViewList = ["example 1"],
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
           default:
@@ -25,7 +25,7 @@ class Main {
             });
         }
       };
-    listKit.pushString(this.core.MOD_NAME, main_view_list, didSelect);
+    listKit.pushString(this.core.MOD_NAME, mainViewList, didSelect);
   }
 }
 
@@ -34,7 +34,7 @@ class Example extends Core {
     super({
       kernel: kernel,
       mod_name: "例子",
-      version: "2",
+      version: "3",
       author: "zhihaofans",
       need_database: false,
       need_core_version: 1,
