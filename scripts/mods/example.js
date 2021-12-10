@@ -19,7 +19,7 @@ class Main {
                 {
                   title: "OK",
                   disabled: false, // Optional
-                  handler: function () {}
+                  handler: () => {}
                 }
               ]
             });
@@ -34,7 +34,7 @@ class Example extends Core {
     super({
       kernel: kernel,
       mod_name: "例子",
-      version: "1",
+      version: "2",
       author: "zhihaofans",
       need_database: false,
       need_core_version: 1,
