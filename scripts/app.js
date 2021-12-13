@@ -3,6 +3,7 @@ const { Kernel } = require("../Core.js/kernel"),
   bilibili = require("./mods/bilibili"),
   nandu = require("./mods/nandu"),
   haobuye = require("./mods/haobuye"),
+  version = require("./mods/jsbox-version"),
   ui = require("../Core.js/ui"),
   listKit = new ui.ListKit(),
   app_name = "Nobundo";
@@ -20,6 +21,7 @@ class AppKernel extends Kernel {
     this.registerCoreMod(new nandu(this));
     this.registerCoreMod(new bilibili(this));
     this.registerCoreMod(new haobuye(this));
+    this.registerCoreMod(new version(this));
   }
   init() {
     listKit.renderIdx(
