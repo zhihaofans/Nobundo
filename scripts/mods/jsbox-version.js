@@ -1,7 +1,5 @@
 class v2_19_0 {
-  constructor(name) {
-    this.NAME = name;
-  }
+  constructor() {}
   init() {
     $ui.push({
       props: {
@@ -11,7 +9,7 @@ class v2_19_0 {
         {
           type: "list",
           props: {
-            data: ["钥匙串"]
+            data: ["钥匙串", "UUID"]
           },
           layout: $layout.fill,
           events: {
@@ -20,6 +18,8 @@ class v2_19_0 {
                 case 0:
                   this.keychain();
                   break;
+                case 1:
+                  this.uuid();
               }
             }
           }
@@ -37,7 +37,7 @@ class v2_19_0 {
         {
           type: "list",
           props: {
-            data: ["写入", "读取"]
+            data: ["写入", "读取", "查看所有", "清空所有"]
           },
           layout: $layout.fill,
           events: {
@@ -102,6 +102,41 @@ class v2_19_0 {
                     }
                   });
                   break;
+                case 2:
+                  var keys = $keychain.keys(keychainDomain);
+                  if (keys && keys.length > 0) {
+                    $ui.push({
+                      props: {
+                        title: ""
+                      },
+                      views: [
+                        {
+                          type: "list",
+                          props: {
+                            data: keys
+                          },
+                          layout: $layout.fill,
+                          events: {
+                            didSelect: (_sender, indexPath, _data) => {
+                              const thisKey = keys[indexPath.row];
+                              $input.text({
+                                type: $kbType.text,
+                                placeholder: thisKey,
+                                text: $keychain.get(thisKey, keychainDomain),
+                                handler: text => {}
+                              });
+                            }
+                          }
+                        }
+                      ]
+                    });
+                  } else {
+                    $ui.toast("空白");
+                  }
+                  break;
+                case 3:
+                  $keychain.clear();
+                  break;
                 default:
                   $ui.error("待更新");
               }
@@ -109,6 +144,14 @@ class v2_19_0 {
           }
         }
       ]
+    });
+  }
+  uuid() {
+    $input.text({
+      type: $kbType.text,
+      placeholder: "",
+      text: $text.uuid,
+      handler: text => {}
     });
   }
 }
@@ -147,7 +190,7 @@ class Version extends Core {
     super({
       kernel: kernel,
       mod_name: "JSBox新功能测试",
-      version: "1",
+      version: "2",
       author: "zhihaofans",
       need_database: false,
       need_core_version: 1,
