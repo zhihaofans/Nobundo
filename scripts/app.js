@@ -1,8 +1,6 @@
 const { Kernel } = require("../Core.js/kernel"),
-  cctv = require("./mods/cctv"),
   bilibili = require("./mods/bilibili"),
   nandu = require("./mods/nandu"),
-  haobuye = require("./mods/haobuye"),
   version = require("./mods/jsbox-version"),
   ui = require("../Core.js/ui"),
   listKit = new ui.ListKit(),
@@ -17,10 +15,8 @@ class AppKernel extends Kernel {
     this.l10n(require("../strings/l10n"));
     //this.DEFAULE_SQLITE_FILE = "/mods.db";
     // Register mods
-    this.registerCoreMod(new cctv(this));
     this.registerCoreMod(new nandu(this));
     this.registerCoreMod(new bilibili(this));
-    this.registerCoreMod(new haobuye(this));
     this.registerCoreMod(new version(this));
   }
   init() {
