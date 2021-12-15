@@ -66,6 +66,7 @@ class UserData {
     this.cookies = core.getSql("cookies");
     this.uid = core.getSql("uid");
     this.accesskey = core.getSql("accesskey");
+    this.keychainDomain = "nobundo.mod.bilibili";
   }
   setAccesskey(newAccesskey) {
     if (newAccesskey) {
@@ -165,12 +166,12 @@ class Bilibili extends Core {
   constructor(kernel) {
     super({
       kernel: kernel,
-      mod_name: "哔哩哔哩",
-      version: "1",
+      modName: "哔哩哔哩",
+      version: "2",
       author: "zhihaofans",
-      need_database: true,
-      need_core_version: 1,
-      database_id: "bilibili"
+      needDatabase: true,
+      needCoreVersion: 2,
+      databaseId: "bilibili"
     });
     this.User = new User(this);
     this.Comic = new Comic({

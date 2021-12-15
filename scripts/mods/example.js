@@ -33,12 +33,12 @@ class Example extends Core {
   constructor(kernel) {
     super({
       kernel: kernel,
-      mod_name: "例子",
-      version: "3",
+      modName: "例子",
+      version: "4",
       author: "zhihaofans",
-      need_database: false,
-      need_core_version: 1,
-      database_id: "example"
+      needDatabase: false,
+      needCoreVersion: 2,
+      databaseId: "example"
     });
     this.kernel = kernel;
   }

@@ -1,15 +1,15 @@
-const CORE_VERSION = 1,
+const CORE_VERSION = 2,
   { Result } = require("./object");
 class Core {
   constructor({
     kernel,
-    mod_id,
-    mod_name,
+    modId,
+    modName,
     version,
     author,
-    need_database,
-    database_id,
-    need_core_version,
+    needDatabase,
+    databaseId,
+    needCoreVersion,
     keychainId
   }) {
     this.Kernel = kernel;
@@ -18,13 +18,13 @@ class Core {
     this.AppScheme = require("AppScheme");
     this.Lib = require("./lib");
     this.Http = this.Lib.Http;
-    this.MOD_ID = mod_id;
-    this.MOD_NAME = mod_name ?? "core";
+    this.MOD_ID = modId;
+    this.MOD_NAME = modName ?? "core";
     this.MOD_VERSION = version ?? 1;
     this.MOD_AUTHOR = author ?? "zhihaofans";
-    this.NEED_CORE_VERSION = need_core_version ?? 0;
-    this.NEED_DATABASE = need_database ?? false;
-    this.DATABASE_ID = this.NEED_DATABASE ? database_id : undefined;
+    this.NEED_CORE_VERSION = needCoreVersion ?? 0;
+    this.NEED_DATABASE = needDatabase ?? false;
+    this.DATABASE_ID = this.NEED_DATABASE ? databaseId : undefined;
     this.SQLITE_FILE = this.Kernel.DEFAULE_SQLITE_FILE || undefined;
     this.SQLITE =
       this.NEED_DATABASE && this.SQLITE_FILE ? this.initSQLite() : undefined;

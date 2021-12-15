@@ -72,12 +72,12 @@ class NanDu extends Core {
   constructor(kernel) {
     super({
       kernel: kernel,
-      mod_name: "南方都市报",
-      version: "1",
+      modName: "南方都市报",
+      version: "2",
       author: "zhihaofans",
-      need_database: false,
-      need_core_version: 1,
-      database_id: "nandu"
+      needDatabase: false,
+      needCoreVersion: 2,
+      databaseId: "nandu"
     });
   }
   run() {

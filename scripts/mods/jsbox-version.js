@@ -189,12 +189,12 @@ class Version extends Core {
   constructor(kernel) {
     super({
       kernel: kernel,
-      mod_name: "JSBox新功能测试",
-      version: "2",
+      modName: "JSBox新功能测试",
+      version: "3",
       author: "zhihaofans",
-      need_database: false,
-      need_core_version: 1,
-      database_id: "jsbox.version"
+      needDatabase: false,
+      needCoreVersion: 2,
+      databaseId: "jsbox.version"
     });
     this.kernel = kernel;
   }
