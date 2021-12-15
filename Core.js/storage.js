@@ -1,4 +1,4 @@
-const __VERSION__ = 1;
+const __VERSION__ = 2;
 class Cache {
   constructor(key) {
     this.KEY = key;
@@ -8,6 +8,17 @@ class Cache {
   }
   set(value) {
     return $cache.set(this.KEY, value);
+  }
+}
+class Keychain {
+  constructor(domain) {
+    this.DOMAIN = domain;
+  }
+  getValue(key) {
+    return $keychain.get(key, this.DOMAIN);
+  }
+  setValue(key, value) {
+    return $keychain.set(key, value, this.DOMAIN);
   }
 }
 
@@ -168,6 +179,7 @@ module.exports = {
   __VERSION__,
   Cache,
   File: require("./$_").File,
+  Keychain,
   Prefs,
   SQLite
 };

@@ -9,7 +9,8 @@ class Core {
     author,
     need_database,
     database_id,
-    need_core_version
+    need_core_version,
+    keychainId
   }) {
     this.Kernel = kernel;
     this.$_ = require("./$_");
@@ -27,6 +28,7 @@ class Core {
     this.SQLITE_FILE = this.Kernel.DEFAULE_SQLITE_FILE || undefined;
     this.SQLITE =
       this.NEED_DATABASE && this.SQLITE_FILE ? this.initSQLite() : undefined;
+    this.KEYCHAIN_DOMAIN = keychainId;
   }
   checkCoreVersion() {
     if (CORE_VERSION === this.NEED_CORE_VERSION) {
