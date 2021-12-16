@@ -192,9 +192,7 @@ class Version extends Core {
       modName: "JSBox新功能测试",
       version: "3",
       author: "zhihaofans",
-      needDatabase: false,
-      needCoreVersion: 2,
-      databaseId: "jsbox.version"
+      needCoreVersion: 2
     });
     this.kernel = kernel;
   }

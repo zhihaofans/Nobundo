@@ -75,9 +75,7 @@ class NanDu extends Core {
       modName: "南方都市报",
       version: "2",
       author: "zhihaofans",
-      needDatabase: false,
       needCoreVersion: 2,
-      databaseId: "nandu"
     });
   }
   run() {
