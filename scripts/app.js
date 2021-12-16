@@ -4,12 +4,12 @@ const { Kernel } = require("../Core.js/kernel"),
   version = require("./mods/jsbox-version"),
   ui = require("../Core.js/ui"),
   listKit = new ui.ListKit(),
-  app_name = "Nobundo";
+  appName = "Nobundo";
 class AppKernel extends Kernel {
   constructor() {
     super({
-      app_name,
-      use_sqlite: true,
+      appName,
+      useSqlite: true,
       debug: true
     });
     this.l10n(require("../strings/l10n"));
@@ -21,8 +21,8 @@ class AppKernel extends Kernel {
   }
   init() {
     listKit.renderIdx(
-      app_name,
-      this.REG_CORE_MOD_LIST.map(core_mod => core_mod.MOD_NAME),
+      appName,
+      this.REG_CORE_MOD_LIST.map(coreMod => coreMod.MOD_NAME),
       (section, row) => {
         this.REG_CORE_MOD_LIST[row].run();
       }

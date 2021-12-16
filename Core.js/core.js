@@ -7,7 +7,6 @@ class Core {
     modName,
     version,
     author,
-    needDatabase,
     databaseId,
     needCoreVersion,
     keychainId
@@ -23,11 +22,12 @@ class Core {
     this.MOD_VERSION = version ?? 1;
     this.MOD_AUTHOR = author ?? "zhihaofans";
     this.NEED_CORE_VERSION = needCoreVersion ?? 0;
-    this.NEED_DATABASE = needDatabase ?? false;
     this.DATABASE_ID = this.NEED_DATABASE ? databaseId : undefined;
     this.SQLITE_FILE = this.Kernel.DEFAULE_SQLITE_FILE || undefined;
     this.SQLITE =
-      this.NEED_DATABASE && this.SQLITE_FILE ? this.initSQLite() : undefined;
+      this.DATABASE_ID.length > 0 && this.SQLITE_FILE
+        ? this.initSQLite()
+        : undefined;
     this.KEYCHAIN_DOMAIN = keychainId;
   }
   checkCoreVersion() {
@@ -48,7 +48,7 @@ class Core {
     return SQLite;
   }
   getSql(key) {
-    return this.SQLITE.auto(this.DATABASE_ID, key);
+    return this.SQLITE ? this.SQLITE.auto(this.DATABASE_ID, key) : undefined;
   }
   setSql(key, value) {
     return this.SQLITE.setSimpleData(this.DATABASE_ID, key, value);

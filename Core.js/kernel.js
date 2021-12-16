@@ -1,17 +1,18 @@
-const __VERSION__ = 1,
+const __VERSION__ = 2,
   object = require("./object");
 class Kernel {
-  constructor({ app_name, use_sqlite = false, debug = false }) {
-    this.APP_NAME = app_name;
+  constructor({ appName, useSqlite = false, debug = false }) {
+    this.APP_NAME = appName;
     this.DEBUG = debug;
+    this.USE_SQLITR = useSqlite;
     this.REG_CORE_MOD_LIST = [];
-    if (use_sqlite === true) {
+    if (useSqlite === true) {
       $file.mkdir("/assets/.files/");
       this.DEFAULE_SQLITE_FILE = "/assets/.files/mods.db";
     }
     if (this.isDebug()) {
       this.kernelDebug(`appname:${this.APP_NAME}`);
-      this.kernelDebug(`sqlite:${use_sqlite === true}`);
+      this.kernelDebug(`sqlite:${this.USE_SQLITR === true}`);
       this.kernelDebug(`debug:${this.DEBUG === true}`);
     }
   }
@@ -32,18 +33,18 @@ class Kernel {
   }
   // console
   info(id, msg) {
-    const new_msg = msg ?? id,
-      result = msg ? `${id}:${new_msg}` : new_msg;
+    const newMsg = msg ?? id,
+      result = msg ? `${id}:${newMsg}` : newMsg;
     $console.info(result);
   }
   warn(id, msg) {
-    const new_msg = msg ?? id,
-      result = msg ? `${id}:${new_msg}` : new_msg;
+    const newMsg = msg ?? id,
+      result = msg ? `${id}:${newMsg}` : newMsg;
     $console.warn(result);
   }
   error(id, msg) {
-    const new_msg = msg ?? id,
-      result = msg ? `${id}:${new_msg}` : new_msg;
+    const newMsg = msg ?? id,
+      result = msg ? `${id}:${newMsg}` : newMsg;
     $console.error(result);
   }
   l10n(l10nRes) {
