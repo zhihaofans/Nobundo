@@ -1,6 +1,5 @@
 try {
-  const app = require("./scripts/app");
-  app.run();
+  require("./scripts/app").run();
 } catch (error) {
   $console.error(error);
   $ui.alert({
