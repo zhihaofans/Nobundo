@@ -135,7 +135,7 @@ class v2_19_0 {
                   }
                   break;
                 case 3:
-                  $keychain.clear();
+                  $keychain.clear(keychainDomain);
                   break;
                 default:
                   $ui.error("待更新");
