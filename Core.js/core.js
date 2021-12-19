@@ -15,20 +15,24 @@ class Core {
     this.$_ = require("./$_");
     this.Storage = require("./storage");
     this.AppScheme = require("AppScheme");
-    this.Lib = require("./lib");
-    this.Http = this.Lib.Http;
+
+    this.Http = require("./lib").Http;
     this.MOD_ID = modId;
     this.MOD_NAME = modName ?? "core";
     this.MOD_VERSION = version ?? 1;
     this.MOD_AUTHOR = author ?? "zhihaofans";
     this.NEED_CORE_VERSION = needCoreVersion ?? 0;
-    this.DATABASE_ID = this.NEED_DATABASE ? databaseId : undefined;
+    this.DATABASE_ID = this.NEED_DATABASE ? databaseId : "";
     this.SQLITE_FILE = this.Kernel.DEFAULE_SQLITE_FILE || undefined;
     this.SQLITE =
       this.DATABASE_ID.length > 0 && this.SQLITE_FILE
         ? this.initSQLite()
         : undefined;
-    this.KEYCHAIN_DOMAIN = keychainId;
+    this.KEYCHAIN_DOMAIN = `nobundo.mod.${keychainId}`;
+    this.Keychain =
+      keychainId && keychainId.length > 0
+        ? new this.Storage.Keychain(this.KEYCHAIN_DOMAIN)
+        : undefined;
   }
   checkCoreVersion() {
     if (CORE_VERSION === this.NEED_CORE_VERSION) {

@@ -12,13 +12,19 @@ class Cache {
 }
 class Keychain {
   constructor(domain) {
-    this.DOMAIN = domain;
+    this.DOMAIN = domain.toLowerCase();
   }
   getValue(key) {
     return $keychain.get(key, this.DOMAIN);
   }
   setValue(key, value) {
     return $keychain.set(key, value, this.DOMAIN);
+  }
+  getAll(){
+    const keys=$keychain.keys(),result={
+      
+    }
+    return 
   }
 }
 

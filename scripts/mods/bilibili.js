@@ -18,6 +18,17 @@ const APP_VERSION = {
   { Core } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
+class Http {
+  constructor() {
+    this.TIMEOUT = 5;
+    this.COOKIES = "";
+    this.USERAGENT = "";
+  }
+  setCookies(cookies) {
+    this.COOKIES = cookies;
+  }
+  h_get({ url, cookies, header }) {}
+}
 
 class Comic {
   constructor({ core, userdata }) {
@@ -62,32 +73,42 @@ class Comic {
 }
 class UserData {
   constructor(core) {
-    this.core = core;
+    this.keychainDomain = "nobundo.mod.bilibili";
+    this.Core = core;
+    this.Http = new core.Http(5);
     this.cookies = core.getSql("cookies");
     this.uid = core.getSql("uid");
     this.accesskey = core.getSql("accesskey");
-    this.keychainDomain = "nobundo.mod.bilibili";
+  }
+  getAccesskey() {
+    return this.Core.Keychain.getValue("accesskey");
   }
   setAccesskey(newAccesskey) {
     if (newAccesskey) {
-      this.core.setSql("accesskey", newAccesskey);
+      this.Core.Keychain.setValue("accesskey", newAccesskey);
       this.accesskey = newAccesskey;
     }
   }
+  getCookies() {
+    return this.Core.Keychain.getValue("cookies");
+  }
   setCookies(newCookies) {
     if (newCookies) {
-      this.core.setSql("cookies", newCookies);
+      this.Core.Keychain.setValue("cookies", newCookies);
       this.cookies = newCookies;
       const cookieResult = this.Http.cookieToObj(newCookies);
-      this.Http.setCookies(this.getCookies());
+      this.Http.setCookies(newCookies);
       if (cookieResult.DedeUserID) {
         this.setUid(cookieResult.DedeUserID);
       }
     }
   }
+  getUid() {
+    return this.Core.Keychain.getValue("uid");
+  }
   setUid(newUid) {
     if (newUid) {
-      this.core.setSql("uid", newUid);
+      this.Core.Keychain.setValue("uid", newUid);
       this.uid = newUid;
     }
   }
@@ -143,7 +164,9 @@ class User {
   }
   checkLoginStatus() {}
   isLogin() {
-    return this.Data.accesskey && this.Data.cookies && this.Data.uid;
+    return (
+      this.Data.getAccesskey() && this.Data.getCookies() && this.Data.getUid()
+    );
   }
   login() {
     $ui.menu({
@@ -170,7 +193,8 @@ class Bilibili extends Core {
       version: "2",
       author: "zhihaofans",
       needCoreVersion: 2,
-      databaseId: "bilibili"
+      databaseId: "bilibili",
+      keychainId: "bilibili"
     });
     this.User = new User(this);
     this.Comic = new Comic({
