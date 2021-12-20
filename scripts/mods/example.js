@@ -5,7 +5,7 @@ class Main {
   constructor(core) {
     this.core = core;
     this.kernel = core.kernel;
-    this.http = new core.$_.Http();
+    this.http = new core.Http(5);
   }
   init() {
     const mainViewList = ["example 1"],
@@ -34,11 +34,11 @@ class Example extends Core {
     super({
       kernel: kernel,
       modName: "例子",
-      version: "4",
+      version: "5",
       author: "zhihaofans",
-      needDatabase: false,
       needCoreVersion: 2,
-      databaseId: "example"
+      databaseId: "example",
+      keychainId: "example"
     });
     this.kernel = kernel;
   }
