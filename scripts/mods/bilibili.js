@@ -126,7 +126,11 @@ class User {
   async getUserDataByServer() {
     $ui.loading(true);
     const api_url = "http://api.bilibili.com/x/web-interface/nav",
-      httpResult = await this.Http.get(api_url);
+      header = {
+        "User-Agent": UA.BILIBILI,
+        cookie: this.Data.getCookies()
+      },
+      httpResult = await this.Http.get(api_url, header);
     $console.info(httpResult);
     $ui.loading(false);
     if (httpResult && !httpResult.error) {
