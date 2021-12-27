@@ -2,6 +2,7 @@ const { Kernel } = require("../Core.js/kernel"),
   bilibili = require("./mods/bilibili"),
   nandu = require("./mods/nandu"),
   version = require("./mods/jsbox-version"),
+  wallhaven = require("./mods/wallhaven"),
   ui = require("../Core.js/ui"),
   listKit = new ui.ListKit(),
   appName = "Nobundo";
@@ -18,6 +19,7 @@ class AppKernel extends Kernel {
     this.registerCoreMod(new nandu(this));
     this.registerCoreMod(new bilibili(this));
     this.registerCoreMod(new version(this));
+    this.registerCoreMod(new wallhaven(this));
   }
   init() {
     listKit.renderIdx(

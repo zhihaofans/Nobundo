@@ -6,11 +6,15 @@ class Main {
     this.Core = core;
     this.Kernel = core.kernel;
     this.Http = new core.Http(5);
+    this.keychainId = {
+      apiKey: "apikey",
+      needseed: "nextseed"
+    };
   }
   init() {
     try {
       $ui.menu({
-        items: ["随机"],
+        items: ["随机动漫"],
         handler: (title, idx) => {
           switch (idx) {
             case 0:
@@ -30,16 +34,17 @@ class Main {
   }
   async animeRandom() {
     $ui.loading(true);
-    const next_seed_id = "nextseed",
+    const nextSeedId = this.keychainId.needseed,
       query = `id%3A5type:png`,
       sorting = `random`,
-      randomSeed = this.Keychain.get(next_seed_id) || `XekqJ6`,
+      randomSeed = this.Core.Keychain.get(this.keychainId.needseed) || `XekqJ6`,
       page = 1,
       purity = "111",
       categories = "010",
-      api_key = this.Keychain.get("api_key") || "",
+      api_key = this.Core.Keychain.get(this.keychainId.apiKey) || "",
       url = `https://wallhaven.cc/api/v1/search?q=${query}&sorting=${sorting}&seed=${randomSeed}&page=${page}&purity=${purity}&categories=${categories}&apikey=${api_key}`,
-      httpResult = await this.http.get(url);
+      httpResult = await this.Http.get(url);
+    $console.warn(httpResult);
     if (httpResult.error) {
       $console.error(httpResult.error);
       $ui.loading(false);
@@ -53,9 +58,28 @@ class Main {
         apiMeta = httpData.meta,
         nextRandomSeed = apiMeta.seed;
       $console.info(`nextRandomSeed:${nextRandomSeed}`);
-      this.Keychain.set(next_seed_id, nextRandomSeed || randomSeed);
+      this.Core.Keychain.set(
+        this.keychainId.needseed,
+        nextRandomSeed || randomSeed
+      );
       $ui.loading(false);
       $console.info(httpData);
+      $console.warn(apiData);
+      if (apiData.length > 0) {
+        const didSelect = (sender, indexPath, data) => {
+          $ui.preview({
+            title: "URL",
+            url: apiData[indexPath.row].path
+          });
+        };
+        listKit.pushString(
+          `${apiData.length}张`,
+          apiData.map(img => img.id),
+          didSelect
+        );
+      } else {
+        $ui.toast("空白");
+      }
     }
   }
 }
