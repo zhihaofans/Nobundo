@@ -3,9 +3,9 @@ const { Core } = require("../../Core.js/core"),
   listKit = new uiKit.ListKit();
 class Main {
   constructor(core) {
-    this.core = core;
-    this.kernel = core.kernel;
-    this.http = new core.Http(5);
+    this.Core = core;
+    this.Kernel = core.kernel;
+    this.Http = new core.Http(5);
   }
   init() {
     const mainViewList = ["example 1"],
@@ -40,7 +40,6 @@ class Example extends Core {
       databaseId: "example",
       keychainId: "example"
     });
-    this.kernel = kernel;
   }
   run() {
     $ui.success("run");
