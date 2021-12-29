@@ -1,4 +1,4 @@
-const __VERSION__ = 2,
+const __VERSION__ = 3,
   object = require("./object");
 class Kernel {
   constructor({ appName, useSqlite = false, debug = false }) {
@@ -62,7 +62,28 @@ class Kernel {
   }
   registerCoreMod(ModCore) {
     if (typeof ModCore.run === "function") {
-      this.REG_CORE_MOD_LIST.push(ModCore);
+      const needUpdateCore = ModCore.checkCoreVersion();
+      if (needUpdateCore == 0) {
+        this.REG_CORE_MOD_LIST.push(ModCore);
+      } else {
+        this.error("registerCoreMod", "need update mod");
+        $ui.alert({
+          title: "registerCoreMod",
+          message: `need update mod(${needUpdateCore},${ModCore.MOD_NAME})`,
+          actions: [
+            {
+              title: "OK",
+              disabled: false, // Optional
+              handler: () => {}
+            }
+          ]
+        });
+        throw new object.UserException({
+          name: "Mod version",
+          message: "register mod failed, need update mod or core.js",
+          source: "mod"
+        });
+      }
     } else {
       this.error("registerCoreMod", "ModCore.run ≠ function");
       throw new object.UserException({
