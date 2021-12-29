@@ -8,16 +8,19 @@ class Main {
     this.Http = new core.Http(5);
     this.keychainId = {
       apiKey: "apikey",
-      needseed: "nextseed"
+      nextseed: "nextseed"
     };
   }
   init() {
     try {
       $ui.menu({
-        items: ["随机动漫"],
+        items: ["设置api key", "随机动漫"],
         handler: (title, idx) => {
           switch (idx) {
             case 0:
+              this.setApikey();
+              break;
+            case 1:
               this.animeRandom();
               break;
           }
@@ -32,7 +35,10 @@ class Main {
       $ui.loading(false);
     }
   }
-  async animeRandom() {
+  setApikey() {
+    $ui.error("TODO");
+  }
+  async random(categories = "111") {
     $ui.loading(true);
     const nextSeedId = this.keychainId.needseed,
       query = `id%3A5type:png`,
@@ -40,7 +46,6 @@ class Main {
       randomSeed = this.Core.Keychain.get(this.keychainId.needseed) || `XekqJ6`,
       page = 1,
       purity = "111",
-      categories = "010",
       api_key = this.Core.Keychain.get(this.keychainId.apiKey) || "",
       url = `https://wallhaven.cc/api/v1/search?q=${query}&sorting=${sorting}&seed=${randomSeed}&page=${page}&purity=${purity}&categories=${categories}&apikey=${api_key}`,
       httpResult = await this.Http.get(url);
@@ -81,6 +86,9 @@ class Main {
         $ui.toast("空白");
       }
     }
+  }
+  animeRandom() {
+    this.random("010");
   }
 }
 
