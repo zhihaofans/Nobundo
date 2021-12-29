@@ -1,33 +1,45 @@
-const http = {
-  get: async ({ url, header, timeout }) => {
-    return await $http.get({
-      url: url,
-      timeout: timeout,
-      header: header
-    });
+module.exports = {
+  getUUID: () => {
+    return $text.uuid;
   },
-  getObjFromCookies: cookies => {
-    if (cookies) {
-      const cookieResult = {};
-      cookies.split(";").map(cookieItem => {
-        const itemSplit = cookieItem.trim().split("="),
-          itemKey = itemSplit[0],
-          itemValve = itemSplit[1];
-
-        cookieResult[itemKey] = itemValve;
+  http: {
+    get: async ({ url, header, timeout }) => {
+      return await $http.get({
+        url: url,
+        timeout: timeout,
+        header: header
       });
-      return cookieResult;
-    } else {
-      return undefined;
+    },
+    getObjFromCookies: cookies => {
+      if (cookies) {
+        const cookieResult = {};
+        cookies.split(";").map(cookieItem => {
+          const itemSplit = cookieItem.trim().split("="),
+            itemKey = itemSplit[0],
+            itemValve = itemSplit[1];
+
+          cookieResult[itemKey] = itemValve;
+        });
+        return cookieResult;
+      } else {
+        return undefined;
+      }
+    },
+    post: async ({ url, header, timeout, body }) => {
+      return await $http.post({
+        url: url,
+        header: header,
+        timeout: timeout,
+        body: body
+      });
     }
   },
-  post: async ({ url, header, timeout, body }) => {
-    return await $http.post({
-      url: url,
-      header: header,
-      timeout: timeout,
-      body: body
-    });
+  share: {
+    isAction: () => {
+      return $app.env == $env.action;
+    },
+    isSafari: () => {
+      return $app.env == $env.safari;
+    }
   }
 };
-module.exports = { http };
