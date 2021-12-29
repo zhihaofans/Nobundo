@@ -196,7 +196,7 @@ class Bilibili extends Core {
       modName: "哔哩哔哩",
       version: "2",
       author: "zhihaofans",
-      needCoreVersion: 2,
+      needCoreVersion: 3,
       databaseId: "bilibili",
       keychainId: "bilibili"
     });

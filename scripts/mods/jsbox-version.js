@@ -192,7 +192,7 @@ class Version extends Core {
       modName: "JSBox新功能测试",
       version: "3",
       author: "zhihaofans",
-      needCoreVersion: 2
+      needCoreVersion: 3
     });
     this.kernel = kernel;
   }

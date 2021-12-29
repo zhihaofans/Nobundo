@@ -99,7 +99,7 @@ class Wallhaven extends Core {
       modName: "Wallhaven",
       version: "1",
       author: "zhihaofans",
-      needCoreVersion: 2,
+      needCoreVersion: 3,
       keychainId: "wallhaven"
     });
   }

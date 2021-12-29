@@ -36,7 +36,7 @@ class Example extends Core {
       modName: "例子",
       version: "5",
       author: "zhihaofans",
-      needCoreVersion: 2,
+      needCoreVersion: 3,
       databaseId: "example",
       keychainId: "example"
     });
