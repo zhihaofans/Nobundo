@@ -6,32 +6,31 @@ const APP_INFO = {
   listKit = new uiKit.ListKit();
 class Home {
   constructor(core) {
-    this.core = core;
-    this.kernel = core.Kernel;
-    this.http = new core.$_.Http();
+    this.Core = core;
+    this.Http = new core.$_.Http();
   }
   async getTodayHotNews() {
-    this.kernel.info("getTodayHotNews", "1");
+    this.Kernel.info("getTodayHotNews", "1");
     $ui.loading(true);
     const api_url = `https://api-ndapp.oeeee.com/friends.php?m=Home&a=hot`,
-      http_result = await this.http.get(api_url);
+      http_result = await this.Http.get(api_url);
     $ui.loading(false);
     if (http_result.error) {
-      this.kernel.error(http_result);
+      this.Kernel.error(http_result);
       $ui.error(http_result.error.message);
     } else {
       const result_data = http_result.data;
-      this.kernel.info(result_data);
+      this.Kernel.info(result_data);
       if (result_data.errcode === 0) {
         const result_item_list = result_data.data,
           str_list = result_item_list.map(item => item.title),
           didSelect = (sender, indexPath, data) => {
             const thisNewsItem = result_item_list[indexPath.row];
-            this.core.AppScheme.Browser.Safari.ReadMode(thisNewsItem.url);
+            this.Core.AppScheme.Browser.Safari.ReadMode(thisNewsItem.url);
           };
         listKit.pushString("24小时热榜", str_list, didSelect);
       } else {
-        this.kernel.error(result_data.errmsg);
+        this.Kernel.error(result_data.errmsg);
       }
     }
   }
@@ -39,9 +38,8 @@ class Home {
 
 class AppView {
   constructor(core) {
-    this.core = core;
-    this.kernel = core.kernel;
-    this.home = new Home(this.core);
+    this.Core = core;
+    this.home = new Home(core);
   }
   init() {
     const main_view_list = ["热榜新闻"],
@@ -64,7 +62,7 @@ class AppView {
             });
         }
       };
-    listKit.pushString(this.core.MOD_NAME, main_view_list, didSelect);
+    listKit.pushString(this.Core.MOD_NAME, main_view_list, didSelect);
   }
 }
 
