@@ -25,7 +25,7 @@ class Main {
             });
         }
       };
-    listKit.pushString(this.core.MOD_NAME, mainViewList, didSelect);
+    listKit.pushString(this.Core.MOD_NAME, mainViewList, didSelect);
   }
 }
 
