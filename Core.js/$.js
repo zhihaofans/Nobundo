@@ -1,8 +1,4 @@
-module.exports = {
-  getUUID: () => {
-    return $text.uuid;
-  },
-  http: {
+const http = {
     get: async ({ url, header, timeout }) => {
       return await $http.get({
         url: url,
@@ -25,6 +21,14 @@ module.exports = {
         return undefined;
       }
     },
+    head: async ({ url, header, timeout }) => {
+      return await $http.request({
+        method: "HEAD",
+        url: url,
+        timeout: timeout,
+        header: header
+      });
+    },
     post: async ({ url, header, timeout, body }) => {
       return await $http.post({
         url: url,
@@ -34,12 +38,38 @@ module.exports = {
       });
     }
   },
-  share: {
+  share = {
     isAction: () => {
       return $app.env == $env.action;
     },
     isSafari: () => {
       return $app.env == $env.safari;
+    },
+    getLink: () => {
+      if (share.isAction()) {
+        return $context.link || undefined;
+      }
+      if (share.isSafari()) {
+        return $context.safari
+          ? $context.safari.items.location.href
+          : undefined;
+      }
+      return undefined;
     }
-  }
+  },
+  time = {
+    getUnixTime: () => {
+      return new Date().getTime();
+    },
+    getSecondUnixTime: () => {
+      return Math.round(new Date().getTime() / 1000);
+    }
+  };
+module.exports = {
+  getUUID: () => {
+    return $text.uuid;
+  },
+  http,
+  share,
+  time
 };

@@ -17,6 +17,7 @@ class Core {
     this.AppScheme = require("AppScheme");
 
     this.Http = require("./lib").Http;
+    this.$ = require("./$");
     this.MOD_ID = modId;
     this.MOD_NAME = modName ?? "core";
     this.MOD_VERSION = version ?? 1;
