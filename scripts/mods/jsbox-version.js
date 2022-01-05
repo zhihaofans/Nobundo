@@ -1,3 +1,67 @@
+class ApiTest {
+  constructor(core) {
+    this.Core = core;
+    this.$ = core.$;
+  }
+  init() {
+    this.httpHead();
+  }
+  async httpHead() {
+    const result = await this.$.http.head({
+      url: "https://www.httpbin.org/image/jpeg"
+    });
+    $console.warn(result.response);
+  }
+}
+
+class UiTest {
+  constructor(name) {
+    this.NAME = name;
+  }
+  init() {
+    $ui.push({
+      props: {
+        title: ""
+      },
+      views: [
+        {
+          type: "list",
+          props: {
+            data: [
+              {
+                title: "Default",
+                rows: [
+                  {
+                    type: "progress",
+                    props: {
+                      id: "progress1",
+                      value: 0.5
+                    },
+                    layout: function (make, view) {
+                      make.centerY.equalTo(view.super);
+                      make.left.right.inset(20);
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (_sender, indexPath, _data) => {
+              const section = indexPath.section;
+              const row = indexPath.row;
+            }
+          }
+        }
+      ]
+    });
+    $console.warn($("progress1").value);
+    $("progress1").value = 0.9;
+    $console.warn($("progress1").value);
+  }
+}
+
 class v2_19_0 {
   constructor() {}
   init() {
@@ -163,14 +227,24 @@ const { Core } = require("../../Core.js/core"),
       version: "2.19.0",
       classObject: v2_19_0,
       index: "init"
+    },
+    {
+      version: "ui测试",
+      classObject: UiTest,
+      index: "init"
+    },
+
+    {
+      version: "api测试",
+      classObject: ApiTest,
+      index: "init",
+      needCore: true
     }
   ];
 
 class Main {
   constructor(core) {
-    this.core = core;
-    this.kernel = core.kernel;
-    this.http = new core.$_.Http();
+    this.Core = core;
   }
   init() {
     const main_view_list = versionList.map(v =>
@@ -178,10 +252,12 @@ class Main {
       ),
       didSelect = (sender, indexPath, data) => {
         const thisVer = versionList[indexPath.row],
-          versionClass = new thisVer.classObject();
+          versionClass = new thisVer.classObject(
+            thisVer.needCore == true ? this.Core : undefined
+          );
         versionClass[thisVer.index]();
       };
-    listKit.pushString(this.core.MOD_NAME, main_view_list, didSelect);
+    listKit.pushString(this.Core.MOD_NAME, main_view_list, didSelect);
   }
 }
 
@@ -194,7 +270,6 @@ class Version extends Core {
       author: "zhihaofans",
       needCoreVersion: 3
     });
-    this.kernel = kernel;
   }
   run() {
     const main = new Main(this);
