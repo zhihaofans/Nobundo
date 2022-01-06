@@ -8,7 +8,7 @@ class ApiTest {
   }
   async httpHead() {
     const result = await this.$.http.head({
-      url: "https://www.httpbin.org/image/jpeg"
+      url: "https://www.httpbin.org/get"
     });
     $console.warn(result.response);
   }

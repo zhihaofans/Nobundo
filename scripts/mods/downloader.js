@@ -9,17 +9,97 @@ class Main {
     this.$ = core.$;
   }
   init() {
-    const mainViewList = ["example 1"],
+    const mainViewList = ["example 1", "下载"],
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
           case 0:
             this.downloadImage();
+            break;
+          case 1:
+            this.inputUrl();
             break;
           default:
         }
       };
 
     listKit.pushString(this.Core.MOD_NAME, mainViewList, didSelect);
+  }
+  inputUrl() {
+    $input.text({
+      type: $kbType.text,
+      placeholder: "请输入链接",
+      text: "",
+      handler: input => {
+        if (input.length > 0) {
+          const links = $detector.link(input);
+          if (links.length > 0) {
+            const url = links[0];
+            $console.warn(url);
+            $ui.alert({
+              title: "自动检测链接类型吗",
+              message: "",
+              actions: [
+                {
+                  title: "检测",
+                  disabled: false, // Optional
+                  handler: () => {
+                    this.checkUrl(url);
+                  }
+                },
+                {
+                  title: "手动",
+                  disabled: true, // Optional
+                  handler: () => {}
+                },
+                {
+                  title: "取消",
+                  disabled: false, // Optional
+                  handler: () => {}
+                }
+              ]
+            });
+          } else {
+            $ui.error("找不到链接");
+          }
+        } else {
+          $ui.error("请输入链接");
+        }
+      }
+    });
+  }
+  async checkUrl(url) {
+    const headResult = await this.$.http.head({
+        url
+      }),
+      resp = headResult.response;
+    if (resp.statusCode == 200) {
+      const MIMEType = resp.MIMEType.toLowerCase(),
+        suggestedFilename = resp.suggestedFilename;
+      switch (true) {
+        case MIMEType.startsWith("image/"):
+          this.showDownloadView({
+            url
+          });
+          break;
+        default:
+          $ui.alert({
+            title: "检测不到支持的格式",
+            message: MIMEType,
+            actions: [
+              {
+                title: "手动",
+                disabled: true, // Optional
+                handler: () => {}
+              },
+              {
+                title: "取消"
+              }
+            ]
+          });
+      }
+    } else {
+      $ui.error("错误代码");
+    }
   }
   downloadImage() {
     this.showDownloadView({
