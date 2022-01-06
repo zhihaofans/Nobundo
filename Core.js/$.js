@@ -1,4 +1,12 @@
-const http = {
+const alert = {
+    show: ({ title, message }) => {
+      $ui.alert({
+        title,
+        message
+      });
+    }
+  },
+  http = {
     get: async ({ url, header, timeout }) => {
       return await $http.get({
         url: url,
@@ -66,6 +74,7 @@ const http = {
     }
   };
 module.exports = {
+  alert,
   getUUID: () => {
     return $text.uuid;
   },
