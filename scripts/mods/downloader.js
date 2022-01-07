@@ -73,18 +73,20 @@ class Main {
       }),
       resp = headResult.response;
     if (resp.statusCode == 200) {
-      const MIMEType = resp.MIMEType.toLowerCase(),
+      const mimeType = resp.MIMEType.toLowerCase(),
         suggestedFilename = resp.suggestedFilename;
       switch (true) {
-        case MIMEType.startsWith("image/"):
+        case mimeType.startsWith("image/"):
           this.showDownloadView({
-            url
+            url,
+            mimeType,
+            fileName: suggestedFilename
           });
           break;
         default:
           $ui.alert({
             title: "检测不到支持的格式",
-            message: MIMEType,
+            message: mimeType,
             actions: [
               {
                 title: "手动",
@@ -107,7 +109,17 @@ class Main {
         "https://images.apple.com/v/ios/what-is/b/images/performance_large.jpg"
     });
   }
-  showDownloadView({ url }) {
+  showDownloadView({ url, mimeType, filrName }) {
+    const imageMimetypeList = {
+        "image/gif": "gif",
+        "image/png": "png",
+        "image/jpeg": "jpg",
+        "image/bmp": "bmp",
+        "image/webp": "webp"
+      },
+      hasType = Object.keys(imageMimetypeList).indexOf(mimeType) >= 0,
+      imageType = hasType ? imageMimetypeList[mimeType] : "jpg";
+
     $ui.push({
       props: {
         title: ""
@@ -158,7 +170,7 @@ class Main {
                   const finishTime = this.$.time.getUnixTime();
                   $console.warn(`下载用了${finishTime - startTime}ms`);
                   $quicklook.open({
-                    type: "jpg",
+                    type: imageType,
                     data: resp.data
                   });
                 }
