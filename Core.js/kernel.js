@@ -60,16 +60,16 @@ class Kernel {
     });
     $app.strings = result;
   }
-  registerCoreMod(ModCore) {
-    if (typeof ModCore.run === "function") {
-      const needUpdateCore = ModCore.checkCoreVersion();
+  registerCoreMod(modCore) {
+    if (typeof modCore.run === "function") {
+      const needUpdateCore = modCore.checkCoreVersion();
       if (needUpdateCore == 0) {
-        this.REG_CORE_MOD_LIST.push(ModCore);
+        this.REG_CORE_MOD_LIST.push(modCore);
       } else {
         this.error("registerCoreMod", "need update mod");
         $ui.alert({
           title: "registerCoreMod",
-          message: `need update mod(${needUpdateCore},${ModCore.MOD_NAME})`,
+          message: `need update mod(${needUpdateCore},${modCore.MOD_NAME})`,
           actions: [
             {
               title: "OK",
