@@ -63,6 +63,9 @@ const alert = {
           : undefined;
       }
       return undefined;
+    },
+    getText: () => {
+      return $context.text;
     }
   },
   time = {
