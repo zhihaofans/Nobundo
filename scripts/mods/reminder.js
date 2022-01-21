@@ -73,28 +73,51 @@ class Main {
       placeholder: "",
       text: "",
       handler: text => {
-        if(){
-          const menuResult = await $ui.menu(["今晚8点", "今晚9点"]);
-              //menuResult.index , menuResult.title
-              switch (menuResult.index) {
+        if (text.length > 0) {
+          const nowDate = new Date();
+          $ui.menu({
+            items: ["今晚8点", "今晚9点"],
+            handler: (title, idx) => {
+              switch (idx) {
                 case 0:
                   this.ReminderLib.create({
-                    title,
-                    alarmDate,
+                    title: text,
+                    alarmDate: new Date(
+                      `${nowDate.getFullYear()}-${
+                        nowDate.getMonth() + 1
+                      }-${nowDate.getDate()}T20:00:00`
+                    ),
                     notes,
                     url,
-                    handler
+                    handler: resp => {
+                      $console.info(resp);
+                    }
+                  });
+                case 1:
+                  this.ReminderLib.create({
+                    title: text,
+                    alarmDate: new Date(
+                      `${nowDate.getFullYear()}-${
+                        nowDate.getMonth() + 1
+                      }-${nowDate.getDate()}T21:00:00`
+                    ),
+                    notes,
+                    url,
+                    handler: resp => {
+                      $console.info(resp);
+                    }
                   });
                   break;
-                default:
               }
+            },
+            finished: cancelled => {
+              JSON.stringify;
             }
-        }else{
-          
+          });
         }
       }
     });
-    
+  }
 }
 
 class Reminder extends Core {
