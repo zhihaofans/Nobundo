@@ -7,9 +7,10 @@ class Main {
     this.Kernel = core.kernel;
     this.Http = new core.Http(5);
     this.$ = core.$;
+    this.isShare = core.$.share.isAction();
   }
   init() {
-    const mainViewList = ["example 1", "下载"],
+    const mainViewList = ["example 1", "开始下载"],
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
           case 0:
@@ -23,6 +24,32 @@ class Main {
       };
 
     listKit.pushString(this.Core.MOD_NAME, mainViewList, didSelect);
+    if (this.isShare) {
+      this.loadShare();
+    }
+  }
+  loadShare() {
+    const shareUrl = this.$.share.getLink(),
+      shareText = this.$.share.getText(),
+      linkList = $detector.link(shareUrl);
+    if (linkList.length >= 0) {
+      $ui.alert({
+        title: "分享了链接",
+        message: "是否解析",
+        actions: [
+          {
+            title: "是",
+            disabled: false, // Optional
+            handler: () => {
+              this.checkUrl(linkList[0]);
+            }
+          },
+          {
+            title: "否"
+          }
+        ]
+      });
+    }
   }
   inputUrl() {
     $input.text({
@@ -68,7 +95,8 @@ class Main {
     });
   }
   async checkUrl(url) {
-    const headResult = await this.$.http.head({
+    const startQueryTime = 0,
+      headResult = await this.$.http.head({
         url
       }),
       resp = headResult.response;
@@ -109,7 +137,7 @@ class Main {
         "https://images.apple.com/v/ios/what-is/b/images/performance_large.jpg"
     });
   }
-  showDownloadView({ url, mimeType, filrName }) {
+  showDownloadView({ url, mimeType, fileName }) {
     const imageMimetypeList = {
         "image/gif": "gif",
         "image/png": "png",
@@ -159,7 +187,7 @@ class Main {
                 url: url,
                 showsProgress: true, // Optional, default is true
                 backgroundFetch: true, // Optional, default is false
-                progress: function (bytesWritten, totalBytes) {
+                progress: (bytesWritten, totalBytes) => {
                   const percentage = (bytesWritten * 1.0) / totalBytes;
                   $("progress_download").value = percentage;
                   $console.warn(percentage);
@@ -167,8 +195,8 @@ class Main {
                 handler: resp => {
                   //                  $share.sheet(resp.data);
                   $("progress_download").progressColor = $color("#008000");
-                  const finishTime = this.$.time.getUnixTime();
-                  $console.warn(`下载用了${finishTime - startTime}ms`);
+                  const finishDownloadTime = this.$.time.getUnixTime();
+                  $console.warn(`下载用了${finishDownloadTime - startTime}ms`);
                   $quicklook.open({
                     type: imageType,
                     data: resp.data

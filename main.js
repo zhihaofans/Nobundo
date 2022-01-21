@@ -3,8 +3,8 @@ try {
 } catch (error) {
   $console.error(error);
   $ui.alert({
-    title: error.name,
-    message: error.message,
+    title: "app.run error",
+    message: `[${error.name}]${error.message}`,
     actions: [
       {
         title: "EXIT",
