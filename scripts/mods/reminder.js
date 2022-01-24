@@ -6,6 +6,26 @@ const { Core } = require("../../Core.js/core"),
   listKit = new uiKit.ListKit();
 class ReminderLib {
   constructor() {}
+  editEvent(event, handler) {
+    $ui.alert({
+      title: event.title,
+      message: `提醒时间:${event.alarmDate}\n描述:${event.description}\nUrl:${event.url}`,
+      actions: [
+        {
+          title: "删除",
+          handler: () => {
+            $reminder.delete({
+              event,
+              handler
+            });
+          }
+        },
+        {
+          title: "取消"
+        }
+      ]
+    });
+  }
   deleteEvent(event, handler) {
     $ui.alert({
       title: event.title,
@@ -46,7 +66,17 @@ class ReminderLib {
                       this.deleteEvent(thisEvents, resp => {
                         $console.info(resp.status == 1 ? resp : resp.error);
                         if (resp.status == 1) {
-                          $(listviewId).remove();
+                          $ui.alert({
+                            title: "成功",
+                            message: "请手动退出页面刷新",
+                            actions: [
+                              {
+                                title: "",
+                                disabled: false,
+                                handler: () => {}
+                              }
+                            ]
+                          });
                         } else {
                           const error = resp.error;
                           $ui.alert({
@@ -56,9 +86,7 @@ class ReminderLib {
                               {
                                 title: "好的",
                                 disabled: false,
-                                handler: () => {
-                                  $ui.get(listviewId).remove();
-                                }
+                                handler: () => {}
                               }
                             ]
                           });
