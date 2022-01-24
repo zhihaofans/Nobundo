@@ -88,7 +88,6 @@ class Main {
                   this.ReminderLib.create({
                     title: text,
                     alarmDate: new Date(year, month - 1, date, 20),
-
                     handler: resp => {
                       $console.info(resp);
                       if (resp.status == 1 && resp.error == null) {
@@ -103,7 +102,6 @@ class Main {
                   this.ReminderLib.create({
                     title: text,
                     alarmDate: new Date(year, month - 1, date, 21),
-
                     handler: resp => {
                       $console.info(resp);
                       if (resp.status == 1 && resp.error == null) {
@@ -117,7 +115,7 @@ class Main {
               }
             },
             finished: cancelled => {
-              JSON.stringify;
+              $console.info(`cancel:${cancelled}`);
             }
           });
         }
