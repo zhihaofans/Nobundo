@@ -3,14 +3,22 @@ const { Core } = require("../../Core.js/core"),
   listKit = new uiKit.ListKit();
 class ReminderLib {
   constructor() {}
-  init() {
+  showEvents({ hours }) {
     $reminder.fetch({
       startDate: new Date(),
-      hours: 2 * 24,
+      hours,
       handler: resp => {
         $console.warn(resp);
         if (resp.status == true) {
-          const events = resp.events;
+          const events = resp.events,
+            didSelect = (sender, indexPath, data) => {
+              const thisEvents = events[indexPath.row];
+            };
+          listKit.pushString(
+            `提醒事项(共${events.length}个)`,
+            events.map(event => event.title),
+            didSelect
+          );
         } else {
           $ui.alert({
             title: "加载提醒事项错误",
@@ -46,10 +54,13 @@ class Main {
     this.ReminderLib = new ReminderLib();
   }
   init() {
-    const mainViewList = ["快速添加"],
+    const mainViewList = ["查看所有", "快速添加"],
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
           case 0:
+            this.showEvents();
+            break;
+          case 1:
             this.quickCreate();
             break;
           default:
@@ -73,7 +84,7 @@ class Main {
       year = nowDate.getFullYear(),
       month = nowDate.getMonth() + 1,
       date = nowDate.getDate();
-    $console.warn(`${year}-${month}-${date}`);
+    $console.info(`${year}-${month}-${date}`);
     $input.text({
       type: $kbType.text,
       placeholder: "",
@@ -118,6 +129,19 @@ class Main {
               $console.info(`cancel:${cancelled}`);
             }
           });
+        }
+      }
+    });
+  }
+  showEvents() {
+    $ui.menu({
+      items: ["查看48小时内的提醒"],
+      handler: (title, idx) => {
+        switch (idx) {
+          case 0:
+            this.ReminderLib.showEvents({ hours: 48 });
+            break;
+          default:
         }
       }
     });
