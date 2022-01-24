@@ -3,6 +3,7 @@ const { Core } = require("../../Core.js/core"),
   listKit = new uiKit.ListKit();
 class ReminderLib {
   constructor() {}
+  editEvent(event) {}
   showEvents({ hours }) {
     $reminder.fetch({
       startDate: new Date(),
@@ -13,6 +14,16 @@ class ReminderLib {
           const events = resp.events,
             didSelect = (sender, indexPath, data) => {
               const thisEvents = events[indexPath.row];
+              $console.info(thisEvents);
+              $ui.menu({
+                items: ["编辑", "删除"],
+                handler: function (title, idx) {
+                  switch (idx) {
+                    case 0:
+                      break;
+                  }
+                }
+              });
             };
           listKit.pushString(
             `提醒事项(共${events.length}个)`,
@@ -141,7 +152,6 @@ class Main {
           case 0:
             this.ReminderLib.showEvents({ hours: 48 });
             break;
-          default:
         }
       }
     });
