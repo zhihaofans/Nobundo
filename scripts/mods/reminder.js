@@ -1,10 +1,33 @@
+const $ = require("../../Core.js/$");
+const ui = require("../../Core.js/ui");
+
 const { Core } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 class ReminderLib {
   constructor() {}
-  editEvent(event) {}
+  deleteEvent(event, handler) {
+    $ui.alert({
+      title: event.title,
+      message: `提醒时间:${event.alarmDate}\n描述:${event.description}\nUrl:${event.url}`,
+      actions: [
+        {
+          title: "删除",
+          handler: () => {
+            $reminder.delete({
+              event,
+              handler
+            });
+          }
+        },
+        {
+          title: "取消"
+        }
+      ]
+    });
+  }
   showEvents({ hours }) {
+    const listviewId = "list_reminder_event";
     $reminder.fetch({
       startDate: new Date(),
       hours,
@@ -12,24 +35,46 @@ class ReminderLib {
         $console.warn(resp);
         if (resp.status == true) {
           const events = resp.events,
-            didSelect = (sender, indexPath, data) => {
-              const thisEvents = events[indexPath.row];
+            handler = (section, row) => {
+              const thisEvents = events[row];
               $console.info(thisEvents);
               $ui.menu({
                 items: ["编辑", "删除"],
-                handler: function (title, idx) {
+                handler: (title, idx) => {
                   switch (idx) {
-                    case 0:
+                    case 1:
+                      this.deleteEvent(thisEvents, resp => {
+                        $console.info(resp.status == 1 ? resp : resp.error);
+                        if (resp.status == 1) {
+                          $(listviewId).remove();
+                        } else {
+                          const error = resp.error;
+                          $ui.alert({
+                            title: `错误代码${error.code}`,
+                            message: error.localizedDescription,
+                            actions: [
+                              {
+                                title: "好的",
+                                disabled: false,
+                                handler: () => {
+                                  $ui.get(listviewId).remove();
+                                }
+                              }
+                            ]
+                          });
+                        }
+                      });
                       break;
                   }
                 }
               });
             };
-          listKit.pushString(
-            `提醒事项(共${events.length}个)`,
-            events.map(event => event.title),
-            didSelect
-          );
+          listKit.pushIndex({
+            id: listviewId,
+            title: `提醒事项(共${events.length}个)`,
+            data: events.map(event => event.title),
+            handler
+          });
         } else {
           $ui.alert({
             title: "加载提醒事项错误",
