@@ -32,10 +32,16 @@ class LongClickKit {
   }
 }
 class ViewKit {
-  constructor({ view_id, title, navButtons }) {
-    this.VIEW_ID = view_id;
+  constructor({ viewId, title, navButtons }) {
+    this.VIEW_ID = viewId;
     this.TITLE = title;
     this.NAV_BUTTONS = navButtons;
+  }
+  setTitle(newTitle) {
+    this.TITLE = newTitle;
+  }
+  setNavbutton(newNavbutton) {
+    this.NAV_BUTTONS = newNavbutton;
   }
   pushView(views) {
     $ui.push({
@@ -43,7 +49,26 @@ class ViewKit {
         title: this.TITLE,
         navButtons: this.NAV_BUTTONS
       },
-      views: views,
+      views,
+      events: {
+        appeared: () => {
+          $app.tips("这是第一次加载完毕会出现的提示");
+        },
+        shakeDetected: () => {
+          //摇一摇￼
+          $app.tips("这是摇一摇会出现的提示");
+        }
+      }
+    });
+  }
+  pushViewNew({ id, views }) {
+    $ui.push({
+      props: {
+        id,
+        title: this.TITLE,
+        navButtons: this.NAV_BUTTONS
+      },
+      views,
       events: {
         appeared: () => {
           $app.tips("这是第一次加载完毕会出现的提示");
@@ -77,6 +102,16 @@ class ViewKit {
     });
   }
 }
+// ListViewKit 为测试功能
+class ListViewKit {
+  constructor() {
+    this.UiKit = new ViewKit({
+      viewId: "",
+      title: `ListView_${$text.uuid}`,
+      navButtons: null
+    });
+  }
+}
 class ListKit extends ViewKit {
   constructor() {
     super({
@@ -101,7 +136,7 @@ class ListKit extends ViewKit {
       }
     ]);
   }
-  // pushIdx() is alpha function for test
+  // pushIdx() 为测试功能
   pushIdx(title, listData, _handler = (section, row) => {}) {
     this.TITLE = title;
     this.pushView([
@@ -114,12 +149,34 @@ class ListKit extends ViewKit {
         },
         layout: $layout.fill,
         events: {
-          didSelect: (_sender, indexPath, _data) => {
-            _handler(indexPath.section, indexPath.row);
+          didSelect: (sender, indexPath, _data) => {
+            handler(indexPath.section, indexPath.row);
           }
         }
       }
     ]);
+  }
+  pushIndex({ id, title, data, handler = (section, row) => {} }) {
+    this.TITLE = title;
+    this.pushViewNew({
+      views: [
+        {
+          type: "list",
+          props: {
+            id,
+            autoRowHeight: true,
+            estimatedRowHeight: 10,
+            data
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (_sender, indexPath, _data) => {
+              handler(indexPath.section, indexPath.row);
+            }
+          }
+        }
+      ]
+    });
   }
   pushStringWithLongclick(
     title,
@@ -274,5 +331,6 @@ module.exports = {
   ListKit,
   LongClickKit,
   ImageKit,
-  InputKit
+  InputKit,
+  ListViewKit
 };
