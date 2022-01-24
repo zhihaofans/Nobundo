@@ -28,6 +28,7 @@ class ReminderLib {
     });
   }
   create({ title, alarmDate, notes, url, handler = resp => {} }) {
+    $console.warn(alarmDate);
     $reminder.create({
       title,
       alarmDate,
@@ -68,13 +69,17 @@ class Main {
     listKit.pushString(this.Core.MOD_NAME, mainViewList, didSelect);
   }
   async quickCreate() {
+    const nowDate = new Date(),
+      year = nowDate.getFullYear(),
+      month = nowDate.getMonth() + 1,
+      date = nowDate.getDate();
+    $console.warn(`${year}-${month}-${date}`);
     $input.text({
       type: $kbType.text,
       placeholder: "",
       text: "",
       handler: text => {
         if (text.length > 0) {
-          const nowDate = new Date();
           $ui.menu({
             items: ["今晚8点", "今晚9点"],
             handler: (title, idx) => {
@@ -82,29 +87,30 @@ class Main {
                 case 0:
                   this.ReminderLib.create({
                     title: text,
-                    alarmDate: new Date(
-                      `${nowDate.getFullYear()}-${
-                        nowDate.getMonth() + 1
-                      }-${nowDate.getDate()}T20:00:00`
-                    ),
-                    notes,
-                    url,
+                    alarmDate: new Date(year, month - 1, date, 20),
+
                     handler: resp => {
                       $console.info(resp);
+                      if (resp.status == 1 && resp.error == null) {
+                        $ui.success("添加成功");
+                      } else {
+                        $ui.error("添加失败");
+                      }
                     }
                   });
+                  break;
                 case 1:
                   this.ReminderLib.create({
                     title: text,
-                    alarmDate: new Date(
-                      `${nowDate.getFullYear()}-${
-                        nowDate.getMonth() + 1
-                      }-${nowDate.getDate()}T21:00:00`
-                    ),
-                    notes,
-                    url,
+                    alarmDate: new Date(year, month - 1, date, 21),
+
                     handler: resp => {
                       $console.info(resp);
+                      if (resp.status == 1 && resp.error == null) {
+                        $ui.success("添加成功");
+                      } else {
+                        $ui.error("添加失败");
+                      }
                     }
                   });
                   break;
