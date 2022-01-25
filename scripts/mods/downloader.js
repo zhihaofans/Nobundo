@@ -1,3 +1,5 @@
+const $ = require("../../Core.js/$");
+
 const { Core } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
@@ -5,7 +7,6 @@ class Main {
   constructor(core) {
     this.Core = core;
     this.Kernel = core.kernel;
-    this.Http = new core.Http(5);
     this.$ = core.$;
     this.isShare = core.$.share.isAction();
   }
@@ -158,7 +159,7 @@ class Main {
           props: {
             data: [
               {
-                title: "Default",
+                title: "下载进度",
                 rows: [
                   {
                     type: "progress",
@@ -169,6 +170,29 @@ class Main {
                     layout: (make, view) => {
                       make.centerY.equalTo(view.super);
                       make.left.right.inset(20);
+                    }
+                  },
+                  {
+                    type: "label",
+                    props: {
+                      id: "label_download",
+                      text: "0.00%",
+                      align: $align.center
+                    },
+                    layout: function (make, view) {
+                      make.center.equalTo(view.super);
+                    }
+                  },
+                  {
+                    type: "button",
+                    props: {
+                      id: "button_share",
+                      title: "分享",
+                      hidden: true,
+                      icon: $icon("022", $color("white"), $size(20, 20))
+                    },
+                    layout: function (make, view) {
+                      make.center.equalTo(view.super);
                     }
                   }
                 ]
@@ -189,14 +213,20 @@ class Main {
                 backgroundFetch: true, // Optional, default is false
                 progress: (bytesWritten, totalBytes) => {
                   const percentage = (bytesWritten * 1.0) / totalBytes;
-                  $("progress_download").value = percentage;
+                  $ui.get("progress_download").value = percentage;
+                  $ui.get("label_download").text = `${Math.round(
+                    percentage * 100
+                  )}%`;
                   $console.warn(percentage);
                 },
                 handler: resp => {
-                  //                  $share.sheet(resp.data);
-                  $("progress_download").progressColor = $color("#008000");
+                  //$share.sheet(resp.data);
                   const finishDownloadTime = this.$.time.getUnixTime();
+                  $ui.get("progress_download").progressColor = $color(
+                    "#008000"
+                  );
                   $console.warn(`下载用了${finishDownloadTime - startTime}ms`);
+                  $ui.get("button_share").hidden = false;
                   $quicklook.open({
                     type: imageType,
                     data: resp.data
