@@ -1,4 +1,5 @@
-const alert = {
+const $VERSION$ = "1",
+  alert = {
     show: ({ title, message }) => {
       $ui.alert({
         title,
@@ -98,5 +99,6 @@ module.exports = {
   },
   http,
   share,
-  time
+  time,
+  $VERSION$
 };
