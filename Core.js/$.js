@@ -90,6 +90,21 @@ const $VERSION$ = "1",
         seconds || 0,
         milliseconds || 0
       );
+    },
+    getTomorrowWhatTimeDate: ({ hours, minutes, seconds, milliseconds }) => {
+      const nowDate = new Date(),
+        todayYear = nowDate.getFullYear(),
+        todayMonth = nowDate.getMonth() + 1,
+        todayDate = nowDate.getDate();
+      return new Date(
+        todayYear,
+        todayMonth - 1,
+        todayDate + 1,
+        hours || 0,
+        minutes || 0,
+        seconds || 0,
+        milliseconds || 0
+      );
     }
   };
 module.exports = {
