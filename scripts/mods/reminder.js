@@ -135,6 +135,7 @@ class Main {
   constructor(core) {
     this.Core = core;
     this.Kernel = core.kernel;
+    this.$ = this.Core.$;
     this.ReminderLib = new ReminderLib();
   }
   init() {
@@ -183,7 +184,7 @@ class Main {
                 case 0:
                   this.ReminderLib.create({
                     title: text,
-                    alarmDate: new Date(year, month - 1, date, 20),
+                    alarmDate: this.$.time.getTodayWhatTimeDate({ hours: 20 }),
                     handler: resp => {
                       $console.info(resp);
                       if (resp.status == 1 && resp.error == null) {
@@ -198,7 +199,7 @@ class Main {
                 case 1:
                   this.ReminderLib.create({
                     title: text,
-                    alarmDate: new Date(year, month - 1, date, 21),
+                    alarmDate: this.$.time.getTodayWhatTimeDate({ hours: 21 }),
                     handler: resp => {
                       $console.info(resp);
                       if (resp.status == 1 && resp.error == null) {
@@ -213,7 +214,7 @@ class Main {
                 case 2:
                   this.ReminderLib.create({
                     title: text,
-                    alarmDate: new Date(year, month - 1, date, 22),
+                    alarmDate: this.$.time.getTodayWhatTimeDate({ hours: 22 }),
                     handler: resp => {
                       $console.info(resp);
                       if (resp.status == 1 && resp.error == null) {
@@ -228,7 +229,7 @@ class Main {
                 case 3:
                   this.ReminderLib.create({
                     title: text,
-                    alarmDate: new Date(year, month - 1, date, 23),
+                    alarmDate: this.$.time.getTodayWhatTimeDate({ hours: 23 }),
                     handler: resp => {
                       $console.info(resp);
                       if (resp.status == 1 && resp.error == null) {
@@ -243,7 +244,9 @@ class Main {
                 case 4:
                   this.ReminderLib.create({
                     title: text,
-                    alarmDate: new Date(year, month - 1, date + 1, 8),
+                    alarmDate: this.$.time.getTomorrowWhatTimeDate({
+                      hours: 8
+                    }),
                     handler: resp => {
                       $console.info(resp);
                       if (resp.status == 1 && resp.error == null) {
