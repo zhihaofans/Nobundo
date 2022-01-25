@@ -176,8 +176,9 @@ class Main {
       handler: text => {
         if (text.length > 0) {
           $ui.menu({
-            items: ["今晚8点", "今晚9点"],
+            items: ["今晚8点", "今晚9点", "今晚10点", "今晚11点", "明早8点"],
             handler: (title, idx) => {
+              $ui.loading(true);
               switch (idx) {
                 case 0:
                   this.ReminderLib.create({
@@ -190,6 +191,7 @@ class Main {
                       } else {
                         $ui.error("添加失败");
                       }
+                      $ui.loading(false);
                     }
                   });
                   break;
@@ -204,6 +206,52 @@ class Main {
                       } else {
                         $ui.error("添加失败");
                       }
+                      $ui.loading(false);
+                    }
+                  });
+                  break;
+                case 2:
+                  this.ReminderLib.create({
+                    title: text,
+                    alarmDate: new Date(year, month - 1, date, 22),
+                    handler: resp => {
+                      $console.info(resp);
+                      if (resp.status == 1 && resp.error == null) {
+                        $ui.success("添加成功");
+                      } else {
+                        $ui.error("添加失败");
+                      }
+                      $ui.loading(false);
+                    }
+                  });
+                  break;
+                case 3:
+                  this.ReminderLib.create({
+                    title: text,
+                    alarmDate: new Date(year, month - 1, date, 23),
+                    handler: resp => {
+                      $console.info(resp);
+                      if (resp.status == 1 && resp.error == null) {
+                        $ui.success("添加成功");
+                      } else {
+                        $ui.error("添加失败");
+                      }
+                      $ui.loading(false);
+                    }
+                  });
+                  break;
+                case 4:
+                  this.ReminderLib.create({
+                    title: text,
+                    alarmDate: new Date(year, month - 1, date + 1, 8),
+                    handler: resp => {
+                      $console.info(resp);
+                      if (resp.status == 1 && resp.error == null) {
+                        $ui.success("添加成功");
+                      } else {
+                        $ui.error("添加失败");
+                      }
+                      $ui.loading(false);
                     }
                   });
                   break;
