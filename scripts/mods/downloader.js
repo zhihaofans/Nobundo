@@ -31,7 +31,7 @@ class Main {
   loadShare() {
     const shareUrl = this.$.share.getLink(),
       shareText = this.$.share.getText(),
-      linkList = $detector.link(shareUrl);
+      linkList = $detector.link(shareUrl).concat($detector.link(shareText));
     if (linkList.length >= 0) {
       $ui.alert({
         title: "分享了链接",
