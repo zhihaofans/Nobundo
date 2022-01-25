@@ -74,6 +74,21 @@ const alert = {
     },
     getSecondUnixTime: () => {
       return Math.round(new Date().getTime() / 1000);
+    },
+    getTodayWhatTimeDate: ({ hours, minutes, seconds, milliseconds }) => {
+      const nowDate = new Date(),
+        todayYear = nowDate.getFullYear(),
+        todayMonth = nowDate.getMonth() + 1,
+        todayDate = nowDate.getDate();
+      return new Date(
+        todayYear,
+        todayMonth - 1,
+        todayDate,
+        hours || 0,
+        minutes || 0,
+        seconds || 0,
+        milliseconds || 0
+      );
     }
   };
 module.exports = {
