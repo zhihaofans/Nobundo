@@ -96,11 +96,13 @@ class Main {
     });
   }
   async checkUrl(url) {
+    $ui.loading(true);
     const startQueryTime = 0,
       headResult = await this.$.http.head({
         url
       }),
       resp = headResult.response;
+    $ui.loading(false);
     if (resp.statusCode == 200) {
       const mimeType = resp.MIMEType.toLowerCase(),
         suggestedFilename = resp.suggestedFilename;
@@ -148,7 +150,6 @@ class Main {
       },
       hasType = Object.keys(imageMimetypeList).indexOf(mimeType) >= 0,
       imageType = hasType ? imageMimetypeList[mimeType] : "jpg";
-
     $ui.push({
       props: {
         title: ""
@@ -177,7 +178,8 @@ class Main {
                     props: {
                       id: "label_download",
                       text: "0.00%",
-                      align: $align.center
+                      align: $align.center,
+                      autoFontSize: true
                     },
                     layout: function (make, view) {
                       make.center.equalTo(view.super);
@@ -187,12 +189,13 @@ class Main {
                     type: "button",
                     props: {
                       id: "button_share",
-                      title: "分享",
+                      title: "预览",
                       hidden: true,
-                      icon: $icon("022", $color("white"), $size(20, 20))
+                      icon: $icon("023", $color("white"), $size(20, 20))
                     },
                     layout: function (make, view) {
                       make.center.equalTo(view.super);
+                      make.size.equalTo($size(100, 40));
                     }
                   }
                 ]
@@ -220,16 +223,23 @@ class Main {
                   $console.warn(percentage);
                 },
                 handler: resp => {
-                  //$share.sheet(resp.data);
                   const finishDownloadTime = this.$.time.getUnixTime();
                   $ui.get("progress_download").progressColor = $color(
                     "#008000"
                   );
-                  $console.warn(`下载用了${finishDownloadTime - startTime}ms`);
+                  $console.warn(
+                    `下载用了${finishDownloadTime - startTime}毫秒`
+                  );
                   $ui.get("button_share").hidden = false;
                   $quicklook.open({
                     type: imageType,
                     data: resp.data
+                  });
+                  $ui.get("button_share").whenTapped(() => {
+                    $quicklook.open({
+                      type: imageType,
+                      data: resp.data
+                    });
                   });
                 }
               });
