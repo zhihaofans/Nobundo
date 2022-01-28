@@ -1,6 +1,3 @@
-const $ = require("../../Core.js/$");
-const ui = require("../../Core.js/ui");
-
 const { Core } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
