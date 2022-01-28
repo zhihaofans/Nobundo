@@ -181,7 +181,7 @@ class Main {
                       align: $align.center,
                       autoFontSize: true
                     },
-                    layout: function (make, view) {
+                    layout: (make, view) => {
                       make.center.equalTo(view.super);
                     }
                   },
@@ -193,7 +193,7 @@ class Main {
                       hidden: true,
                       icon: $icon("023", $color("white"), $size(20, 20))
                     },
-                    layout: function (make, view) {
+                    layout: (make, view) => {
                       make.center.equalTo(view.super);
                       make.size.equalTo($size(100, 40));
                     }
