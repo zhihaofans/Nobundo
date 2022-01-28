@@ -6,6 +6,7 @@ class Main {
     this.Core = core;
     this.Kernel = core.kernel;
     this.Http = new core.Http(5);
+    this.$ = core.$;
   }
   init() {
     const mainViewList = ["example 1"],
@@ -34,7 +35,7 @@ class Example extends Core {
     super({
       kernel: kernel,
       modName: "例子",
-      version: "5",
+      version: "5a",
       author: "zhihaofans",
       needCoreVersion: 3,
       databaseId: "example",
