@@ -5,7 +5,8 @@ const { Kernel } = require("../Core.js/kernel"),
     version: require("./mods/jsbox-version"),
     wallhaven: require("./mods/wallhaven"),
     downloader: require("./mods/downloader"),
-    reminder: require("./mods/reminder")
+    reminder: require("./mods/reminder"),
+    daoshuri: require("./mods/daoshuri")
   },
   ui = require("../Core.js/ui"),
   listKit = new ui.ListKit(),
@@ -26,6 +27,7 @@ class AppKernel extends Kernel {
     this.registerCoreMod(new mods.wallhaven(this));
     this.registerCoreMod(new mods.downloader(this));
     this.registerCoreMod(new mods.reminder(this));
+    this.registerCoreMod(new mods.daoshuri(this));
   }
   init() {
     listKit.renderIdx(
