@@ -111,6 +111,29 @@ class ListViewKit {
       navButtons: null
     });
   }
+  pushViews(views, didSelect = (section, row) => {}) {
+    $ui.push({
+      props: {
+        title: ""
+      },
+      views: [
+        {
+          type: "list",
+          props: {
+            data: views
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (_sender, indexPath, _data) => {
+              const section = indexPath.section;
+              const row = indexPath.row;
+              didSelect();
+            }
+          }
+        }
+      ]
+    });
+  }
 }
 class ListKit extends ViewKit {
   constructor() {
@@ -137,7 +160,7 @@ class ListKit extends ViewKit {
     ]);
   }
   // pushIdx() 为测试功能
-  pushIdx(title, listData, _handler = (section, row) => {}) {
+  pushIdx(title, listData, handler = (section, row) => {}) {
     this.TITLE = title;
     this.pushView([
       {
