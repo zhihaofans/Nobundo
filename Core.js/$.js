@@ -105,6 +105,15 @@ const $VERSION$ = "1",
         seconds || 0,
         milliseconds || 0
       );
+    },
+    pickDate: async () => {
+      return await $picker.date({ props: { mode: 1 } });
+    },
+    pickTime: async () => {
+      return await $picker.date({ props: { mode: 0 } });
+    },
+    pickDateAndTime: async () => {
+      return await $picker.date({ props: { mode: 2 } });
     }
   };
 module.exports = {
