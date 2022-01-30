@@ -63,6 +63,13 @@ class Main {
   async getPastDate() {
     const dateResult = await $picker.date({});
     $console.info(dateResult);
+    if (dateResult) {
+      const result = this.DSR.getIntervalDate(
+        dateResult.getTime(),
+        new Date().getTime()
+      );
+      $console.info(result);
+    }
   }
   testView() {
     const dataPicker = {
