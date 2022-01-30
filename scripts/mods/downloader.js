@@ -11,16 +11,12 @@ class Main {
     this.isShare = core.$.share.isAction();
   }
   init() {
-    const mainViewList = ["example 1", "开始下载"],
+    const mainViewList = ["开始下载"],
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
           case 0:
-            this.downloadImage();
-            break;
-          case 1:
             this.inputUrl();
             break;
-          default:
         }
       };
 
@@ -133,12 +129,6 @@ class Main {
     } else {
       $ui.error("错误代码");
     }
-  }
-  downloadImage() {
-    this.showDownloadView({
-      url:
-        "https://images.apple.com/v/ios/what-is/b/images/performance_large.jpg"
-    });
   }
   showDownloadView({ url, mimeType, fileName }) {
     const imageMimetypeList = {
