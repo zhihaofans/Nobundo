@@ -216,11 +216,14 @@ class Bilibili extends Core {
         message: "",
         actions: [
           {
-            title: "OK",
+            title: "登录",
             disabled: false, // Optional
             handler: () => {
               this.User.login();
             }
+          },
+          {
+            title: "取消"
           }
         ]
       });
