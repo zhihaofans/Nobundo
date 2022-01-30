@@ -26,7 +26,6 @@ class Main {
   constructor(core) {
     this.Core = core;
     this.Kernel = core.kernel;
-    this.Http = new core.Http(5);
     this.$ = core.$;
     this.DSR = new DaoshuriKit();
   }
@@ -42,7 +41,7 @@ class Main {
     listKit.pushString(this.Core.MOD_NAME, mainViewList, didSelect);
   }
   async getPastDate() {
-    const dateResult = await $picker.date({ props: { mode: 1 } });
+    const dateResult = await this.$.time.pickDate();
     if (dateResult) {
       const result = this.DSR.getIntervalDate(
         new Date().getTime(),
@@ -68,14 +67,6 @@ class Main {
         ]
       });
     }
-  }
-  testView() {
-    const dataPicker = {
-      type: "date-picker",
-      layout: make => {
-        make.left.top.right.equalTo(0);
-      }
-    };
   }
 }
 
