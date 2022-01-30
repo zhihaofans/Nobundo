@@ -12,8 +12,6 @@ class DaoshuriKit {
       year2 = date2.getFullYear(),
       month2 = date2.getMonth() + 1,
       day2 = date2.getDate();
-    $console.info(date1);
-    $console.info(date2);
     if (year1 == year2 && month1 == month2 && day1 == day2) {
       return 0;
     }
@@ -33,27 +31,10 @@ class Main {
     this.DSR = new DaoshuriKit();
   }
   init() {
-    const mainViewList = ["过去日期", "过去日期"],
+    const mainViewList = ["选择日期"],
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
           case 0:
-            $ui.alert({
-              title: indexPath.row,
-              message: data,
-              actions: [
-                {
-                  title: "OK",
-                  disabled: false, // Optional
-                  handler: () => {
-                    $console.info(
-                      this.DSR.getIntervalDate(1643430327000, 1643513127000)
-                    );
-                  }
-                }
-              ]
-            });
-            break;
-          case 1:
             this.getPastDate();
             break;
         }
@@ -61,14 +42,31 @@ class Main {
     listKit.pushString(this.Core.MOD_NAME, mainViewList, didSelect);
   }
   async getPastDate() {
-    const dateResult = await $picker.date({});
-    $console.info(dateResult);
+    const dateResult = await $picker.date({ props: { mode: 1 } });
     if (dateResult) {
       const result = this.DSR.getIntervalDate(
-        dateResult.getTime(),
-        new Date().getTime()
+        new Date().getTime(),
+        dateResult.getTime()
       );
-      $console.info(result);
+      let text = "";
+      if (result == 0) {
+        text = "今天";
+      } else if (result < 0) {
+        text = `${result * -1}天前`;
+      } else if (result > 0) {
+        text = `${result}天后`;
+      } else {
+        text = `未知结果：${result}`;
+      }
+      $ui.alert({
+        title: "结果",
+        message: text,
+        actions: [
+          {
+            title: "OK"
+          }
+        ]
+      });
     }
   }
   testView() {
@@ -88,9 +86,9 @@ class Daoshuri extends Core {
       modName: "倒数日",
       version: "1",
       author: "zhihaofans",
-      needCoreVersion: 3,
-      databaseId: "daoshuri",
-      keychainId: "daoshuri"
+      needCoreVersion: 3
+      // databaseId: "daoshuri",
+      // keychainId: "daoshuri"
     });
   }
   run() {
