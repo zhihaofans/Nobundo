@@ -105,16 +105,15 @@ class ViewKit {
 // ListViewKit 为测试功能
 class ListViewKit {
   constructor() {
-    this.UiKit = new ViewKit({
-      viewId: "",
-      title: `ListView_${$text.uuid}`,
-      navButtons: null
-    });
+    this.TITLE = "ListView";
+  }
+  setTitle(newTitle) {
+    this.TITLE = newTitle;
   }
   pushViews(views, didSelect = (section, row) => {}) {
     $ui.push({
       props: {
-        title: ""
+        title: this.TITLE
       },
       views: [
         {
@@ -125,9 +124,7 @@ class ListViewKit {
           layout: $layout.fill,
           events: {
             didSelect: (_sender, indexPath, _data) => {
-              const section = indexPath.section;
-              const row = indexPath.row;
-              didSelect();
+              didSelect(indexPath.section, indexPath.row);
             }
           }
         }
