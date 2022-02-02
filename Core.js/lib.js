@@ -40,7 +40,7 @@ class Http {
     return url ? result : undefined;
   }
   download(url, handler, progress) {
-    const header = { "User-Agent": this.USER_AGENT, cookie: this.COOKIES };
+    const header = { "User-Agent": this.USER_AGENT, "cookie": this.COOKIES };
     $http.download({
       url: url,
       header: header,
