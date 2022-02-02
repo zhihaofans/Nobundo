@@ -41,7 +41,7 @@ class BilibiliApi {
     $console.info(sign);
     return $text.MD5(sign);
   }
-  async getTvLoginQrcode() {
+  getTvLoginQrcode() {
     const url =
         "http://passport.bilibili.com/x/passport-tv-login/qrcode/auth_code",
       header = {},
@@ -59,12 +59,22 @@ class BilibiliApi {
         params
       );
     $console.info({ params, appSec, body });
-    return await this.$.http.post({
+    return this.$.http.post({
       url,
       header,
       timeout,
       body
     });
+  }
+  getWebLoginQrcode() {
+    const url = "http://passport.bilibili.com/qrcode/getLoginUrl",
+      header = {},
+      timeout = 5;
+    return this.$.http.get({
+      url,
+      header,
+      timeout
+    }).data;
   }
 }
 
