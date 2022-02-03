@@ -13,6 +13,31 @@ class User {
         qrcodeUrl = qrcodeData.url,
         oauthKey = qrcodeData.oauthKey,
         qrcodeImage = $qrcode.encode(qrcodeUrl);
+      $ui.push({
+        props: {
+          title: ""
+        },
+        views: [
+          {
+            type: "list",
+            props: {
+              data: [
+                {
+                  type: "image",
+                  props: {
+                    data: qrcodeImage.png
+                  },
+                  layout: (make, view) => {
+                    make.center.equalTo(view.super);
+                    make.size.equalTo($size(50, 50));
+                  }
+                }
+              ]
+            },
+            layout: $layout.fill
+          }
+        ]
+      });
     } else {
     }
   }
