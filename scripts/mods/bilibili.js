@@ -1,6 +1,12 @@
 const { Core } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
+class User {
+  constructor({ core }) {
+    this.Core = core;
+    this.API = new BilibiliApi({ core });
+  }
+}
 class BilibiliApi {
   constructor({ core }) {
     this.Core = core;
@@ -82,12 +88,12 @@ class Main {
   constructor(core) {
     this.Core = core;
     this.Kernel = core.kernel;
-    this.Http = new core.Http(5);
-    this.$ = core.$;
     this.Api = new BilibiliApi({
       core
     });
+    this.User = new User({ core });
   }
+
   async test() {
     const result = await this.Api.getTvLoginQrcode();
     $console.warn(result);
