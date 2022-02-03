@@ -19,22 +19,32 @@ class User {
         },
         views: [
           {
-            type: "list",
-            props: {
-              data: [
-                {
-                  type: "image",
-                  props: {
-                    data: qrcodeImage.png
-                  },
-                  layout: (make, view) => {
-                    make.center.equalTo(view.super);
-                    make.size.equalTo($size(50, 50));
-                  }
-                }
-              ]
+            type: "scroll",
+            layout: function (make, view) {
+              make.center.equalTo(view.super);
+              make.size.equalTo($size(100, 500));
             },
-            layout: $layout.fill
+            views: [
+              {
+                type: "image",
+                props: {
+                  data: qrcodeImage.png
+                },
+                layout: function (make, view) {
+                  make.center.equalTo(view.super);
+                  make.size.equalTo($size(100, 100));
+                }
+              },
+              {
+                type: "button",
+                props: {
+                  title: "Click"
+                },
+                layout: function (make, view) {
+                  make.center.equalTo(view.super);
+                }
+              }
+            ]
           }
         ]
       });
@@ -139,20 +149,9 @@ class Main {
     const mainViewList = ["example 1"],
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
-          default:
-            $ui.alert({
-              title: indexPath.row,
-              message: data,
-              actions: [
-                {
-                  title: "OK",
-                  disabled: false, // Optional
-                  handler: () => {
-                    this.User.loginByQrcode();
-                  }
-                }
-              ]
-            });
+          case 0:
+            this.User.loginByQrcode();
+            break;
         }
       };
     listKit.pushString(this.Core.MOD_NAME, mainViewList, didSelect);
