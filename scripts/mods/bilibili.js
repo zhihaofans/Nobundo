@@ -4,7 +4,17 @@ const { Core } = require("../../Core.js/core"),
 class User {
   constructor({ core }) {
     this.Core = core;
-    this.API = new BilibiliApi({ core });
+    this.Api = new BilibiliApi({ core });
+  }
+  async loginByQrcode() {
+    const result = await this.Api.getWebLoginQrcode();
+    if (result.status == true || result.code == 0) {
+      const qrcodeData = result.data,
+        qrcodeUrl = qrcodeData.url,
+        oauthKey = qrcodeData.oauthKey,
+        qrcodeImage = $qrcode.encode(qrcodeUrl);
+    } else {
+    }
   }
 }
 class BilibiliApi {
@@ -72,15 +82,17 @@ class BilibiliApi {
       body
     });
   }
-  getWebLoginQrcode() {
+  async getWebLoginQrcode() {
     const url = "http://passport.bilibili.com/qrcode/getLoginUrl",
       header = {},
-      timeout = 5;
-    return this.$.http.get({
-      url,
-      header,
-      timeout
-    }).data;
+      timeout = 5,
+      result = await this.$.http.get({
+        url,
+        header,
+        timeout
+      });
+    $console.warn(result);
+    return result.data;
   }
 }
 
@@ -111,7 +123,7 @@ class Main {
                   title: "OK",
                   disabled: false, // Optional
                   handler: () => {
-                    this.test();
+                    this.User.loginByQrcode();
                   }
                 }
               ]
