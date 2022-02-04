@@ -19,32 +19,22 @@ class User {
         },
         views: [
           {
-            type: "scroll",
-            layout: function (make, view) {
-              make.center.equalTo(view.super);
-              make.size.equalTo($size(100, 500));
+            type: "list",
+            props: {
+              data: [
+                {
+                  title: "Section 0",
+                  rows: ["0-0", "0-1", "0-2"]
+                }
+              ]
             },
-            views: [
-              {
-                type: "image",
-                props: {
-                  data: qrcodeImage.png
-                },
-                layout: function (make, view) {
-                  make.center.equalTo(view.super);
-                  make.size.equalTo($size(100, 100));
-                }
-              },
-              {
-                type: "button",
-                props: {
-                  title: "Click"
-                },
-                layout: function (make, view) {
-                  make.center.equalTo(view.super);
-                }
+            layout: $layout.fill,
+            events: {
+              didSelect: (_sender, indexPath, _data) => {
+                const section = indexPath.section;
+                const row = indexPath.row;
               }
-            ]
+            }
           }
         ]
       });
@@ -135,15 +125,7 @@ class Main {
   constructor(core) {
     this.Core = core;
     this.Kernel = core.kernel;
-    this.Api = new BilibiliApi({
-      core
-    });
     this.User = new User({ core });
-  }
-
-  async test() {
-    const result = await this.Api.getTvLoginQrcode();
-    $console.warn(result);
   }
   init() {
     const mainViewList = ["example 1"],
