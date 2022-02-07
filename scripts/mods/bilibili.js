@@ -7,15 +7,17 @@ class User {
     this.Api = new BilibiliApi({ core });
   }
   async loginByQrcode() {
+    $ui.loading(true);
     const result = await this.Api.getWebLoginQrcode();
     if (result.status == true || result.code == 0) {
       const qrcodeData = result.data,
         qrcodeUrl = qrcodeData.url,
         oauthKey = qrcodeData.oauthKey,
         qrcodeImage = $qrcode.encode(qrcodeUrl);
+      $ui.loading(false);
       $ui.push({
         props: {
-          title: ""
+          title: "扫描二维码"
         },
         views: [
           {
@@ -23,8 +25,12 @@ class User {
             props: {
               data: [
                 {
-                  title: "Section 0",
-                  rows: ["0-0", "0-1", "0-2"]
+                  title: "点击登录",
+                  rows: ["显示二维码", "已经扫好"]
+                },
+                {
+                  title: "二维码Token",
+                  rows: [oauthKey]
                 }
               ]
             },
@@ -33,12 +39,54 @@ class User {
               didSelect: (_sender, indexPath, _data) => {
                 const section = indexPath.section;
                 const row = indexPath.row;
+                switch (section) {
+                  case 0:
+                    switch (row) {
+                      case 0:
+                        $quicklook.open({
+                          image: qrcodeImage
+                        });
+
+                        break;
+                    }
+                    break;
+                  case 1:
+                    switch (row) {
+                      case 0:
+                        $share.sheet({
+                          items: [
+                            {
+                              name: "bilibili_login_qrcode_web_oauthkey.txt",
+                              data: oauthKey
+                            }
+                          ], // 也支持 item
+                          handler: success => {
+                            $console.warn(success);
+                          }
+                        });
+                        break;
+                    }
+
+                    break;
+                }
               }
             }
           }
         ]
       });
     } else {
+      $ui.loading(false);
+      $ui.alert({
+        title: "登录失败",
+        message: `获取二维码错误，代码${result.code}`,
+        actions: [
+          {
+            title: "OK",
+            disabled: false, // Optional
+            handler: () => {}
+          }
+        ]
+      });
     }
   }
 }
@@ -119,6 +167,7 @@ class BilibiliApi {
     $console.warn(result);
     return result.data;
   }
+  async loginByWebQrcode(token) {}
 }
 
 class Main {
@@ -128,7 +177,7 @@ class Main {
     this.User = new User({ core });
   }
   init() {
-    const mainViewList = ["example 1"],
+    const mainViewList = ["扫描二维码登录"],
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
           case 0:
