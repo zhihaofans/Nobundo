@@ -386,7 +386,7 @@ class User {
     $console.info({ userInfoResult });
     $ui.alert({
       title: "用户信息",
-      message: userInfoResult,
+      message: JSON.parse(userInfoResult),
       actions: [
         {
           title: "OK",
