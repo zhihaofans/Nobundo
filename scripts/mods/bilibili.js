@@ -397,6 +397,26 @@ class User {
     });
   }
 }
+class Vip {
+  constructor({ core }) {
+    this.Core = core;
+    this.$ = core.$;
+    this.User = new User({ core });
+  }
+  async getPrivilegeStatus() {
+    const cookie = this.User.getCookies(),
+      header = { cookie },
+      url = "http://api.bilibili.com/x/vip/privilege/my",
+      timeout = 5,
+      result = await this.$.http.get({
+        url,
+        header,
+        timeout
+      });
+    $console.info({ result });
+    return result.data;
+  }
+}
 class BilibiliApi {
   constructor({ core }) {
     this.Core = core;
