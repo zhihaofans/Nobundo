@@ -17,7 +17,6 @@ class DataStorage {
       switch (type) {
         case this.STORAGE_TYPE.KEYCHAIN:
           return this.Keychain.set(id, data);
-          break;
         default:
           return undefined;
       }
@@ -30,7 +29,18 @@ class DataStorage {
       switch (type) {
         case this.STORAGE_TYPE.KEYCHAIN:
           return this.Keychain.get(id) || defaultData;
-          break;
+        default:
+          return undefined;
+      }
+    } else {
+      return undefined;
+    }
+  }
+  removeData({ type, id }) {
+    if (id.length > 0) {
+      switch (type) {
+        case this.STORAGE_TYPE.KEYCHAIN:
+          return this.Keychain.remove(id);
         default:
           return undefined;
       }
@@ -100,7 +110,7 @@ class User {
 
                         break;
                       case 1:
-                        this.Api.loginByWebQrcode(oauthKey);
+                        this.checkQrcodeStatus(oauthKey);
                         break;
                     }
                     break;
@@ -143,6 +153,17 @@ class User {
       });
     }
   }
+  inputQrcodeOauthkey() {
+    $input.text({
+      type: $kbType.text,
+      placeholder: "请输入二维码token",
+      handler: oauthKey => {
+        if (oauthKey.length > 0) {
+          this.checkQrcodeStatus(oauthKey);
+        }
+      }
+    });
+  }
   async checkQrcodeStatus(token) {
     const oauthKey = this.DS.loadData({
         type: this.DS.STORAGE_TYPE.KEYCHAIN,
@@ -152,15 +173,92 @@ class User {
         type: this.DS.STORAGE_TYPE.KEYCHAIN,
         id: "user.login.qrcode.ts"
       });
+    $console.info({
+      oauthKey,
+      ts,
+      token
+    });
     if (token.length > 0) {
-      if (
-        token !== oauthKey ||
-        this.Core.$.time.getSecondUnixTime() >= ts + 180
-      ) {
+      if (token == oauthKey) {
+        if (this.Core.$.time.getSecondUnixTime() >= ts + 180) {
+          this.DS.removeData({
+            type: this.DS.STORAGE_TYPE.KEYCHAIN,
+            id: "user.login.qrcode.oauthkey"
+          });
+          this.DS.removeData({
+            type: this.DS.STORAGE_TYPE.KEYCHAIN,
+            id: "user.login.qrcode.ts"
+          });
+          $console.error("二维码token过期");
+          return undefined;
+        }
+      } else if (token !== oauthKey) {
+        this.DS.removeData({
+          type: this.DS.STORAGE_TYPE.KEYCHAIN,
+          id: "user.login.qrcode.oauthkey"
+        });
+        this.DS.removeData({
+          type: this.DS.STORAGE_TYPE.KEYCHAIN,
+          id: "user.login.qrcode.ts"
+        });
+        $console.warn("已删除旧二维码token");
       }
-      const result = await this.Api.loginByWebQrcode(token);
-      if (result) {
+      const resp = await this.Api.loginByWebQrcode(token);
+      if (resp.data) {
+        const result = resp.data,
+          response = resp.response;
+        $console.info(result);
+        $console.info(response.headers);
+        if (result.status) {
+          const scanTs = result.ts,
+            setCookie = response.headers["Set-Cookie"];
+          //DedeUserID
+          const DedeUserID_left = setCookie.indexOf("DedeUserID=") + 11,
+            DedeUserID_right = setCookie.indexOf(";", DedeUserID_left + 1),
+            DedeUserID = setCookie.substring(DedeUserID_left, DedeUserID_right);
+          //DedeUserID__ckMd5
+          const DedeUserID__ckMd5_left =
+              setCookie.indexOf("DedeUserID__ckMd5=") + 18,
+            DedeUserID__ckMd5_right = setCookie.indexOf(
+              ";",
+              DedeUserID__ckMd5_left + 1
+            ),
+            DedeUserID__ckMd5 = setCookie.substring(
+              DedeUserID__ckMd5_left,
+              DedeUserID__ckMd5_right
+            );
+          //SESSDATA
+          const SESSDATA_left = setCookie.indexOf("SESSDATA=") + 9,
+            SESSDATA_right = setCookie.indexOf(";", SESSDATA_left + 1),
+            SESSDATA = setCookie.substring(SESSDATA_left, SESSDATA_right);
+          //bili_jct
+          const bili_jct_left = setCookie.indexOf("bili_jct=") + 9,
+            bili_jct_right = setCookie.indexOf(";", bili_jct_left + 1),
+            bili_jct = setCookie.substring(bili_jct_left, bili_jct_right);
+
+          //cookies
+          const cookies = { DedeUserID, DedeUserID__ckMd5, SESSDATA, bili_jct };
+          $console.info({ scanTs, cookies });
+          this.DS.saveData({
+            type: this.DS.STORAGE_TYPE.KEYCHAIN,
+            id: "user.login.cookies",
+            data: JSON.stringify(cookies)
+          });
+        } else {
+          $ui.alert({
+            title: "错误",
+            message: result.message,
+            actions: [
+              {
+                title: "OK",
+                disabled: false,
+                handler: () => {}
+              }
+            ]
+          });
+        }
       } else {
+        return undefined;
       }
     } else {
       return undefined;
@@ -246,19 +344,17 @@ class BilibiliApi {
   }
   async loginByWebQrcode(oauthKey) {
     $console.info(oauthKey);
-    const url = "http://passport.bilibili.com/qrcode/getLoginInfo",
-      header = {},
+    const header = {},
       timeout = 5,
       gourl = "http://www.bilibili.com/",
-      body = { oauthKey, gourl },
+      url = `http://passport.bilibili.com/qrcode/getLoginInfo?oauthKey=${oauthKey}&gourl=${gourl}`,
       result = await this.$.http.post({
         url,
         header,
-        timeout,
-        body
+        timeout
       });
     $console.warn(result);
-    return result.data;
+    return result;
   }
 }
 
@@ -269,11 +365,14 @@ class Main {
     this.User = new User({ core });
   }
   init() {
-    const mainViewList = ["扫描二维码登录"],
+    const mainViewList = ["扫描二维码登录", "手动输入二维码token"],
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
           case 0:
             this.User.loginByQrcode();
+            break;
+          case 1:
+            this.User.inputQrcodeOauthkey();
             break;
         }
       };
