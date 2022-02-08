@@ -30,6 +30,13 @@ const $VERSION$ = "1",
         return undefined;
       }
     },
+    getCookiesStrFromObj: cookiesObj => {
+      let cookiesStr = "";
+      Object.keys(cookiesObj).map(key => {
+        cookiesStr += key + "=" + cookiesObj[key] + ";";
+      });
+      return cookiesStr;
+    },
     head: async ({ url, header, timeout }) => {
       return await $http.request({
         method: "HEAD",
