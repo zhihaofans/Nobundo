@@ -56,7 +56,26 @@ class User {
     this.Api = new BilibiliApi({ core });
     this.DS = new DataStorage(core);
   }
-  async loginByQrcode() {
+  loginByQrcode() {
+    $ui.menu({
+      items: ["网页登录", "电视登录", "手动输入网页二维码token"],
+      handler: (title, idx) => {
+        $console.info({ "ui.menu": { title, idx } });
+        switch (idx) {
+          case 0:
+            this.loginByWebQrcode();
+            break;
+          case 2:
+            this.inputQrcodeOauthkey();
+            break;
+        }
+      },
+      finished: cancelled => {
+        $console.info({ "ui.menu": { cancelled } });
+      }
+    });
+  }
+  async loginByWebQrcode() {
     $ui.loading(true);
     const result = await this.Api.getWebLoginQrcode();
     if (result && result.status == true && result.code == 0) {
@@ -358,17 +377,11 @@ class Main {
     this.User = new User({ core });
   }
   init() {
-    const mainViewList = ["扫描二维码登录", "手动输入二维码token", "电视登录"],
+    const mainViewList = ["扫描二维码登录"],
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
           case 0:
             this.User.loginByQrcode();
-            break;
-          case 1:
-            this.User.inputQrcodeOauthkey();
-            break;
-          case 2:
-            this.User.Api.getTvLoginQrcode();
             break;
         }
       };
