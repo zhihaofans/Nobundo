@@ -76,10 +76,7 @@ class User {
           case 4:
             $ui.alert({
               title: "Cookies",
-              message: this.DS.loadData({
-                type: this.DS.STORAGE_TYPE.KEYCHAIN,
-                id: "user.login.cookies"
-              }),
+              message: this.getCookies(),
               actions: [
                 {
                   title: "OK",
@@ -90,10 +87,7 @@ class User {
                   title: "删除",
                   disabled: false,
                   handler: () => {
-                    const success = this.DS.removeData({
-                      type: this.DS.STORAGE_TYPE.KEYCHAIN,
-                      id: "user.login.cookies"
-                    });
+                    const success = this.removeCookies();
                     $console.info({ success });
                   }
                 }
@@ -322,10 +316,7 @@ class User {
       handler: (title, idx) => {
         switch (idx) {
           case 0:
-            const cookies = this.DS.loadData({
-              type: this.DS.STORAGE_TYPE.KEYCHAIN,
-              id: "user.login.cookies"
-            });
+            const cookies = this.getCookies();
             $ui.alert({
               title: "Cookies",
               message: cookies,
@@ -376,6 +367,34 @@ class User {
       id: "user.login.cookies"
     });
     $console.info({ success });
+  }
+  getCookies() {
+    const cookies = JSON.parse(
+      this.DS.loadData({
+        type: this.DS.STORAGE_TYPE.KEYCHAIN,
+        id: "user.login.cookies"
+      })
+    );
+    $console.info({ cookies });
+    return cookies;
+  }
+  async getUserInfo() {
+    const cookie = this.getCookies(),
+      userInfoResult = await this.Api.getUserInfo(
+        this.Core.$.http.getCookiesStrFromObj(cookie)
+      );
+    $console.info({ userInfoResult });
+    $ui.alert({
+      title: "用户信息",
+      message: userInfoResult,
+      actions: [
+        {
+          title: "OK",
+          disabled: false,
+          handler: () => {}
+        }
+      ]
+    });
   }
 }
 class BilibiliApi {
@@ -462,6 +481,18 @@ class BilibiliApi {
     $console.warn(result);
     return result;
   }
+  async getUserInfo(cookie) {
+    const url = "http://api.bilibili.com/x/web-interface/nav",
+      header = { cookie },
+      timeout = 5,
+      result = await this.$.http.get({
+        url,
+        header,
+        timeout
+      });
+    $console.info({ result });
+    return result.data;
+  }
 }
 
 class Main {
@@ -471,7 +502,7 @@ class Main {
     this.User = new User({ core });
   }
   init() {
-    const mainViewList = ["扫描二维码登录", "查看登录数据"],
+    const mainViewList = ["扫描二维码登录", "查看登录数据", "查看用户信息"],
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
           case 0:
@@ -479,6 +510,9 @@ class Main {
             break;
           case 1:
             this.User.checkLoginCache();
+            break;
+          case 2:
+            this.User.getUserInfo();
             break;
         }
       };
