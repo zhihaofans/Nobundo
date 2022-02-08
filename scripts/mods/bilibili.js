@@ -58,7 +58,13 @@ class User {
   }
   loginByQrcode() {
     $ui.menu({
-      items: ["网页登录", "电视登录", "手动输入网页二维码token"],
+      items: [
+        "网页登录",
+        "电视登录",
+        "手动输入网页二维码token",
+        "手动输入电视二维码token",
+        "查看Cookies"
+      ],
       handler: (title, idx) => {
         $console.info({ "ui.menu": { title, idx } });
         switch (idx) {
@@ -67,6 +73,22 @@ class User {
             break;
           case 2:
             this.inputQrcodeOauthkey();
+            break;
+          case 4:
+            $ui.alert({
+              title: "Cookies",
+              message: this.DS.loadData({
+                type: this.DS.STORAGE_TYPE.KEYCHAIN,
+                id: "user.login.cookies"
+              }),
+              actions: [
+                {
+                  title: "OK",
+                  disabled: false,
+                  handler: () => {}
+                }
+              ]
+            });
             break;
         }
       },
