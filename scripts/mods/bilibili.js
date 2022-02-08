@@ -1,20 +1,71 @@
 const { Core } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
+class DataStorage {
+  constructor(core) {
+    this.Core = core;
+    this.Keychain = core.Keychain;
+    this.STORAGE_TYPE = {
+      CACHE: 0,
+      PREFS: 1,
+      SQLITE: 2,
+      KEYCHAIN: 3
+    };
+  }
+  saveData({ type, id, data }) {
+    if (id.length > 0 && data.length > 0) {
+      switch (type) {
+        case this.STORAGE_TYPE.KEYCHAIN:
+          return this.Keychain.set(id, data);
+          break;
+        default:
+          return undefined;
+      }
+    } else {
+      return undefined;
+    }
+  }
+  loadData({ type, id, defaultData }) {
+    if (id.length > 0) {
+      switch (type) {
+        case this.STORAGE_TYPE.KEYCHAIN:
+          return this.Keychain.get(id) || defaultData;
+          break;
+        default:
+          return undefined;
+      }
+    } else {
+      return undefined;
+    }
+  }
+}
+
 class User {
   constructor({ core }) {
     this.Core = core;
     this.Api = new BilibiliApi({ core });
+    this.DS = new DataStorage(core);
   }
   async loginByQrcode() {
     $ui.loading(true);
     const result = await this.Api.getWebLoginQrcode();
-    if (result.status == true || result.code == 0) {
+    if (result && result.status == true && result.code == 0) {
       const qrcodeData = result.data,
+        ts = result.ts,
         qrcodeUrl = qrcodeData.url,
         oauthKey = qrcodeData.oauthKey,
         qrcodeImage = $qrcode.encode(qrcodeUrl);
       $ui.loading(false);
+      this.DS.saveData({
+        type: this.DS.STORAGE_TYPE.KEYCHAIN,
+        id: "user.login.qrcode.oauthkey",
+        data: oauthKey
+      });
+      this.DS.saveData({
+        type: this.DS.STORAGE_TYPE.KEYCHAIN,
+        id: "user.login.qrcode.oauthkey.ts",
+        data: ts
+      });
       $ui.push({
         props: {
           title: "扫描二维码"
@@ -47,6 +98,9 @@ class User {
                           image: qrcodeImage
                         });
 
+                        break;
+                      case 1:
+                        this.Api.loginByWebQrcode(oauthKey);
                         break;
                     }
                     break;
@@ -87,6 +141,29 @@ class User {
           }
         ]
       });
+    }
+  }
+  async checkQrcodeStatus(token) {
+    const oauthKey = this.DS.loadData({
+        type: this.DS.STORAGE_TYPE.KEYCHAIN,
+        id: "user.login.qrcode.oauthkey"
+      }),
+      ts = this.DS.loadData({
+        type: this.DS.STORAGE_TYPE.KEYCHAIN,
+        id: "user.login.qrcode.ts"
+      });
+    if (token.length > 0) {
+      if (
+        token !== oauthKey ||
+        this.Core.$.time.getSecondUnixTime() >= ts + 180
+      ) {
+      }
+      const result = await this.Api.loginByWebQrcode(token);
+      if (result) {
+      } else {
+      }
+    } else {
+      return undefined;
     }
   }
 }
@@ -167,7 +244,22 @@ class BilibiliApi {
     $console.warn(result);
     return result.data;
   }
-  async loginByWebQrcode(token) {}
+  async loginByWebQrcode(oauthKey) {
+    $console.info(oauthKey);
+    const url = "http://passport.bilibili.com/qrcode/getLoginInfo",
+      header = {},
+      timeout = 5,
+      gourl = "http://www.bilibili.com/",
+      body = { oauthKey, gourl },
+      result = await this.$.http.post({
+        url,
+        header,
+        timeout,
+        body
+      });
+    $console.warn(result);
+    return result.data;
+  }
 }
 
 class Main {
