@@ -66,13 +66,12 @@ class User {
         "查看Cookies"
       ],
       handler: (title, idx) => {
-        $console.info({ "ui.menu": { title, idx } });
         switch (idx) {
           case 0:
             this.loginByWebQrcode();
             break;
           case 2:
-            this.inputQrcodeOauthkey();
+            this.inputWebQrcodeOauthkey();
             break;
           case 4:
             $ui.alert({
@@ -86,6 +85,17 @@ class User {
                   title: "OK",
                   disabled: false,
                   handler: () => {}
+                },
+                {
+                  title: "删除",
+                  disabled: false,
+                  handler: () => {
+                    const success = this.DS.removeData({
+                      type: this.DS.STORAGE_TYPE.KEYCHAIN,
+                      id: "user.login.cookies"
+                    });
+                    $console.info({ success });
+                  }
                 }
               ]
             });
@@ -151,7 +161,7 @@ class User {
 
                         break;
                       case 1:
-                        this.checkQrcodeStatus(oauthKey);
+                        this.checkWebQrcodeStatus(oauthKey);
                         break;
                     }
                     break;
@@ -164,7 +174,7 @@ class User {
                               name: "bilibili_login_qrcode_web_oauthkey.txt",
                               data: oauthKey
                             }
-                          ], // 也支持 item
+                          ],
                           handler: success => {
                             $console.warn(success);
                           }
@@ -194,18 +204,18 @@ class User {
       });
     }
   }
-  inputQrcodeOauthkey() {
+  inputWebQrcodeOauthkey() {
     $input.text({
       type: $kbType.text,
       placeholder: "请输入二维码token",
       handler: oauthKey => {
         if (oauthKey.length > 0) {
-          this.checkQrcodeStatus(oauthKey);
+          this.checkWebQrcodeStatus(oauthKey);
         }
       }
     });
   }
-  async checkQrcodeStatus(token) {
+  async checkWebQrcodeStatus(token) {
     const oauthKey = this.DS.loadData({
         type: this.DS.STORAGE_TYPE.KEYCHAIN,
         id: "user.login.qrcode.oauthkey"
@@ -280,11 +290,12 @@ class User {
           //cookies
           const cookies = { DedeUserID, DedeUserID__ckMd5, SESSDATA, bili_jct };
           $console.info({ scanTs, cookies });
-          this.DS.saveData({
+          const success = this.DS.saveData({
             type: this.DS.STORAGE_TYPE.KEYCHAIN,
             id: "user.login.cookies",
             data: JSON.stringify(cookies)
           });
+          $console.info({ success });
         } else {
           $ui.alert({
             title: "错误",
@@ -304,6 +315,67 @@ class User {
     } else {
       return undefined;
     }
+  }
+  checkLoginCache() {
+    $ui.menu({
+      items: ["查看Cookies"],
+      handler: (title, idx) => {
+        switch (idx) {
+          case 0:
+            const cookies = this.DS.loadData({
+              type: this.DS.STORAGE_TYPE.KEYCHAIN,
+              id: "user.login.cookies"
+            });
+            $ui.alert({
+              title: "Cookies",
+              message: cookies,
+              actions: [
+                {
+                  title: "OK",
+                  disabled: false,
+                  handler: () => {}
+                },
+                {
+                  title: "分享",
+                  disabled: false,
+                  handler: () => {
+                    $share.sheet({
+                      items: [
+                        {
+                          name: "bilibili_user_cookies.txt",
+                          data: cookies
+                        }
+                      ],
+                      handler: success => {
+                        $console.info({ success });
+                      }
+                    });
+                  }
+                },
+                {
+                  title: "删除",
+                  disabled: false,
+                  handler: () => {
+                    this.removeCookies();
+                  }
+                }
+              ]
+            });
+            break;
+            break;
+        }
+      },
+      finished: cancelled => {
+        $console.info({ "ui.menu": { cancelled } });
+      }
+    });
+  }
+  removeCookies() {
+    const success = this.DS.removeData({
+      type: this.DS.STORAGE_TYPE.KEYCHAIN,
+      id: "user.login.cookies"
+    });
+    $console.info({ success });
   }
 }
 class BilibiliApi {
@@ -399,11 +471,14 @@ class Main {
     this.User = new User({ core });
   }
   init() {
-    const mainViewList = ["扫描二维码登录"],
+    const mainViewList = ["扫描二维码登录", "查看登录数据"],
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
           case 0:
             this.User.loginByQrcode();
+            break;
+          case 1:
+            this.User.checkLoginCache();
             break;
         }
       };
