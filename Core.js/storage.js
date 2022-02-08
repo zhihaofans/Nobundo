@@ -125,6 +125,9 @@ class Keychain {
     });
     return result;
   }
+  remove(key) {
+    return $keychain.remove(key, this.DOMAIN);
+  }
 }
 
 class Prefs {
