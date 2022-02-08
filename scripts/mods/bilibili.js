@@ -306,9 +306,7 @@ class BilibiliApi {
     return $text.MD5(sign);
   }
   getTvLoginQrcode() {
-    const url =
-        "http://passport.bilibili.com/x/passport-tv-login/qrcode/auth_code",
-      header = {},
+    const header = {},
       timeout = 5,
       appkey = "4409e2ce8ffd12b8",
       appSec = this.getAppsecByAppkey(appkey),
@@ -316,19 +314,14 @@ class BilibiliApi {
       ts = new Date().getTime(),
       params = { appkey, local_id, ts },
       sign = this.getSign(params, appkey, appSec),
-      body = Object.assign(
-        {
-          sign
-        },
-        params
-      );
-    $console.info({ params, appSec, body });
-    return this.$.http.post({
-      url,
-      header,
-      timeout,
-      body
-    });
+      url = `http://passport.bilibili.com/x/passport-tv-login/qrcode/auth_code?appkey=${appkey}&appSec=${appSec}&ts=${ts}&sign=${sign}`,
+      result = this.$.http.post({
+        url,
+        header,
+        timeout
+      });
+    $console.info({ params, appSec, url });
+    return result;
   }
   async getWebLoginQrcode() {
     const url = "http://passport.bilibili.com/qrcode/getLoginUrl",
@@ -365,7 +358,7 @@ class Main {
     this.User = new User({ core });
   }
   init() {
-    const mainViewList = ["扫描二维码登录", "手动输入二维码token"],
+    const mainViewList = ["扫描二维码登录", "手动输入二维码token", "电视登录"],
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
           case 0:
@@ -373,6 +366,9 @@ class Main {
             break;
           case 1:
             this.User.inputQrcodeOauthkey();
+            break;
+          case 2:
+            this.User.Api.getTvLoginQrcode();
             break;
         }
       };
