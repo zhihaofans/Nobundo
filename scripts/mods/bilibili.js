@@ -404,17 +404,48 @@ class Vip {
     this.User = new User({ core });
   }
   async getPrivilegeStatus() {
+    $ui.loading(true);
     const cookie = this.User.getCookies(),
       header = { cookie },
       url = "http://api.bilibili.com/x/vip/privilege/my",
       timeout = 5,
-      result = await this.$.http.get({
+      resp = await this.$.http.get({
         url,
         header,
         timeout
+      }),
+      response = resp.response;
+    $console.info({ resp });
+    $ui.loading(false);
+    if (resp.error) {
+      $ui.alert({
+        title: `请求错误(${response.code})`,
+        message: resp.error.localizedDescription,
+        actions: [
+          {
+            title: "OK",
+            disabled: false,
+            handler: () => {}
+          }
+        ]
       });
-    $console.info({ result });
-    return result.data;
+    } else {
+      const result = resp.data;
+      if (result.code == 0) {
+      } else {
+        $ui.alert({
+          title: `请求失败(${result.code})`,
+          message: result.message,
+          actions: [
+            {
+              title: "OK",
+              disabled: false,
+              handler: () => {}
+            }
+          ]
+        });
+      }
+    }
   }
 }
 class BilibiliApi {
