@@ -334,7 +334,7 @@ class User {
                       items: [
                         {
                           name: "bilibili_user_cookies.txt",
-                          data: cookies
+                          data: JSON.stringify(cookies)
                         }
                       ],
                       handler: success => {
@@ -432,6 +432,16 @@ class Vip {
     } else {
       const result = resp.data;
       if (result.code == 0) {
+        const privilegeList = result.data.list,
+          privilegeStr = { 1: "B币", 2: "会员购优惠券", 3: "漫画福利券" },
+          didSelect = (sender, indexPath, data) => {
+            const thisPrivilege = privilegeList[indexPath.row];
+          };
+        listKit.pushString(
+          "大会员特权",
+          privilegeList.map(privilege => privilegeStr[privilege.type]),
+          didSelect
+        );
       } else {
         $ui.alert({
           title: `请求失败(${result.code})`,
