@@ -48,6 +48,12 @@ class DataStorage {
       return undefined;
     }
   }
+  setKeychain(key, value) {
+    return this.Keychain.set(key, value);
+  }
+  getKeychain(key, defaultValue = undefined) {
+    return this.Keychain.get(key) || defaultValue;
+  }
 }
 
 class User {
@@ -111,16 +117,8 @@ class User {
         oauthKey = qrcodeData.oauthKey,
         qrcodeImage = $qrcode.encode(qrcodeUrl);
       $ui.loading(false);
-      this.DS.saveData({
-        type: this.DS.STORAGE_TYPE.KEYCHAIN,
-        id: "user.login.qrcode.oauthkey",
-        data: oauthKey
-      });
-      this.DS.saveData({
-        type: this.DS.STORAGE_TYPE.KEYCHAIN,
-        id: "user.login.qrcode.oauthkey.ts",
-        data: ts
-      });
+      this.DS.setKeychain("user.login.qrcode.oauthkey", oauthKey);
+      this.DS.setKeychain("user.login.qrcode.oauthkey.ts", ts);
       $ui.push({
         props: {
           title: "扫描二维码"
@@ -210,14 +208,8 @@ class User {
     });
   }
   async checkWebQrcodeStatus(token) {
-    const oauthKey = this.DS.loadData({
-        type: this.DS.STORAGE_TYPE.KEYCHAIN,
-        id: "user.login.qrcode.oauthkey"
-      }),
-      ts = this.DS.loadData({
-        type: this.DS.STORAGE_TYPE.KEYCHAIN,
-        id: "user.login.qrcode.ts"
-      });
+    const oauthKey = this.DS.getKeychain("user.login.qrcode.oauthkey"),
+      ts = this.DS.getKeychain("user.login.qrcode.ts");
     $console.info({
       oauthKey,
       ts,
@@ -284,11 +276,10 @@ class User {
           //cookies
           const cookies = { DedeUserID, DedeUserID__ckMd5, SESSDATA, bili_jct };
           $console.info({ scanTs, cookies });
-          const success = this.DS.saveData({
-            type: this.DS.STORAGE_TYPE.KEYCHAIN,
-            id: "user.login.cookies",
-            data: JSON.stringify(cookies)
-          });
+          const success = this.DS.setKeychain(
+            "user.login.cookies",
+            JSON.stringify(cookies)
+          );
           $console.info({ success });
         } else {
           $ui.alert({
@@ -368,12 +359,7 @@ class User {
     $console.info({ success });
   }
   getCookies() {
-    const cookies = JSON.parse(
-      this.DS.loadData({
-        type: this.DS.STORAGE_TYPE.KEYCHAIN,
-        id: "user.login.cookies"
-      })
-    );
+    const cookies = JSON.parse(this.DS.getKeychain("user.login.cookies"));
     $console.info({ cookies });
     return cookies;
   }
