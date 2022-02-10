@@ -63,7 +63,9 @@ class Kernel {
   registerCoreMod(modCore) {
     if (typeof modCore.run === "function") {
       const needUpdateCore = modCore.checkCoreVersion();
-      if (needUpdateCore == 0) {
+      if (modCore.IGNORE_CORE_VERSION == true) {
+        this.REG_CORE_MOD_LIST.push(modCore);
+      } else if (needUpdateCore == 0) {
         this.REG_CORE_MOD_LIST.push(modCore);
       } else {
         this.error("registerCoreMod", "need update mod");

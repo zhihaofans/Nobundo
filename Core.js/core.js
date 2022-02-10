@@ -9,7 +9,8 @@ class Core {
     author,
     databaseId,
     needCoreVersion,
-    keychainId
+    keychainId,
+    ignoreCoreVersion
   }) {
     this.Kernel = kernel;
     this.$_ = require("./$_");
@@ -34,6 +35,7 @@ class Core {
       keychainId && keychainId.length > 0
         ? new this.Storage.Keychain(this.KEYCHAIN_DOMAIN)
         : undefined;
+    this.IGNORE_CORE_VERSION = ignoreCoreVersion === true;
   }
   checkCoreVersion() {
     if (CORE_VERSION === this.NEED_CORE_VERSION) {
