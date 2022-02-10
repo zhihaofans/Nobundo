@@ -435,6 +435,7 @@ class Vip {
           privilegeStr = { 1: "B币", 2: "会员购优惠券", 3: "漫画福利券" },
           didSelect = (sender, indexPath, data) => {
             const thisPrivilege = privilegeList[indexPath.row];
+            this.receivePrivilege(thisPrivilege.type);
           };
         listKit.pushString(
           "大会员特权",
@@ -499,7 +500,7 @@ class Vip {
           message: "",
           actions: [
             {
-              title: "",
+              title: "OK",
               disabled: false,
               handler: () => {}
             }
@@ -507,8 +508,8 @@ class Vip {
         });
       } else {
         $ui.alert({
-          title: `请求失败(${result.code})`,
-          message: result.message,
+          title: `领取失败(${result.code})`,
+          message: resultCodeList[result.code.toString()],
           actions: [
             {
               title: "OK",
