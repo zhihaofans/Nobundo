@@ -420,12 +420,33 @@ class Vip {
         const privilegeList = result.data.list,
           privilegeStr = { 1: "B币", 2: "会员购优惠券", 3: "漫画福利券" },
           didSelect = (sender, indexPath, data) => {
+            $console.info({
+              indexPath
+            });
             const thisPrivilege = privilegeList[indexPath.row];
-            this.receivePrivilege(thisPrivilege.type);
+            if (thisPrivilege.state == 1) {
+              $ui.alert({
+                title: "领取失败",
+                message: privilegeStr[thisPrivilege.type] + "已领取",
+                actions: [
+                  {
+                    title: "OK",
+                    disabled: false, // Optional
+                    handler: () => {}
+                  }
+                ]
+              });
+            } else {
+              this.receivePrivilege(thisPrivilege.type);
+            }
           };
         listKit.pushString(
           "大会员特权",
-          privilegeList.map(privilege => privilegeStr[privilege.type]),
+          privilegeList.map(privilege => {
+            const privilegeStatus =
+              privilege.state == 1 ? "(已领取)" : "未领取";
+            return privilegeStr[privilege.type] + privilegeStatus;
+          }),
           didSelect
         );
       } else {
