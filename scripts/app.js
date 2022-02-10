@@ -4,9 +4,9 @@ const { Kernel } = require("../Core.js/kernel"),
     nandu: require("./mods/nandu"),
     version: require("./mods/jsbox-version"),
     wallhaven: require("./mods/wallhaven"),
-    downloader: require("./mods/downloader"),
-    reminder: require("./mods/reminder"),
-    daoshuri: require("./mods/daoshuri")
+    downloader: require("./mods/downloader")
+    //    reminder: require("./mods/reminder"),
+    //    daoshuri: require("./mods/daoshuri")
   },
   ui = require("../Core.js/ui"),
   listKit = new ui.ListKit(),
@@ -26,8 +26,9 @@ class AppKernel extends Kernel {
     this.registerCoreMod(new mods.version(this));
     this.registerCoreMod(new mods.wallhaven(this));
     this.registerCoreMod(new mods.downloader(this));
-    this.registerCoreMod(new mods.reminder(this));
-    this.registerCoreMod(new mods.daoshuri(this));
+    //    this.registerCoreMod(new mods.reminder(this));
+    //    this.registerCoreMod(new mods.daoshuri(this));
+    this.loadCoreMods("/scripts/mods/", ["reminder.js", "daoshuri.js"]);
   }
   init() {
     listKit.renderIdx(

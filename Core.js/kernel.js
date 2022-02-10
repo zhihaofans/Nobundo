@@ -33,17 +33,17 @@ class Kernel {
   }
   // console
   info(id, msg) {
-    const newMsg = msg ?? id,
+    const newMsg = msg || id,
       result = msg ? `${id}:${newMsg}` : newMsg;
     $console.info(result);
   }
   warn(id, msg) {
-    const newMsg = msg ?? id,
+    const newMsg = msg || id,
       result = msg ? `${id}:${newMsg}` : newMsg;
     $console.warn(result);
   }
   error(id, msg) {
-    const newMsg = msg ?? id,
+    const newMsg = msg || id,
       result = msg ? `${id}:${newMsg}` : newMsg;
     $console.error(result);
   }
@@ -72,13 +72,11 @@ class Kernel {
         $ui.alert({
           title: "registerCoreMod",
           message: `need update mod(${needUpdateCore},${modCore.MOD_NAME})`,
-          actions: [
-            {
-              title: "OK",
-              disabled: false, // Optional
-              handler: () => {}
-            }
-          ]
+          actions: [{
+            title: "OK",
+            disabled: false, // Optional
+            handler: () => {}
+          }]
         });
         throw new object.UserException({
           name: "Mod version",
@@ -94,6 +92,12 @@ class Kernel {
         source: "mod"
       });
     }
+  }
+  loadCoreMods(modDir, modList) {
+    modList.map(mod => {
+      const thisMod = require(modDir + mod)
+      this.registerCoreMod(new thisMod(this))
+    })
   }
 }
 module.exports = {
