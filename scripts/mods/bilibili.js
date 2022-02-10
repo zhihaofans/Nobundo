@@ -456,6 +456,70 @@ class Vip {
       }
     }
   }
+  async receivePrivilege(typeId) {
+    $ui.loading(true);
+    const cookie = this.User.getCookies(),
+      header = { cookie },
+      bili_jct = cookie.bili_jct,
+      url = `http://api.bilibili.com/x/vip/privilege/receive?type=${typeId}&csrf=${bili_jct}`,
+      timeout = 5,
+      resp = await this.$.http.post({
+        url,
+        header,
+        timeout
+      }),
+      response = resp.response,
+      resultCodeList = {
+        "-101": "账号未登录",
+        "-111": "csrf 校验失败",
+        "-400": "请求错误",
+        "69800": "网络繁忙 请稍后再试",
+        "69801": "你已领取过该权益",
+        "0": "成功"
+      };
+    $console.info({ resp });
+    $ui.loading(false);
+    if (resp.error) {
+      $ui.alert({
+        title: `请求错误(${response.code})`,
+        message: resp.error.localizedDescription,
+        actions: [
+          {
+            title: "OK",
+            disabled: false,
+            handler: () => {}
+          }
+        ]
+      });
+    } else {
+      const result = resp.data;
+      if (result.code == 0) {
+        $ui.alert({
+          title: "领取成功",
+          message: "",
+          actions: [
+            {
+              title: "",
+              disabled: false,
+              handler: () => {}
+            }
+          ]
+        });
+      } else {
+        $ui.alert({
+          title: `请求失败(${result.code})`,
+          message: result.message,
+          actions: [
+            {
+              title: "OK",
+              disabled: false,
+              handler: () => {}
+            }
+          ]
+        });
+      }
+    }
+  }
 }
 class BilibiliApi {
   constructor({ core }) {
@@ -560,9 +624,15 @@ class Main {
     this.Core = core;
     this.Kernel = core.kernel;
     this.User = new User({ core });
+    this.Vip = new Vip({ core });
   }
   init() {
-    const mainViewList = ["扫描二维码登录", "查看登录数据", "查看用户信息"],
+    const mainViewList = [
+        "扫描二维码登录",
+        "查看登录数据",
+        "查看用户信息",
+        "查看大会员特权"
+      ],
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
           case 0:
@@ -573,6 +643,9 @@ class Main {
             break;
           case 2:
             this.User.getUserInfo();
+            break;
+          case 3:
+            this.Vip.getPrivilegeStatus();
             break;
         }
       };
