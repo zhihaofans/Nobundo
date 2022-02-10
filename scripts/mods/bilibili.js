@@ -353,7 +353,6 @@ class User {
               ]
             });
             break;
-            break;
         }
       },
       finished: cancelled => {
