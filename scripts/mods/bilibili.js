@@ -653,7 +653,6 @@ class Bilibili extends Core {
     });
   }
   run() {
-    $ui.success("run");
     const main = new Main(this);
     main.init();
   }

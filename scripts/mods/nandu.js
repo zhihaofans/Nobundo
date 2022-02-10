@@ -7,7 +7,7 @@ const APP_INFO = {
 class Home {
   constructor(core) {
     this.Core = core;
-    this.Http = new core.$_.Http();
+    this.Http = new core.Http(5);
   }
   async getTodayHotNews() {
     this.Kernel.info("getTodayHotNews", "1");
