@@ -9,6 +9,7 @@ class AppKernel extends Kernel {
       useSqlite: true,
       debug: true
     });
+    // 加载多语言
     this.l10n(require("../strings/l10n"));
     //this.DEFAULE_SQLITE_FILE = "/mods.db";
     // 注册mod
