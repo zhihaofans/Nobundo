@@ -72,11 +72,13 @@ class Kernel {
         $ui.alert({
           title: "registerCoreMod",
           message: `need update mod(${needUpdateCore},${modCore.MOD_NAME})`,
-          actions: [{
-            title: "OK",
-            disabled: false, // Optional
-            handler: () => {}
-          }]
+          actions: [
+            {
+              title: "OK",
+              disabled: false, // Optional
+              handler: () => {}
+            }
+          ]
         });
         throw new object.UserException({
           name: "Mod version",
@@ -95,9 +97,14 @@ class Kernel {
   }
   loadCoreMods(modDir, modList) {
     modList.map(mod => {
-      const thisMod = require(modDir + mod)
-      this.registerCoreMod(new thisMod(this))
-    })
+      try {
+        const modPath = modDir + mod,
+          thisMod = require(modPath);
+        this.registerCoreMod(new thisMod(this));
+      } catch (error) {
+        $console.error({ error: error.message, mod });
+      }
+    });
   }
 }
 module.exports = {

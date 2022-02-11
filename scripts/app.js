@@ -1,13 +1,4 @@
 const { Kernel } = require("../Core.js/kernel"),
-  mods = {
-    bilibili: require("./mods/bilibili"),
-    nandu: require("./mods/nandu"),
-    version: require("./mods/jsbox-version"),
-    wallhaven: require("./mods/wallhaven"),
-    downloader: require("./mods/downloader")
-    //    reminder: require("./mods/reminder"),
-    //    daoshuri: require("./mods/daoshuri")
-  },
   ui = require("../Core.js/ui"),
   listKit = new ui.ListKit(),
   appName = "Nobundo";
@@ -20,15 +11,17 @@ class AppKernel extends Kernel {
     });
     this.l10n(require("../strings/l10n"));
     //this.DEFAULE_SQLITE_FILE = "/mods.db";
-    // Register mods
-    this.registerCoreMod(new mods.nandu(this));
-    this.registerCoreMod(new mods.bilibili(this));
-    this.registerCoreMod(new mods.version(this));
-    this.registerCoreMod(new mods.wallhaven(this));
-    this.registerCoreMod(new mods.downloader(this));
-    //    this.registerCoreMod(new mods.reminder(this));
-    //    this.registerCoreMod(new mods.daoshuri(this));
-    this.loadCoreMods("/scripts/mods/", ["reminder.js", "daoshuri.js"]);
+    // 注册mod
+    const coreModList = [
+      "nandu.js",
+      "bilibili.js",
+      "jsbox-version.js",
+      "wallhaven.js",
+      "downloader.js",
+      "reminder.js",
+      "daoshuri.js"
+    ];
+    this.loadCoreMods("/scripts/mods/", coreModList);
   }
   init() {
     listKit.renderIdx(
