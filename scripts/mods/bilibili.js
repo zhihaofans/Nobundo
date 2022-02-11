@@ -630,7 +630,6 @@ class BilibiliApi {
 class Main {
   constructor(core) {
     this.Core = core;
-    this.Kernel = core.kernel;
     this.User = new User({ core });
     this.Vip = new Vip({ core });
   }
@@ -666,7 +665,7 @@ class Bilibili extends Core {
     super({
       kernel: kernel,
       modName: "Bilibili",
-      version: "5a",
+      version: "5b",
       author: "zhihaofans",
       needCoreVersion: 3,
       databaseId: "bilibili",
