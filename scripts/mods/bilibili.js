@@ -392,7 +392,7 @@ class Vip {
     $ui.loading(true);
     const cookie = this.User.getCookies(),
       header = { cookie },
-      url = "http://api.bilibili.com/x/vip/privilege/my",
+      url = "https://api.bilibili.com/x/vip/privilege/my",
       timeout = 5,
       resp = await this.$.http.get({
         url,
@@ -469,7 +469,7 @@ class Vip {
     const cookie = this.User.getCookies(),
       header = { cookie },
       bili_jct = cookie.bili_jct,
-      url = `http://api.bilibili.com/x/vip/privilege/receive?type=${typeId}&csrf=${bili_jct}`,
+      url = `https://api.bilibili.com/x/vip/privilege/receive?type=${typeId}&csrf=${bili_jct}`,
       timeout = 5,
       resp = await this.$.http.post({
         url,
@@ -578,7 +578,7 @@ class BilibiliApi {
       ts = new Date().getTime(),
       params = { appkey, local_id, ts },
       sign = this.getSign(params, appkey, appSec),
-      url = `http://passport.bilibili.com/x/passport-tv-login/qrcode/auth_code?appkey=${appkey}&appSec=${appSec}&ts=${ts}&sign=${sign}`,
+      url = `https://passport.bilibili.com/x/passport-tv-login/qrcode/auth_code?appkey=${appkey}&appSec=${appSec}&ts=${ts}&sign=${sign}`,
       result = this.$.http.post({
         url,
         header,
@@ -588,7 +588,7 @@ class BilibiliApi {
     return result;
   }
   async getWebLoginQrcode() {
-    const url = "http://passport.bilibili.com/qrcode/getLoginUrl",
+    const url = "https://passport.bilibili.com/qrcode/getLoginUrl",
       header = {},
       timeout = 5,
       result = await this.$.http.get({
@@ -603,8 +603,8 @@ class BilibiliApi {
     $console.info(oauthKey);
     const header = {},
       timeout = 5,
-      gourl = "http://www.bilibili.com/",
-      url = `http://passport.bilibili.com/qrcode/getLoginInfo?oauthKey=${oauthKey}&gourl=${gourl}`,
+      gourl = "https://www.bilibili.com/",
+      url = `https://passport.bilibili.com/qrcode/getLoginInfo?oauthKey=${oauthKey}&gourl=${gourl}`,
       result = await this.$.http.post({
         url,
         header,
@@ -614,7 +614,26 @@ class BilibiliApi {
     return result;
   }
   async getUserInfo(cookie) {
-    const url = "http://api.bilibili.com/x/web-interface/nav",
+    const url = "https://api.bilibili.com/x/web-interface/nav",
+      header = { cookie },
+      timeout = 5,
+      result = await this.$.http.get({
+        url,
+        header,
+        timeout
+      });
+    $console.info({ result });
+    return result.data;
+  }
+}
+class Video {
+  constructor({ core }) {
+    this.Core = core;
+    this.$ = core.$;
+    this.Http = new this.Core.Http(5);
+  }
+  async getLaterToWatch(cookie) {
+    const url = "https://api.bilibili.com/x/v2/history/toview",
       header = { cookie },
       timeout = 5,
       result = await this.$.http.get({
@@ -632,13 +651,15 @@ class Main {
     this.Core = core;
     this.User = new User({ core });
     this.Vip = new Vip({ core });
+    this.Video = new Video({ core });
   }
   init() {
     const mainViewList = [
         "扫描二维码登录",
         "查看登录数据",
         "查看用户信息",
-        "查看大会员特权"
+        "查看大会员特权",
+        "稍后再看"
       ],
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
@@ -653,6 +674,9 @@ class Main {
             break;
           case 3:
             this.Vip.getPrivilegeStatus();
+            break;
+          case 4:
+            this.Video.getLaterToWatch(this.User.getCookies());
             break;
         }
       };
