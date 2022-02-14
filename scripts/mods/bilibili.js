@@ -633,16 +633,38 @@ class Video {
     this.Http = new this.Core.Http(5);
   }
   async getLaterToWatch(cookie) {
+    $ui.loading(true);
     const url = "https://api.bilibili.com/x/v2/history/toview",
       header = { cookie },
       timeout = 5,
-      result = await this.$.http.get({
+      resp = await this.$.http.get({
         url,
         header,
         timeout
       });
-    $console.info({ result });
-    return result.data;
+    $console.info({ resp });
+    if (resp.error) {
+      $ui.loading(false);
+      $ui.alert({
+        title: "获取失败",
+        message: resp.error.message,
+        actions: [
+          {
+            title: "OK",
+            disabled: false, // Optional
+            handler: () => {}
+          }
+        ]
+      });
+    } else {
+      const result = resp.data;
+      if (result) {
+        if (result.code == 0) {
+        } else {
+        }
+      } else {
+      }
+    }
   }
 }
 
