@@ -102,7 +102,7 @@ class Kernel {
           thisMod = require(modPath);
         this.registerCoreMod(new thisMod(this));
       } catch (error) {
-        $console.error({ error: error.message, mod });
+        $console.error({ name: error.name, error: error.message, mod });
       }
     });
   }
