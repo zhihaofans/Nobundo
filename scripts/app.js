@@ -20,7 +20,8 @@ class AppKernel extends Kernel {
       "wallhaven.js",
       "downloader.js",
       "reminder.js",
-      "daoshuri.js"
+      "daoshuri.js",
+      "free-api.js"
     ];
     this.loadCoreMods("/scripts/mods/", coreModList);
   }
