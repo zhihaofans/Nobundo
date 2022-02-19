@@ -1,51 +1,28 @@
 const { Core } = require("../../Core.js/core"),
-  uiKit = require("../../Core.js/ui"),
-  listKit = new uiKit.ListKit();
-class Main {
-  constructor(core) {
-    this.Core = core;
-    this.Kernel = core.kernel;
-    this.Http = new core.Http(5);
-    this.$ = core.$;
-  }
-  init() {
-    const mainViewList = ["example 1"],
-      didSelect = (sender, indexPath, data) => {
-        switch (indexPath.row) {
-          default:
-            $ui.alert({
-              title: indexPath.row,
-              message: data,
-              actions: [
-                {
-                  title: "OK",
-                  disabled: false, // Optional
-                  handler: () => {}
-                }
-              ]
-            });
-        }
-      };
-    listKit.pushString(this.Core.MOD_NAME, mainViewList, didSelect);
-  }
-}
-
+  { ModuleLoader } = require("../../Core.js/core.module");
 class Example extends Core {
   constructor(kernel) {
     super({
       kernel: kernel,
+      modId: "example",
       modName: "例子",
-      version: "5a",
+      version: "5b",
       author: "zhihaofans",
       needCoreVersion: 3,
       databaseId: "example",
       keychainId: "example"
     });
+    this.ModuleLoader = new ModuleLoader(this);
   }
   run() {
+    this.ModuleLoader.addModule("example.ui.js");
+    try {
+      const ui = this.ModuleLoader.getModule("example.ui");
+      ui.initUi();
+    } catch (error) {
+      $console.error(error);
+    }
     $ui.success("run");
-    const main = new Main(this);
-    main.init();
   }
 }
 module.exports = Example;

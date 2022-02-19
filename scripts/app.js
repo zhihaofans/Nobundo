@@ -7,7 +7,8 @@ class AppKernel extends Kernel {
     super({
       appName,
       useSqlite: true,
-      debug: true
+      debug: true,
+      modDir: "/scripts/mods/"
     });
     // 加载多语言
     this.l10n(require("../strings/l10n"));
@@ -21,9 +22,10 @@ class AppKernel extends Kernel {
       "downloader.js",
       "reminder.js",
       "daoshuri.js",
-      "free-api.js"
+      "free-api.js",
+      "example.js"
     ];
-    this.loadCoreMods("/scripts/mods/", coreModList);
+    this.loadCoreMods(this.MOD_DIR, coreModList);
   }
   init() {
     listKit.renderIdx(
