@@ -1,6 +1,6 @@
 {
-  "core.js": "0.0.1.210705",
-  "core": 1,
+  "core.js": "0.0.1.220219,
+  "core": 3,
   "ui": 1,
   "alert": 1,
   "default": 1,
@@ -9,5 +9,7 @@
   "storage": 1,
   "object": 1,
   "update": 1,
-  "$_": 8
+  "$_": 8,
+  "$": 1,
+  "core.module": 1
 }

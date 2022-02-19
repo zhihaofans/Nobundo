@@ -1,7 +1,7 @@
 const __VERSION__ = 3,
   object = require("./object");
 class Kernel {
-  constructor({ appName, useSqlite = false, debug = false }) {
+  constructor({ appName, useSqlite = false, debug = false, modDir }) {
     this.APP_NAME = appName;
     this.DEBUG = debug;
     this.USE_SQLITR = useSqlite;
@@ -15,6 +15,7 @@ class Kernel {
       this.kernelDebug(`sqlite:${this.USE_SQLITR === true}`);
       this.kernelDebug(`debug:${this.DEBUG === true}`);
     }
+    this.MOD_DIR = modDir;
   }
   isDebug() {
     this.DEBUG = this.DEBUG === true;
