@@ -2,7 +2,7 @@ const { CoreModule } = require("../../Core.js/core.module"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 
-class Video {
+class User {
   constructor({ core }) {
     this.Core = core;
     this.$ = core.$;
@@ -44,21 +44,21 @@ class Video {
   }
 }
 
-class BilibiliApi extends CoreModule {
+class BilibiliVideo extends CoreModule {
   constructor(core) {
     super({
       coreId: "bilibili",
-      moduleId: "bilibili.api",
-      moduleName: "哔哩哔哩Api",
+      moduleId: "bilibili.video",
+      moduleName: "哔哩哔哩视频",
       version: "1",
       author: "zhihaofans"
     });
     this.Core = core;
   }
-  getVideo() {
-    return new Video({
+  getUser() {
+    return new User({
       core: this.Core
     });
   }
 }
-module.exports = BilibiliApi;
+module.exports = BilibiliVideo;

@@ -633,8 +633,8 @@ class Main {
     this.Core = core;
     this.User = new User({ core });
     this.Vip = new Vip({ core });
-    this.Api = this.Core.ModuleLoader.getModule("bilibili.api");
-    this.Video = this.Api.getVideo();
+    this.Video = this.Core.ModuleLoader.getModule("bilibili.video");
+    this.VideoUser = this.Video.getUser();
   }
   init() {
     const mainViewList = [
@@ -659,7 +659,7 @@ class Main {
             this.Vip.getPrivilegeStatus();
             break;
           case 4:
-            this.Video.getLaterToWatch(this.User.getCookies());
+            this.VideoUser.getLaterToWatch(this.User.getCookies());
             break;
         }
       };
@@ -682,7 +682,7 @@ class Bilibili extends Core {
     this.ModuleLoader = new ModuleLoader(this);
   }
   run() {
-    this.ModuleLoader.addModule("bilibili.api.js");
+    this.ModuleLoader.addModule("bilibili.video.js");
     const main = new Main(this);
     main.init();
   }
