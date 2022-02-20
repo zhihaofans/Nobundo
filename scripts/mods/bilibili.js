@@ -1,5 +1,6 @@
 const { Core } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
+  { ModuleLoader } = require("../../Core.js/core.module"),
   listKit = new uiKit.ListKit();
 class DataStorage {
   constructor(core) {
@@ -626,54 +627,14 @@ class BilibiliApi {
     return result.data;
   }
 }
-class Video {
-  constructor({ core }) {
-    this.Core = core;
-    this.$ = core.$;
-    this.Http = new this.Core.Http(5);
-  }
-  async getLaterToWatch(cookie) {
-    $ui.loading(true);
-    const url = "https://api.bilibili.com/x/v2/history/toview",
-      header = { cookie },
-      timeout = 5,
-      resp = await this.$.http.get({
-        url,
-        header,
-        timeout
-      });
-    $console.info({ resp });
-    if (resp.error) {
-      $ui.loading(false);
-      $ui.alert({
-        title: "获取失败",
-        message: resp.error.message,
-        actions: [
-          {
-            title: "OK",
-            disabled: false, // Optional
-            handler: () => {}
-          }
-        ]
-      });
-    } else {
-      const result = resp.data;
-      if (result) {
-        if (result.code == 0) {
-        } else {
-        }
-      } else {
-      }
-    }
-  }
-}
 
 class Main {
   constructor(core) {
     this.Core = core;
     this.User = new User({ core });
     this.Vip = new Vip({ core });
-    this.Video = new Video({ core });
+    this.Api = this.Core.ModuleLoader.getModule("bilibili.api");
+    this.Video = this.Api.getVideo();
   }
   init() {
     const mainViewList = [
@@ -710,15 +671,18 @@ class Bilibili extends Core {
   constructor(kernel) {
     super({
       kernel: kernel,
-      modName: "Bilibili",
+      modId: "bilibili",
+      modName: "哔哩哔哩",
       version: "5b",
       author: "zhihaofans",
       needCoreVersion: 3,
       databaseId: "bilibili",
       keychainId: "bilibili"
     });
+    this.ModuleLoader = new ModuleLoader(this);
   }
   run() {
+    this.ModuleLoader.addModule("bilibili.api.js");
     const main = new Main(this);
     main.init();
   }
