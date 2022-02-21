@@ -33,12 +33,57 @@ class User {
         ]
       });
     } else {
+      $ui.loading(false);
       const result = resp.data;
       if (result) {
         if (result.code == 0) {
+          const data = result.data,
+            listCount = data.count,
+            later2watchList = data.list;
+          if (listCount > 0) {
+            $ui.push({
+              props: {
+                title: `稍后再看共${listCount}个视频`
+              },
+              views: [
+                {
+                  type: "list",
+                  props: {
+                    data: later2watchList.map(thisVideo => {
+                      return {
+                        title: `@${thisVideo.owner.name}(${thisVideo.owner.mid})`,
+                        rows: [thisVideo.title]
+                      };
+                    })
+                  },
+                  layout: $layout.fill,
+                  events: {
+                    didSelect: (_sender, indexPath, _data) => {
+                      const section = indexPath.section;
+                      const row = indexPath.row;
+                    }
+                  }
+                }
+              ]
+            });
+          } else {
+            $ui.error("请添加视频");
+          }
         } else {
+          $ui.alert({
+            title: `错误${result.code}`,
+            message: result.message,
+            actions: [
+              {
+                title: "OK",
+                disabled: false, // Optional
+                handler: () => {}
+              }
+            ]
+          });
         }
       } else {
+        $ui.error("空白请求结果");
       }
     }
   }
