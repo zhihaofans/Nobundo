@@ -49,6 +49,8 @@ class User {
                 {
                   type: "list",
                   props: {
+                    autoRowHeight: true,
+                    estimatedRowHeight: 44,
                     data: later2watchList.map(thisVideo => {
                       return {
                         title: `@${thisVideo.owner.name}(${thisVideo.owner.mid})`,
@@ -59,8 +61,8 @@ class User {
                   layout: $layout.fill,
                   events: {
                     didSelect: (_sender, indexPath, _data) => {
-                      const section = indexPath.section;
-                      const row = indexPath.row;
+                      const thisViseo = later2watchList[indexPath.section],
+                        row = indexPath.row;
                     }
                   }
                 }
