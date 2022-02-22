@@ -36,6 +36,7 @@ class ModuleLoader {
       });
       return false;
     }
+
     if (!$file.exists(modulePath) || $file.isDirectory(modulePath)) {
       $console.error({
         name: "core.module.ModuleLoader.addModule",
@@ -48,6 +49,18 @@ class ModuleLoader {
     try {
       const moduleFile = require(modulePath),
         thisModule = new moduleFile(this.Core);
+      if (this.Core.MOD_ID != thisModule.CORE_ID) {
+        $console.error({
+          name: "core.module.ModuleLoader.addModule",
+          message: "CORE_ID错误",
+          MOD_NAME: this.Core.MOD_NAME,
+          CORE_ID: thisModule.CORE_ID,
+          MOD_ID: this.Core.MOD_ID,
+          MODULE_ID: thisModule.MODULE_ID,
+          MODULE_NAME: thisModule.MODULE_NAME
+        });
+        return false;
+      }
       this.ModuleList[thisModule.MODULE_ID] = thisModule;
       $console.info(
         `Mod[${this.Core.MOD_NAME}]加载module[${thisModule.MODULE_NAME}]`
