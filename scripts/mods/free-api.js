@@ -1,18 +1,29 @@
 const { Core } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
-
-class Jinritoutiao {
-  constructor(core) {
+class Douyin {
+  constructor() {}
+  init(core) {
     this.Core = core;
-    this.$ = core.$;
+    this.$ = this.Core.$;
+    $input.text({
+      type: $kbType.url,
+      placeholder: "输入抖音链接",
+      text: "",
+      handler: input => {
+        const urlList = $detector.link(input);
+        if (urlList.length > 0) {
+          const url = urlList[0];
+          this.download(url);
+        } else {
+          $ui.error("请输入抖音链接");
+        }
+      }
+    });
   }
-  init() {
-    this.getNews();
-  }
-  async getNews() {
+  async download(douyinUrl) {
     $ui.loading(true);
-    const url = "https://is.snssdk.com/api/news/feed/v51/",
+    const url = `https://api.oick.cn/douyin/api.php?url=${douyinUrl}`,
       resp = await this.$.http.get({ url }),
       response = resp.response;
     $console.info({ resp });
@@ -31,32 +42,16 @@ class Jinritoutiao {
       });
     } else {
       const result = resp.data;
-      if (result.message == "success") {
-        const newsList = result.data,
-          didSelect = (sender, indexPath, data) => {
-            $console.info({
-              indexPath
-            });
-            const thisPrivilege = privilegeList[indexPath.row];
-            if (thisPrivilege.state == 1) {
-              $ui.alert({
-                title: "领取失败",
-                message: privilegeStr[thisPrivilege.type] + "已领取",
-                actions: [
-                  {
-                    title: "OK",
-                    disabled: false, // Optional
-                    handler: () => {}
-                  }
-                ]
-              });
-            } else {
-              this.receivePrivilege(thisPrivilege.type);
-            }
-          };
+      if (result.code == undefined) {
+        const didSelect = (sender, indexPath, data) => {
+          $console.info({
+            indexPath,
+            data
+          });
+        };
         listKit.pushString(
-          "今日头条",
-          newsList.map(news => {}),
+          "抖音解析结果",
+          [`@${result.nickname}`, result.title, result.play, result.music],
           didSelect
         );
       } else {
@@ -83,11 +78,11 @@ class Main {
     this.$ = core.$;
     this.apiList = [
       {
-        id: "jinritoutiao",
-        title: "今日头条",
-        class: Jinritoutiao,
+        id: "douyin.download",
+        title: "抖音解析下载",
+        class: Douyin,
         func: "init",
-        needCore: false
+        needCore: true
       }
     ];
   }
@@ -96,7 +91,7 @@ class Main {
       const thisApi = this.apiList[indexPath.row];
       try {
         const thisClass = new thisApi["class"](this);
-        thisClass[thisApi.func]();
+        thisClass[thisApi.func](this.Core);
       } catch (error) {
         $console.error(error);
         $ui.alert({
