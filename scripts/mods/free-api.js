@@ -48,6 +48,15 @@ class Douyin {
             indexPath,
             data
           });
+          switch (indexPath.row) {
+            case 2:
+              $share.sheet([result.play]);
+              break;
+            case 3:
+              $share.sheet([result.music]);
+              break;
+            default:
+          }
         };
         listKit.pushString(
           "抖音解析结果",
