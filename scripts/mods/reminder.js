@@ -174,7 +174,14 @@ class Main {
       handler: text => {
         if (text.length > 0) {
           $ui.menu({
-            items: ["今晚8点", "今晚9点", "今晚10点", "今晚11点", "明早8点"],
+            items: [
+              "今晚8点",
+              "今晚9点",
+              "今晚10点",
+              "今晚11点",
+              "明早8点",
+              "半小时后"
+            ],
             handler: (title, idx) => {
               $ui.loading(true);
               switch (idx) {
@@ -283,6 +290,7 @@ class Reminder extends Core {
   constructor(kernel) {
     super({
       kernel: kernel,
+      modId: "reminder",
       modName: "提醒事项",
       version: "1",
       author: "zhihaofans",

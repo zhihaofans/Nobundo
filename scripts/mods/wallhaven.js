@@ -96,6 +96,7 @@ class Wallhaven extends Core {
   constructor(kernel) {
     super({
       kernel: kernel,
+      modId: "wallhaven",
       modName: "Wallhaven",
       version: "1",
       author: "zhihaofans",

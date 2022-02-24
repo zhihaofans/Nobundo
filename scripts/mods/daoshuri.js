@@ -74,6 +74,7 @@ class Daoshuri extends Core {
   constructor(kernel) {
     super({
       kernel: kernel,
+      modId: "daoshuri",
       modName: "倒数日",
       version: "1",
       author: "zhihaofans",

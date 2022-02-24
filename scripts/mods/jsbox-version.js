@@ -265,6 +265,7 @@ class Version extends Core {
   constructor(kernel) {
     super({
       kernel: kernel,
+      modId: "jsbox-version",
       modName: "JSBox新功能测试",
       version: "3",
       author: "zhihaofans",

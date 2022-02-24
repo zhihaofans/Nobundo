@@ -245,6 +245,7 @@ class Downloader extends Core {
   constructor(kernel) {
     super({
       kernel: kernel,
+      modId: "downloader",
       modName: "下载器",
       version: "1",
       author: "zhihaofans",

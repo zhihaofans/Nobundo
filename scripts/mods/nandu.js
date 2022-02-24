@@ -70,6 +70,7 @@ class NanDu extends Core {
   constructor(kernel) {
     super({
       kernel: kernel,
+      modId: "nandu",
       modName: "南方都市报",
       version: "2",
       author: "zhihaofans",
