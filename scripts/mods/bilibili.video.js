@@ -61,8 +61,9 @@ class User {
                   layout: $layout.fill,
                   events: {
                     didSelect: (_sender, indexPath, _data) => {
-                      const thisViseo = later2watchList[indexPath.section],
+                      const thisVideo = later2watchList[indexPath.section],
                         row = indexPath.row;
+                      $app.openURL(thisVideo.short_link_v2);
                     }
                   }
                 }
