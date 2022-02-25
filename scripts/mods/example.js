@@ -6,11 +6,9 @@ class Example extends Core {
       kernel: kernel,
       modId: "example",
       modName: "例子",
-      version: "5b",
+      version: "5c",
       author: "zhihaofans",
-      needCoreVersion: 3,
-      databaseId: "example",
-      keychainId: "example"
+      needCoreVersion: 3
     });
     this.ModuleLoader = new ModuleLoader(this);
   }

@@ -15,9 +15,7 @@ class ApiTest {
 }
 
 class UiTest {
-  constructor(name) {
-    this.NAME = name;
-  }
+  constructor() {}
   init() {
     $ui.push({
       props: {
@@ -37,7 +35,7 @@ class UiTest {
                       id: "progress1",
                       value: 0.5
                     },
-                    layout: function (make, view) {
+                    layout: (make, view) => {
                       make.centerY.equalTo(view.super);
                       make.left.right.inset(20);
                     }

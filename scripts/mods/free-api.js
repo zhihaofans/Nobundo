@@ -132,8 +132,7 @@ class FreeApi extends Core {
       modName: "免费Api",
       version: "1",
       author: "zhihaofans",
-      needCoreVersion: 3,
-      keychainId: "free_api"
+      needCoreVersione: 3
     });
   }
   run() {

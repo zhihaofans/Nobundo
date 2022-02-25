@@ -79,8 +79,6 @@ class Daoshuri extends Core {
       version: "1",
       author: "zhihaofans",
       needCoreVersion: 3
-      // databaseId: "daoshuri",
-      // keychainId: "daoshuri"
     });
   }
   run() {

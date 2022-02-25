@@ -249,9 +249,7 @@ class Downloader extends Core {
       modName: "下载器",
       version: "1",
       author: "zhihaofans",
-      needCoreVersion: 3,
-      databaseId: "downloader",
-      keychainId: "downloader"
+      needCoreVersion: 3
     });
   }
   run() {
