@@ -1,13 +1,11 @@
-const $ = require("../../Core.js/$");
-
 const { Core } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 class Main {
   constructor(core) {
     this.Core = core;
-    this.Kernel = core.kernel;
-    this.$ = core.$;
+    this.Kernel = this.Core.kernel;
+    this.$ = this.Core.$;
     this.isShare = core.$.share.isAction();
   }
   init() {
@@ -247,15 +245,15 @@ class Downloader extends Core {
       kernel: kernel,
       modId: "downloader",
       modName: "下载器",
-      version: "1",
+      version: "1a",
       author: "zhihaofans",
       needCoreVersion: 3
     });
+    this.main = new Main(this);
   }
   run() {
     $ui.success("run");
-    const main = new Main(this);
-    main.init();
+    this.main.init();
   }
 }
 module.exports = Downloader;

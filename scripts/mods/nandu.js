@@ -1,13 +1,11 @@
-const APP_INFO = {
-    UA: "NanDu/6.3.3 (iPhone; iOS 14.7; Scale/2.00)"
-  },
-  { Core } = require("../../Core.js/core"),
+const { Core } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 class Home {
   constructor(core) {
     this.Core = core;
     this.Http = new core.Http(5);
+    this.AppScheme = require("AppScheme");
   }
   async getTodayHotNews() {
     this.Kernel.info("getTodayHotNews", "1");
@@ -26,7 +24,7 @@ class Home {
           str_list = result_item_list.map(item => item.title),
           didSelect = (sender, indexPath, data) => {
             const thisNewsItem = result_item_list[indexPath.row];
-            this.Core.AppScheme.Browser.Safari.ReadMode(thisNewsItem.url);
+            this.AppScheme.Browser.Safari.ReadMode(thisNewsItem.url);
           };
         listKit.pushString("24小时热榜", str_list, didSelect);
       } else {
@@ -90,8 +88,7 @@ class NanDu extends Core {
         actions: [
           {
             title: "OK",
-            disabled: false, // Optional
-            handler: function () {}
+            disabled: false // Optional
           }
         ]
       });
