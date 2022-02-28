@@ -13,7 +13,6 @@ class KernelIndex extends Kernel {
     });
     // 注册mod
     const coreModList = [
-      "nandu.js",
       "bilibili.js",
       "jsbox-version.js",
       "wallhaven.js",
