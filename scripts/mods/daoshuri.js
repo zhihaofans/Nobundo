@@ -25,8 +25,7 @@ class DaoshuriKit {
 class Main {
   constructor(core) {
     this.Core = core;
-    this.Kernel = core.kernel;
-    this.$ = core.$;
+    this.$ = require("/Core.js/$");
     this.DSR = new DaoshuriKit();
   }
   init() {

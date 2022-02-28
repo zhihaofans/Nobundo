@@ -4,9 +4,8 @@ const { Core } = require("../../Core.js/core"),
 class Main {
   constructor(core) {
     this.Core = core;
-    this.Kernel = this.Core.kernel;
-    this.$ = this.Core.$;
-    this.isShare = core.$.share.isAction();
+    this.$ = require("/Core.js/$");
+    this.isShare = this.$.share.isAction();
   }
   init() {
     const mainViewList = ["开始下载"],
@@ -17,7 +16,6 @@ class Main {
             break;
         }
       };
-
     listKit.pushString(this.Core.MOD_NAME, mainViewList, didSelect);
     if (this.isShare) {
       this.loadShare();
