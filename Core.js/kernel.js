@@ -64,9 +64,19 @@ class Kernel {
   registerCoreMod(modCore) {
     if (typeof modCore.run === "function") {
       const needUpdateCore = modCore.checkCoreVersion();
-      if (modCore.IGNORE_CORE_VERSION == true) {
-        this.REG_CORE_MOD_LIST.push(modCore);
-      } else if (needUpdateCore == 0) {
+      if (modCore.MOD_ID.length <= 0) {
+        throw new object.UserException({
+          name: "Mod id",
+          message: "need mod id",
+          source: "mod"
+        });
+      } else if (modCore.MOD_NAME.length <= 0) {
+        throw new object.UserException({
+          name: "Mod name",
+          message: "need mod name",
+          source: "mod"
+        });
+      } else if (modCore.IGNORE_CORE_VERSION == true || needUpdateCore == 0) {
         this.REG_CORE_MOD_LIST.push(modCore);
       } else {
         this.error("registerCoreMod", "need update mod");
@@ -106,6 +116,9 @@ class Kernel {
         $console.error({ name: error.name, error: error.message, mod });
       }
     });
+  }
+  getMod(modId) {
+    return this.MOD_LIST[modId];
   }
 }
 module.exports = {

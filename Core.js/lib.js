@@ -1,9 +1,9 @@
 const __VERSION__ = 1,
-  default_data = require("./default");
+  defaultData = require("./default");
 class Http {
   constructor(timeout) {
-    this.TIMEOUT = timeout ?? 5;
-    this.USER_AGENT = default_data.http.user_agent;
+    this.TIMEOUT = timeout || 5;
+    this.USER_AGENT = defaultData.http.user_agent;
     this.COOKIES = "";
   }
   setCookies(cookies) {
@@ -13,7 +13,7 @@ class Http {
     this.USER_AGENT = ua;
   }
   async get(url, header) {
-    const new_header = header ?? {};
+    const new_header = header || {};
     new_header["User-Agent"] = this.USER_AGENT;
     if (this.COOKIES) {
       new_header["cookie"] = this.COOKIES;
@@ -66,4 +66,5 @@ class Http {
     }
   }
 }
+
 module.exports = { __VERSION__, Http };

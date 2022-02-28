@@ -1,10 +1,18 @@
-const $VERSION$ = "1",
+const version = "1",
   alert = {
     show: ({ title, message }) => {
       $ui.alert({
         title,
         message
       });
+    }
+  },
+  file = {
+    isFile: filePath => {
+      return !$file.isDirectory(filePath);
+    },
+    isFileExist: filePath => {
+      return $file.exists(filePath) && !$file.isDirectory(filePath);
     }
   },
   http = {
@@ -124,12 +132,13 @@ const $VERSION$ = "1",
     }
   };
 module.exports = {
+  version,
   alert,
   getUUID: () => {
     return $text.uuid;
   },
+  file,
   http,
   share,
-  time,
-  $VERSION$
+  time
 };

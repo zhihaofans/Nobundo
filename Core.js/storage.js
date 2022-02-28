@@ -40,7 +40,7 @@ class File {
     return path && this.IS_ICLOUD ? $drive.exists(path) : $file.exists(path);
   }
   ifFile(path) {
-    return this.isExists(path) && !this.isDirectory(path);
+    return !$file.isDirectory(path);
   }
   getFileList(dir, ext = undefined) {
     if ($file.exists(dir) && $file.isDirectory(dir)) {

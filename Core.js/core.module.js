@@ -19,7 +19,7 @@ class ModuleLoader {
     if (fileName.length <= 0) {
       $console.error({
         name: "core.module.ModuleLoader.addModule",
-        MOD_NAME: this.Core.MOD_NAME,
+        MOD_NAME: this.Core.CORE_INFO.NAME,
         message: "需要module fileName",
         fileName,
         length: fileName.length
@@ -28,11 +28,11 @@ class ModuleLoader {
     }
     const modulePath = this.MOD_DIR + fileName;
     $console.info({ modulePath });
-    if (this.Core.MOD_ID.length <= 0) {
+    if (this.Core.CORE_INFO.ID.length <= 0) {
       $console.error({
         name: "core.module.ModuleLoader.addModule",
         message: "需要Core.MOD_ID",
-        MOD_NAME: this.Core.MOD_NAME
+        MOD_NAME: this.Core.CORE_INFO.NAME
       });
       return false;
     }
@@ -41,7 +41,7 @@ class ModuleLoader {
       $console.error({
         name: "core.module.ModuleLoader.addModule",
         message: "module文件不存在",
-        MOD_NAME: this.Core.MOD_NAME,
+        MOD_NAME: this.Core.CORE_INFO.NAME,
         fileName
       });
       return false;
@@ -49,13 +49,13 @@ class ModuleLoader {
     try {
       const moduleFile = require(modulePath),
         thisModule = new moduleFile(this.Core);
-      if (this.Core.MOD_ID != thisModule.CORE_ID) {
+      if (this.Core.CORE_INFO.ID != thisModule.CORE_ID) {
         $console.error({
           name: "core.module.ModuleLoader.addModule",
           message: "CORE_ID错误",
-          MOD_NAME: this.Core.MOD_NAME,
+          MOD_NAME: this.Core.CORE_INFO.NAME,
           CORE_ID: thisModule.CORE_ID,
-          MOD_ID: this.Core.MOD_ID,
+          MOD_ID: this.Core.CORE_INFO.ID,
           MODULE_ID: thisModule.MODULE_ID,
           MODULE_NAME: thisModule.MODULE_NAME
         });
@@ -63,14 +63,14 @@ class ModuleLoader {
       }
       this.ModuleList[thisModule.MODULE_ID] = thisModule;
       $console.info(
-        `Mod[${this.Core.MOD_NAME}]加载module[${thisModule.MODULE_NAME}]`
+        `Mod[${this.Core.CORE_INFO.NAME}]加载module[${thisModule.MODULE_NAME}]`
       );
       return true;
     } catch (error) {
       $console.error({
         id: "core.module.ModuleLoader.addModule.try",
         fileName,
-        MOD_NAME: this.Core.MOD_NAME,
+        MOD_NAME: this.Core.CORE_INFO.NAME,
         error: error.message
       });
       return false;
