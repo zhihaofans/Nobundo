@@ -20,7 +20,8 @@ class KernelIndex extends Kernel {
       "reminder.js",
       "daoshuri.js",
       "free-api.js",
-      "example.js"
+      "example.js",
+      "mefang.js"
     ];
     this.loadCoreMods(this.MOD_DIR, coreModList);
   }
@@ -35,8 +36,8 @@ class KernelIndex extends Kernel {
   }
 }
 class App extends AppKernel {
-  constructor({ modDir }) {
-    super({ modDir });
+  constructor({ appId, modDir, l10nPath }) {
+    super({ appId, modDir, l10nPath });
   }
   init() {
     const kernelIndex = new KernelIndex({
@@ -46,14 +47,16 @@ class App extends AppKernel {
     kernelIndex.init();
   }
 }
-const run = () => {
+function run() {
   try {
     const app = new App({
-      modDir: "/scripts/mods/"
+      appId: "zhihaofans.nobundo",
+      modDir: "/scripts/mods/",
+      l10nPath: "/strings/l10n.js"
     });
     app.init();
   } catch (_error) {
     $console.error(_error);
   }
-};
+}
 module.exports = { run };
