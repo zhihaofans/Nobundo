@@ -94,6 +94,31 @@ class ModLoader {
       });
     }
   }
+  addModByList(fileNameList) {
+    fileNameList.map(name => this.addMod(name));
+  }
+  getMod(modId) {
+    return this.modList.mods[modId];
+  }
+  runMod(modId) {
+    const thisMod = this.modList.mods[modId];
+    try {
+      thisMod.init();
+    } catch (error) {
+      $console.error(error);
+      $ui.alert({
+        title: `运行错误(${modId})`,
+        message: error.message,
+        actions: [
+          {
+            title: "OK",
+            disabled: false, // Optional
+            handler: () => {}
+          }
+        ]
+      });
+    }
+  }
 }
 
 module.exports = {
