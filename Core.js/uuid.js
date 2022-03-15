@@ -1,10 +1,10 @@
 class UserUUID {
   constructor(appKernel) {
     this.AppKernel = appKernel;
-    this.DEVELOPER_DIR = "shared://zhihaofans/";
-    this.DATA_DIR = this.DEVELOPER_DIR + "Core.js/";
+    this.ICLOUD_DIR = "drive://zhihaofans/";
+    this.DATA_DIR = this.ICLOUD_DIR + "Core.js/";
     this.KEYCHAIN_DOMAIN = "zhihaofans.corejs";
-    $file.mkdir(this.DEVELOPER_DIR);
+    $file.mkdir(this.ICLOUD_DIR);
     $file.mkdir(this.DATA_DIR);
     this.init();
     this.AppLog = new AppLog({
@@ -21,6 +21,10 @@ class UserUUID {
     $file.write({
       data: $data({ string: this.UUID }),
       path: this.DATA_DIR + "uuid"
+    });
+    $file.write({
+      data: $data({ string: this.UUID }),
+      path: this.ICLOUD_DATA_DIR + "uuid"
     });
   }
   getDeviceUUID() {

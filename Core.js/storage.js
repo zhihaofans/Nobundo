@@ -101,6 +101,39 @@ class File {
     return undefined;
   }
 }
+class Icloud {
+  constructor() {}
+  pickFile(handler, types) {
+    $drive.open({
+      types,
+      handler: data => handler(data)
+    });
+  }
+  pickFiles(handler, types) {
+    $drive.open({
+      multi: true,
+      types,
+      handler: data => handler(data)
+    });
+  }
+  saveFile(fileName, data, handler) {
+    $drive.save({
+      name: fileName,
+      data,
+      handler
+    });
+  }
+  readFile(filePath) {
+    return $drive.read(filePath);
+  }
+  isDirectoryExist(filePath) {
+    return $drive.exists(filePath) && $drive.isDirectory(filePath);
+  }
+  isFileExist(filePath) {
+    return $drive.exists(filePath) && !$drive.isDirectory(filePath);
+  }
+}
+
 class Keychain {
   constructor(domain) {
     this.DOMAIN = domain.toLowerCase();
@@ -261,32 +294,12 @@ class SQLite {
     }
   }
 }
-class Converter {
-  constructor(from_what, to_what) {
-    this.SOURCE_ID = {
-      CACHE: 0,
-      PREFS: 1,
-      SQLITE: 2
-    };
-    this.FROM_WHAT = from_what;
-    this.TO_WHAT = to_what;
-    this.CONVERT_TABLE = [
-      {
-        from: "demo.from.key",
-        to: "demo.to.key"
-      }
-    ];
-  }
-  setConvertTable(new_table) {
-    this.CONVERT_TABLE = new_table;
-  }
-  startConvert() {}
-}
 
 module.exports = {
   __VERSION__,
   Cache,
   File,
+  Icloud,
   Keychain,
   Prefs,
   SQLite
