@@ -45,6 +45,7 @@ class App extends AppKernel {
       modDir: this.MOD_DIR
     });
     kernelIndex.init();
+    $console.info(`启动耗时${new Date().getTime() - this.START_TIME}ms`);
   }
 }
 function run() {
