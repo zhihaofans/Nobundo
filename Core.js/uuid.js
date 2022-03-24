@@ -1,14 +1,12 @@
 class UserUUID {
-  constructor(appKernel) {
-    this.AppKernel = appKernel;
-    this.ICLOUD_DIR = "drive://zhihaofans/";
-    this.DATA_DIR = this.ICLOUD_DIR + "Core.js/";
+  constructor(app) {
+    this.AppKernel = app;
+    this.App = app;
+    this.DATA_DIR = this.App.DATA_DIR.ICLOUD;
     this.KEYCHAIN_DOMAIN = "zhihaofans.corejs";
-    $file.mkdir(this.ICLOUD_DIR);
-    $file.mkdir(this.DATA_DIR);
     this.init();
     this.AppLog = new AppLog({
-      appKernel: this.AppKernel,
+      app: this.App,
       dataDir: this.DATA_DIR
     });
   }
@@ -22,10 +20,6 @@ class UserUUID {
       data: $data({ string: this.UUID }),
       path: this.DATA_DIR + "uuid"
     });
-    $file.write({
-      data: $data({ string: this.UUID }),
-      path: this.ICLOUD_DATA_DIR + "uuid"
-    });
   }
   getDeviceUUID() {
     const UUID =
@@ -36,8 +30,8 @@ class UserUUID {
   }
 }
 class AppLog {
-  constructor({ appKernel, dataDir }) {
-    this.AppKernel = appKernel;
+  constructor({ app, dataDir }) {
+    this.App = app;
     this.DATA_DIR = dataDir;
     this.setLastApp({
       message: `logtime:${new Date().getTime()}`
@@ -45,9 +39,9 @@ class AppLog {
   }
   setLastApp({ message }) {
     const lastAppLog = {
-      appId: this.AppKernel.AppInfo.id,
-      appName: this.AppKernel.AppInfo.name,
-      timestamp: this.AppKernel.START_TIME,
+      appId: this.App.AppInfo.id,
+      appName: this.App.AppInfo.name,
+      timestamp: this.App.START_TIME,
       message
     };
     $file.write({

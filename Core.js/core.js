@@ -79,6 +79,52 @@ class ModLoader {
       if (this.modList.id.indexOf(modId) < 0) {
         this.modList.id.push(modId);
         this.modList.mods[modId] = thisMod;
+        if (typeof modCore.run === "function") {
+          const needUpdateCore = modCore.checkCoreVersion();
+          if (modCore.MOD_ID.length <= 0) {
+            throw new object.UserException({
+              name: "Mod id",
+              message: "need mod id",
+              source: "mod"
+            });
+          } else if (modCore.MOD_NAME.length <= 0) {
+            throw new object.UserException({
+              name: "Mod name",
+              message: "need mod name",
+              source: "mod"
+            });
+          } else if (
+            modCore.IGNORE_CORE_VERSION == true ||
+            needUpdateCore == 0
+          ) {
+            this.REG_CORE_MOD_LIST.push(modCore);
+          } else {
+            this.error("registerCoreMod", "need update mod");
+            $ui.alert({
+              title: "registerCoreMod",
+              message: `need update mod(${needUpdateCore},${modCore.MOD_NAME})`,
+              actions: [
+                {
+                  title: "OK",
+                  disabled: false, // Optional
+                  handler: () => {}
+                }
+              ]
+            });
+            throw new object.UserException({
+              name: "Mod version",
+              message: "register mod failed, need update mod or core.js",
+              source: "mod"
+            });
+          }
+        } else {
+          this.error("registerCoreMod", "ModCore.run ≠ function");
+          throw new object.UserException({
+            name: "Bug",
+            message: "register mod failed, ModCore.run  is not the function",
+            source: "mod"
+          });
+        }
       } else {
         throw new object.UserException({
           name: "重复",

@@ -1,5 +1,6 @@
 const START_TIME = new Date().getTime(),
-  { UserUUID } = require("./uuid");
+  { UserUUID } = require("./uuid"),
+  $ = require("./$");
 
 class AppKernel {
   constructor({ appId, modDir, l10nPath }) {
@@ -8,6 +9,12 @@ class AppKernel {
     this.AppConfig = JSON.parse($file.read("/config.json"));
     this.AppInfo = this.AppConfig.info;
     this.AppInfo.id = appId;
+    this.DATA_DIR = {
+      SHARED: "shared://zhihaofans/Core.js/",
+      ICLOUD: "drive://zhihaofans/Core.js/"
+    };
+    $.file.mkdirs(this.DATA_DIR.SHARED);
+    $.file.mkdirs(this.DATA_DIR.ICLOUD);
     this.l10n(require(l10nPath));
     this.UUID = new UserUUID(this);
   }
@@ -27,7 +34,33 @@ class AppKernel {
   getLocale() {
     return $app.info.locale;
   }
-  getString(id, lang = this.getLocale()) {}
+  getString(id, lang = this.getLocale()) {
+    return $app.strings[lang][id];
+  }
+  setSharedDataDir(path) {
+    if (path) {
+      this.DATA_DIR.SHARED = path;
+      if (!this.DATA_DIR.SHARED.endsWith("/")) {
+        this.DATA_DIR.SHARED += "/";
+      }
+    }
+  }
+  setIcloudDataDir(path) {
+    if (path) {
+      this.DATA_DIR.ICLOUD = path;
+      if (!this.DATA_DIR.ICLOUD.endsWith("/")) {
+        this.DATA_DIR.ICLOUD += "/";
+      }
+    }
+  }
+  setLocalDataDir(path) {
+    if (path) {
+      this.DATA_DIR.LOCAL = path;
+      if (!this.DATA_DIR.LOCAL.endsWith("/")) {
+        this.DATA_DIR.LOCAL += "/";
+      }
+    }
+  }
 }
 
 module.exports = { AppKernel, version: 1 };
