@@ -1,7 +1,19 @@
 const { Kernel } = require("../Core.js/kernel"),
   { AppKernel } = require("../Core.js/app"),
+  { ModLoader } = require("../Core.js/core"),
   ui = require("../Core.js/ui"),
-  listKit = new ui.ListKit();
+  listKit = new ui.ListKit(),
+  coreModList = [
+    "bilibili.js",
+    "jsbox-version.js",
+    "wallhaven.js",
+    "downloader.js",
+    "reminder.js",
+    "daoshuri.js",
+    "free-api.js",
+    "example.js",
+    "mefang.js"
+  ];
 
 class KernelIndex extends Kernel {
   constructor({ appName, modDir }) {
@@ -12,17 +24,6 @@ class KernelIndex extends Kernel {
       modDir
     });
     // 注册mod
-    const coreModList = [
-      "bilibili.js",
-      "jsbox-version.js",
-      "wallhaven.js",
-      "downloader.js",
-      "reminder.js",
-      "daoshuri.js",
-      "free-api.js",
-      "example.js",
-      "mefang.js"
-    ];
     this.loadCoreMods(this.MOD_DIR, coreModList);
   }
   init() {
@@ -38,14 +39,27 @@ class KernelIndex extends Kernel {
 class App extends AppKernel {
   constructor({ appId, modDir, l10nPath }) {
     super({ appId, modDir, l10nPath });
-  }
-  init() {
-    const kernelIndex = new KernelIndex({
+    this.setLocalDataDir("/.data/local_data/");
+    this;
+    this.modLoader = new ModLoader({ modDir });
+    this.kernelIndex = new KernelIndex({
       appName: this.AppInfo.name,
       modDir: this.MOD_DIR
     });
-    kernelIndex.init();
+    //this.modLoader.addModByList(coreModList);
+  }
+  init() {
+    this.kernelIndex.init();
     $console.info(`启动耗时${new Date().getTime() - this.START_TIME}ms`);
+  }
+  initModList() {
+    listKit.renderIdx(
+      this.APP_NAME,
+      this.modLoader.modList.mods.map(coreMod => coreMod.MOD_NAME),
+      (section, row) => {
+        this.modLoader.runMod(this.modLoader.modList[row].CORE_INFO.ID);
+      }
+    );
   }
 }
 function run() {
