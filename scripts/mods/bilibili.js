@@ -663,7 +663,7 @@ class Main {
             break;
         }
       };
-    listKit.pushString(this.Core.MOD_NAME, mainViewList, didSelect);
+    listKit.pushString(this.Core.CORE_INFO.NAME, mainViewList, didSelect);
   }
 }
 

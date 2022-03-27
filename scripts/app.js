@@ -12,24 +12,27 @@ const { Kernel } = require("../Core.js/kernel"),
     "daoshuri.js",
     "free-api.js",
     "example.js",
-    "mefang.js"
+    "mefang.js",
+    "punches.js"
   ];
 
 class KernelIndex extends Kernel {
-  constructor({ appName, modDir }) {
+  constructor({ app, appName, modDir }) {
     super({
       appName,
       useSqlite: true,
       debug: true,
       modDir
     });
+    this.App = app;
+    this.DATA_DIR = app.DATA_DIR;
     // 注册mod
     this.loadCoreMods(this.MOD_DIR, coreModList);
   }
   init() {
     listKit.renderIdx(
       this.APP_NAME,
-      this.REG_CORE_MOD_LIST.map(coreMod => coreMod.MOD_NAME),
+      this.REG_CORE_MOD_LIST.map(coreMod => coreMod.CORE_INFO.NAME),
       (section, row) => {
         this.REG_CORE_MOD_LIST[row].run();
       }
@@ -39,10 +42,9 @@ class KernelIndex extends Kernel {
 class App extends AppKernel {
   constructor({ appId, modDir, l10nPath }) {
     super({ appId, modDir, l10nPath });
-    this.setLocalDataDir("/.data/local_data/");
-    this;
     this.modLoader = new ModLoader({ modDir });
     this.kernelIndex = new KernelIndex({
+      app: this,
       appName: this.AppInfo.name,
       modDir: this.MOD_DIR
     });
