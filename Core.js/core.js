@@ -26,20 +26,12 @@ class Core {
       IGNORE_CORE_VERSION: ignoreCoreVersion,
       KEYCHAIN_DOMAIN: `nobundo.mod.${author}.${modId}`
     };
-    //this.MOD_ID = this.CORE_INFO.ID;
-    //this.MOD_NAME = this.CORE_INFO.NAME || "core";
-    //this.MOD_VERSION = this.CORE_INFO.VERSION || 1;
-    //this.MOD_AUTHOR = this.CORE_INFO.AUTHOR || "zhihaofans";
-    //this.NEED_CORE_VERSION = this.CORE_INFO.CORE_VERSION || 0;
-    //this.DATABASE_ID = this.CORE_INFO.DATABASE_ID;
     this.SQLITE_FILE = this.Kernel.DEFAULE_SQLITE_FILE || undefined;
     this.SQLITE =
       this.CORE_INFO.DATABASE_ID.length > 0 && this.Kernel.DEFAULE_SQLITE_FILE
         ? this.initSQLite()
         : undefined;
-    this.KEYCHAIN_DOMAIN = this.CORE_INFO.KEYCHAIN_DOMAIN;
     this.Keychain = new this.Storage.Keychain(this.CORE_INFO.KEYCHAIN_DOMAIN);
-    this.IGNORE_CORE_VERSION = ignoreCoreVersion === true;
   }
   checkCoreVersion() {
     if (CORE_VERSION === this.CORE_INFO.CORE_VERSION) {
@@ -72,77 +64,27 @@ class ModLoader {
     this.MOD_DIR = modDir;
     this.modList = { id: [], mods: {} };
   }
-  addMod(fileName) {
-    const filePath = this.MOD_DIR + fileName;
-    if (fileName.length > 0 && $.file.isFileExist(filePath)) {
-      const thisMod = require(filePath),
-        modId = thisMod.CORE_INFO.ID;
-      if (this.modList.id.indexOf(modId) < 0) {
-        this.modList.id.push(modId);
-        this.modList.mods[modId] = thisMod;
-        if (typeof thisMod.run === "function") {
-          const needUpdateCore = thisMod.checkCoreVersion();
-          if (thisMod.CORE_INFO.ID.length <= 0) {
-            throw new object.UserException({
-              name: "Mod id",
-              message: "need mod id",
-              source: "mod"
-            });
-          } else if (thisMod.MOD_NAME.length <= 0) {
-            throw new object.UserException({
-              name: "Mod name",
-              message: "need mod name",
-              source: "mod"
-            });
-          } else if (
-            thisMod.IGNORE_CORE_VERSION == true ||
-            needUpdateCore == 0
-          ) {
-            this.REG_CORE_MOD_LIST.push(thisMod);
-          } else {
-            this.error("registerCoreMod", "need update mod");
-            $ui.alert({
-              title: "registerCoreMod",
-              message: `need update mod(${needUpdateCore},${thisMod.MOD_NAME})`,
-              actions: [
-                {
-                  title: "OK",
-                  disabled: false, // Optional
-                  handler: () => {}
-                }
-              ]
-            });
-            throw new object.UserException({
-              name: "Mod version",
-              message: "register mod failed, need update mod or core.js",
-              source: "mod"
-            });
-          }
+  addMod(modCore) {
+    if (typeof modCore.run == "function") {
+      if (
+        modCore.CORE_INFO.ID.length > 0 &&
+        modCore.CORE_INFO.NAME.length > 0 &&
+        modCore.CORE_INFO.AUTHOR.length > 0
+      ) {
+        const needUpdateCore = modCore.checkCoreVersion();
+        if (
+          modCore.CORE_INFO.IGNORE_CORE_VERSION == true ||
+          needUpdateCore == 0
+        ) {
         } else {
-          this.error("registerCoreMod", "ModCore.run ≠ function");
-          throw new object.UserException({
-            name: "Bug",
-            message: "register mod failed, ModCore.run  is not the function",
-            source: "mod"
-          });
         }
       } else {
-        throw new object.UserException({
-          name: "重复",
-          message: "重复添加mod",
-          source: "developer"
-        });
       }
     } else {
-      throw new object.UserException({
-        name: "404",
-        message: "找不到该mod",
-        source: "developer"
-      });
     }
   }
   addModByList(fileNameList) {
-    fileNameList.map(name => this.addMod(name));
+    fileNameList.map(fileName => this.addMod(require(fileName)));
   }
   getMod(modId) {
     return this.modList.mods[modId];
