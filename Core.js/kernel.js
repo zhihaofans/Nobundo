@@ -64,25 +64,28 @@ class Kernel {
   registerCoreMod(modCore) {
     if (typeof modCore.run === "function") {
       const needUpdateCore = modCore.checkCoreVersion();
-      if (modCore.MOD_ID.length <= 0) {
+      if (modCore.CORE_INFO.ID.length <= 0) {
         throw new object.UserException({
           name: "Mod id",
           message: "need mod id",
           source: "mod"
         });
-      } else if (modCore.MOD_NAME.length <= 0) {
+      } else if (modCore.CORE_INFO.NAME.length <= 0) {
         throw new object.UserException({
           name: "Mod name",
           message: "need mod name",
           source: "mod"
         });
-      } else if (modCore.IGNORE_CORE_VERSION == true || needUpdateCore == 0) {
+      } else if (
+        modCore.CORE_INFO.IGNORE_CORE_VERSION == true ||
+        needUpdateCore == 0
+      ) {
         this.REG_CORE_MOD_LIST.push(modCore);
       } else {
         this.error("registerCoreMod", "need update mod");
         $ui.alert({
           title: "registerCoreMod",
-          message: `need update mod(${needUpdateCore},${modCore.MOD_NAME})`,
+          message: `need update mod(${needUpdateCore},${modCore.CORE_INFO.NAME})`,
           actions: [
             {
               title: "OK",

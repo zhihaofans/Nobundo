@@ -8,11 +8,10 @@ class Core {
     modName,
     version,
     author,
-    databaseId,
     needCoreVersion,
-    keychainId,
     ignoreCoreVersion
   }) {
+    this.App = kernel.App;
     this.Kernel = kernel;
     this.Storage = require("./storage");
     this.Http = require("./lib").Http;
@@ -27,15 +26,15 @@ class Core {
       IGNORE_CORE_VERSION: ignoreCoreVersion,
       KEYCHAIN_DOMAIN: `nobundo.mod.${author}.${modId}`
     };
-    this.MOD_ID = this.CORE_INFO.ID;
-    this.MOD_NAME = this.CORE_INFO.NAME || "core";
-    this.MOD_VERSION = this.CORE_INFO.VERSION || 1;
-    this.MOD_AUTHOR = this.CORE_INFO.AUTHOR || "zhihaofans";
-    this.NEED_CORE_VERSION = this.CORE_INFO.CORE_VERSION || 0;
-    this.DATABASE_ID = this.CORE_INFO.DATABASE_ID;
+    //this.MOD_ID = this.CORE_INFO.ID;
+    //this.MOD_NAME = this.CORE_INFO.NAME || "core";
+    //this.MOD_VERSION = this.CORE_INFO.VERSION || 1;
+    //this.MOD_AUTHOR = this.CORE_INFO.AUTHOR || "zhihaofans";
+    //this.NEED_CORE_VERSION = this.CORE_INFO.CORE_VERSION || 0;
+    //this.DATABASE_ID = this.CORE_INFO.DATABASE_ID;
     this.SQLITE_FILE = this.Kernel.DEFAULE_SQLITE_FILE || undefined;
     this.SQLITE =
-      this.DATABASE_ID.length > 0 && this.Kernel.DEFAULE_SQLITE_FILE
+      this.CORE_INFO.DATABASE_ID.length > 0 && this.Kernel.DEFAULE_SQLITE_FILE
         ? this.initSQLite()
         : undefined;
     this.KEYCHAIN_DOMAIN = this.CORE_INFO.KEYCHAIN_DOMAIN;
@@ -56,14 +55,16 @@ class Core {
   }
   initSQLite() {
     const SQLite = new this.Storage.SQLite(this.SQLITE_FILE);
-    SQLite.createSimpleTable(this.DATABASE_ID);
+    SQLite.createSimpleTable(this.CORE_INFO.DATABASE_ID);
     return SQLite;
   }
   getSql(key) {
-    return this.SQLITE ? this.SQLITE.auto(this.DATABASE_ID, key) : undefined;
+    return this.SQLITE
+      ? this.SQLITE.auto(this.CORE_INFO.DATABASE_ID, key)
+      : undefined;
   }
   setSql(key, value) {
-    return this.SQLITE.setSimpleData(this.DATABASE_ID, key, value);
+    return this.SQLITE.setSimpleData(this.CORE_INFO.DATABASE_ID, key, value);
   }
 }
 class ModLoader {
@@ -79,30 +80,30 @@ class ModLoader {
       if (this.modList.id.indexOf(modId) < 0) {
         this.modList.id.push(modId);
         this.modList.mods[modId] = thisMod;
-        if (typeof modCore.run === "function") {
-          const needUpdateCore = modCore.checkCoreVersion();
-          if (modCore.MOD_ID.length <= 0) {
+        if (typeof thisMod.run === "function") {
+          const needUpdateCore = thisMod.checkCoreVersion();
+          if (thisMod.CORE_INFO.ID.length <= 0) {
             throw new object.UserException({
               name: "Mod id",
               message: "need mod id",
               source: "mod"
             });
-          } else if (modCore.MOD_NAME.length <= 0) {
+          } else if (thisMod.MOD_NAME.length <= 0) {
             throw new object.UserException({
               name: "Mod name",
               message: "need mod name",
               source: "mod"
             });
           } else if (
-            modCore.IGNORE_CORE_VERSION == true ||
+            thisMod.IGNORE_CORE_VERSION == true ||
             needUpdateCore == 0
           ) {
-            this.REG_CORE_MOD_LIST.push(modCore);
+            this.REG_CORE_MOD_LIST.push(thisMod);
           } else {
             this.error("registerCoreMod", "need update mod");
             $ui.alert({
               title: "registerCoreMod",
-              message: `need update mod(${needUpdateCore},${modCore.MOD_NAME})`,
+              message: `need update mod(${needUpdateCore},${thisMod.MOD_NAME})`,
               actions: [
                 {
                   title: "OK",
