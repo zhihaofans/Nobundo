@@ -26,10 +26,9 @@ class KernelIndex extends Kernel {
     });
     this.App = app;
     this.DATA_DIR = app.DATA_DIR;
-    // 注册mod
-    this.loadCoreMods(this.MOD_DIR, coreModList);
   }
   init() {
+    this.loadCoreMods(this.MOD_DIR, coreModList);
     listKit.renderIdx(
       this.APP_NAME,
       this.REG_CORE_MOD_LIST.map(coreMod => coreMod.CORE_INFO.NAME),
@@ -42,24 +41,28 @@ class KernelIndex extends Kernel {
 class App extends AppKernel {
   constructor({ appId, modDir, l10nPath }) {
     super({ appId, modDir, l10nPath });
-    this.modLoader = new ModLoader({ modDir });
+
     this.kernelIndex = new KernelIndex({
       app: this,
       appName: this.AppInfo.name,
       modDir: this.MOD_DIR
     });
-    //this.modLoader.addModByList(coreModList);
+    this.modLoader = new ModLoader({ modDir, app: this });
   }
   init() {
-    this.kernelIndex.init();
+    //this.kernelIndex.init();
+    this.initModList();
     $console.info(`启动耗时${new Date().getTime() - this.START_TIME}ms`);
   }
   initModList() {
+    this.modLoader.addModByList(coreModList);
     listKit.renderIdx(
-      this.APP_NAME,
-      this.modLoader.modList.mods.map(coreMod => coreMod.MOD_NAME),
+      this.AppInfo.name,
+      this.modLoader.modList.id.map(
+        modId => this.modLoader.modList.mods[modId].CORE_INFO.NAME
+      ),
       (section, row) => {
-        this.modLoader.runMod(this.modLoader.modList[row].CORE_INFO.ID);
+        this.modLoader.runMod(this.modLoader.modList.id[row]);
       }
     );
   }
