@@ -6,10 +6,10 @@
     "rotateDisabled": false,
     "theme": "auto",
     "keyboardToolbarEnabled": false,
-    "minSDKVer": "2.0.0"
+    "minSDKVer": "2.20.0"
   },
   "info": {
-    "version": "1.0.0-20220210a",
+    "version": "1.0.0-20220328",
     "author": "zhihaofans",
     "types": 5,
     "website": "https://github.com/zhihaofans/Nobundo",
