@@ -3,6 +3,7 @@ const CORE_VERSION = 3,
   $ = require("./$");
 class Core {
   constructor({
+    app,
     kernel,
     modId,
     modName,
@@ -11,7 +12,7 @@ class Core {
     needCoreVersion,
     ignoreCoreVersion
   }) {
-    this.App = kernel.App;
+    //this.App = kernel.App;
     this.Kernel = kernel;
     this.Storage = require("./storage");
     this.Http = require("./lib").Http;
@@ -60,7 +61,9 @@ class Core {
   }
 }
 class ModLoader {
-  constructor({ modDir }) {
+  constructor({ app, modDir }) {
+    this.App = app;
+    this.Kernel = app.kernelIndex;
     this.MOD_DIR = modDir;
     this.modList = { id: [], mods: {} };
   }
@@ -76,23 +79,40 @@ class ModLoader {
           modCore.CORE_INFO.IGNORE_CORE_VERSION == true ||
           needUpdateCore == 0
         ) {
+          const modID = modCore.CORE_INFO.ID;
+          if (
+            this.modList.id.indexOf(modID) < 0 &&
+            this.modList.mods[modID] == undefined
+          ) {
+            this.modList.id.push(modID);
+            this.modList.mods[modID] = modCore;
+          } else {
+            $console.error(1);
+          }
         } else {
+          $console.error(2);
         }
       } else {
+        $console.error(3);
       }
     } else {
+      $console.error(4);
     }
   }
   addModByList(fileNameList) {
-    fileNameList.map(fileName => this.addMod(require(fileName)));
+    fileNameList.map(fileName => {
+      const thisMod = require(this.MOD_DIR + fileName);
+      this.addMod(new thisMod(this.Kernel));
+    });
   }
   getMod(modId) {
     return this.modList.mods[modId];
   }
   runMod(modId) {
     const thisMod = this.modList.mods[modId];
+    $console.warn(thisMod);
     try {
-      thisMod.init();
+      thisMod.run();
     } catch (error) {
       $console.error(error);
       $ui.alert({
