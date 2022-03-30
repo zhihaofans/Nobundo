@@ -1,12 +1,14 @@
 const START_TIME = new Date().getTime(),
   { UserUUID } = require("./uuid"),
-  $ = require("./$");
-
+  $ = require("./$"),
+  { VersionException } = require("./object"),
+  NEED_JSBOX_VERSION = 1361,
+  NOW_JSBOX_VERSION = Number.parseInt($app.info.build);
 class AppKernel {
-  constructor({ appId, modDir, l10nPath, debug }) {
+  constructor({ appId, modDir, l10nPath }) {
     this.START_TIME = START_TIME;
     this.MOD_DIR = modDir;
-    this.DEBUG = debug == true;
+    this.DEBUG = $app.isDebugging;
     this.AppConfig = JSON.parse($file.read("/config.json"));
     this.AppInfo = this.AppConfig.info;
     this.AppInfo.id = appId;
@@ -15,11 +17,18 @@ class AppKernel {
       ICLOUD: "drive://zhihaofans/Core.js/",
       LOCAL: "/assets/.files/"
     };
+    this.DEFAULE_SQLITE_FILE = this.DATA_DIR.LOCAL + "mods.db";
     $.file.mkdirs(this.DATA_DIR.SHARED);
     $.file.mkdirs(this.DATA_DIR.ICLOUD);
     $.file.mkdirs(this.DATA_DIR.LOCAL);
     this.l10n(require(l10nPath));
     this.UUID = new UserUUID(this);
+    if (this.DEBUG) {
+      this.kernelDebug(`appName:${this.AppInfo.name}`);
+      this.kernelDebug(`appId:${this.AppInfo.id}`);
+      this.kernelDebug(`debug:${this.DEBUG}`);
+    }
+    this.checkJsboxVersion();
   }
   l10n(l10nRes) {
     const result = {};
@@ -68,13 +77,33 @@ class AppKernel {
     }
   }
   info(id, msg) {
-    $console.info(msg ? `${id}:${msg}` : id);
+    if (this.DEBUG) {
+      $console.info(msg ? `${id}:${msg}` : id);
+    }
   }
   warn(id, msg) {
-    $console.warn(msg ? `${id}:${msg}` : id);
+    if (this.DEBUG) {
+      $console.warn(msg ? `${id}:${msg}` : id);
+    }
   }
   error(id, msg) {
-    $console.error(msg ? `${id}:${msg}` : id);
+    if (this.DEBUG) {
+      $console.error(msg ? `${id}:${msg}` : id);
+    }
+  }
+  kernelDebug(message) {
+    if (this.DEBUG) {
+      $console.info(`Kernel:${message}`);
+    }
+  }
+  checkJsboxVersion() {
+    if (NOW_JSBOX_VERSION < NEED_JSBOX_VERSION) {
+      throw new VersionException({
+        message: "需要更新JSBox",
+        nowVersion: NOW_JSBOX_VERSION,
+        needVersion: NEED_JSBOX_VERSION
+      });
+    }
   }
 }
 

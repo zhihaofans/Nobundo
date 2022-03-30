@@ -12,7 +12,7 @@ class Core {
     needCoreVersion,
     ignoreCoreVersion
   }) {
-    //this.App = kernel.App;
+    this.App = app;
     this.Kernel = kernel;
     this.Storage = require("./storage");
     this.Http = require("./lib").Http;
@@ -25,9 +25,9 @@ class Core {
       CORE_VERSION: needCoreVersion,
       DATABASE_ID: modId,
       IGNORE_CORE_VERSION: ignoreCoreVersion,
-      KEYCHAIN_DOMAIN: `nobundo.mod.${author}.${modId}`
+      KEYCHAIN_DOMAIN: `nobundo.mods.${author}.${modId}`
     };
-    this.SQLITE_FILE = this.Kernel.DEFAULE_SQLITE_FILE || undefined;
+    this.SQLITE_FILE = this.Kernel.DEFAULE_SQLITE_FILE;
     this.SQLITE =
       this.CORE_INFO.DATABASE_ID.length > 0 && this.Kernel.DEFAULE_SQLITE_FILE
         ? this.initSQLite()
@@ -87,10 +87,10 @@ class ModLoader {
             this.modList.id.push(modID);
             this.modList.mods[modID] = modCore;
           } else {
-            $console.error(1);
+            $console.error(`modID(${modID})已存在`);
           }
         } else {
-          $console.error(2);
+          $console.error({ needUpdateCore });
         }
       } else {
         $console.error(3);

@@ -14,9 +14,18 @@ class UserException {
     this.source = source ?? "user";
   }
 }
-
+class VersionException {
+  constructor({ name, message, source, nowVersion, needVersion }) {
+    this.name = name || "VersionException";
+    this.message = message || "";
+    this.source = source || "Developer";
+    this.now_version = nowVersion;
+    this.need_version = needVersion;
+  }
+}
 module.exports = {
   __VERSION__,
   Result,
-  UserException
+  UserException,
+  VersionException
 };
