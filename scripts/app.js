@@ -17,15 +17,18 @@ const { Kernel } = require("../Core.js/kernel"),
   ];
 
 class KernelIndex extends Kernel {
-  constructor({ app, appName, modDir }) {
+  constructor({ app, appName, modDir, debug }) {
     super({
       appName,
       useSqlite: true,
-      debug: true,
+      debug,
       modDir
     });
     this.App = app;
     this.DATA_DIR = app.DATA_DIR;
+    this.info = app.info;
+    this.error = app.error;
+    this.warn = app.warn;
   }
   init() {
     this.loadCoreMods(this.MOD_DIR, coreModList);
@@ -41,18 +44,18 @@ class KernelIndex extends Kernel {
 class App extends AppKernel {
   constructor({ appId, modDir, l10nPath }) {
     super({ appId, modDir, l10nPath });
-
     this.kernelIndex = new KernelIndex({
       app: this,
       appName: this.AppInfo.name,
-      modDir: this.MOD_DIR
+      modDir: this.MOD_DIR,
+      debug: this.DEBUG
     });
     this.modLoader = new ModLoader({ modDir, app: this });
   }
   init() {
     //this.kernelIndex.init();
     this.initModList();
-    $console.info(`启动耗时${new Date().getTime() - this.START_TIME}ms`);
+    this.info(`启动耗时${new Date().getTime() - this.START_TIME}ms`);
   }
   initModList() {
     this.modLoader.addModByList(coreModList);
@@ -75,8 +78,19 @@ function run() {
       l10nPath: "/strings/l10n.js"
     });
     app.init();
-  } catch (_error) {
-    $console.error(_error);
+  } catch (error) {
+    $console.error(error);
+    $ui.alert({
+      title: "app.js throw",
+      message: error,
+      actions: [
+        {
+          title: "OK",
+          disabled: false, // Optional
+          handler: () => {}
+        }
+      ]
+    });
   }
 }
 module.exports = { run };
