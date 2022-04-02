@@ -59,15 +59,23 @@ class App extends AppKernel {
   }
   initModList() {
     this.modLoader.addModByList(coreModList);
-    listKit.renderIdx(
-      this.AppInfo.name,
-      this.modLoader.modList.id.map(
-        modId => this.modLoader.modList.mods[modId].CORE_INFO.NAME
-      ),
-      (section, row) => {
-        this.modLoader.runMod(this.modLoader.modList.id[row]);
-      }
-    );
+
+    switch ($app.env) {
+      case $env.widget:
+        this.modLoader.setWidgetMod("example");
+        this.modLoader.runWidgetMod();
+        break;
+      default:
+        listKit.renderIdx(
+          this.AppInfo.name,
+          this.modLoader.modList.id.map(
+            modId => this.modLoader.modList.mods[modId].CORE_INFO.NAME
+          ),
+          (section, row) => {
+            this.modLoader.runMod(this.modLoader.modList.id[row]);
+          }
+        );
+    }
   }
 }
 function run() {

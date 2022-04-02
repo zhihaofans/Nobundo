@@ -22,5 +22,18 @@ class Example extends Core {
     }
     $ui.success("run");
   }
+  runWidget() {
+    const inputValue = $widget.inputValue;
+    $widget.setTimeline({
+      render: ctx => {
+        return {
+          type: "text",
+          props: {
+            text: `[${inputValue}]Hello, Example!`
+          }
+        };
+      }
+    });
+  }
 }
 module.exports = Example;
