@@ -1,5 +1,4 @@
 const CORE_VERSION = 3,
-  object = require("./object"),
   $ = require("./$");
 class Core {
   constructor({
@@ -66,6 +65,7 @@ class ModLoader {
     this.Kernel = app.kernelIndex;
     this.MOD_DIR = modDir;
     this.modList = { id: [], mods: {} };
+    this.WIDGET_MOD_ID = undefined;
   }
   addMod(modCore) {
     if (typeof modCore.run == "function") {
@@ -125,6 +125,35 @@ class ModLoader {
             handler: () => {}
           }
         ]
+      });
+    }
+  }
+  setWidgetMod(modId) {
+    if (
+      this.modList.id.indexOf(modId) >= 0 &&
+      typeof this.modList.mods[modId].runWidget == "function"
+    ) {
+      this.WIDGET_MOD_ID = modId;
+      this.App.WIDGET_MOD_ID = modId;
+    }
+  }
+  runWidgetMod() {
+    const modId = this.WIDGET_MOD_ID,
+      thisMod = this.modList.mods[modId];
+    $console.warn(thisMod);
+    try {
+      thisMod.runWidget();
+    } catch (error) {
+      $console.error(error);
+      $widget.setTimeline({
+        render: ctx => {
+          return {
+            type: "text",
+            props: {
+              text: error.message
+            }
+          };
+        }
       });
     }
   }

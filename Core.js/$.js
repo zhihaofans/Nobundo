@@ -1,5 +1,4 @@
-const version = "1",
-  alert = {
+const alert = {
     show: ({ title, message }) => {
       $ui.alert({
         title,
@@ -54,6 +53,9 @@ const version = "1",
         $file.mkdir(nextPath);
       });
     }
+  },
+  getUUID = () => {
+    return $text.uuid;
   },
   http = {
     get: async ({ url, header, timeout }) => {
@@ -170,15 +172,16 @@ const version = "1",
     pickDateAndTime: async () => {
       return await $picker.date({ props: { mode: 2 } });
     }
+  },
+  toInt = data => {
+    return Number.parseInt(data);
   };
 module.exports = {
-  version,
   alert,
-  getUUID: () => {
-    return $text.uuid;
-  },
+  getUUID,
   file,
   http,
   share,
-  time
+  time,
+  toInt
 };

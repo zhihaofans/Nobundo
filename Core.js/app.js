@@ -1,9 +1,9 @@
 const START_TIME = new Date().getTime(),
-  { UserUUID } = require("./uuid"),
-  $ = require("./$"),
-  { VersionException } = require("./object"),
   NEED_JSBOX_VERSION = 1361,
-  NOW_JSBOX_VERSION = Number.parseInt($app.info.build);
+  NOW_JSBOX_VERSION = Number.parseInt($app.info.build),
+  { UserUUID } = require("./uuid"),
+  { VersionException } = require("./object"),
+  $ = require("./$");
 class AppKernel {
   constructor({ appId, modDir, l10nPath }) {
     this.START_TIME = START_TIME;
@@ -29,6 +29,7 @@ class AppKernel {
       this.kernelDebug(`debug:${this.DEBUG}`);
     }
     this.checkJsboxVersion();
+    this.WIDGET_MOD_ID = undefined;
   }
   l10n(l10nRes) {
     const result = {};
