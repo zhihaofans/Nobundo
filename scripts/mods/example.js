@@ -6,7 +6,7 @@ class Example extends Core {
       kernel: kernel,
       modId: "example",
       modName: "例子",
-      version: "5c",
+      version: "6",
       author: "zhihaofans",
       needCoreVersion: 3
     });
@@ -23,13 +23,13 @@ class Example extends Core {
     $ui.success("run");
   }
   runWidget() {
-    const inputValue = $widget.inputValue;
+    const inputValue = $widget.inputValue ? `[${$widget.inputValue}]` : "";
     $widget.setTimeline({
       render: ctx => {
         return {
           type: "text",
           props: {
-            text: `[${inputValue}]Hello, Example!`
+            text: `${inputValue}Hello, Example!`
           }
         };
       }
