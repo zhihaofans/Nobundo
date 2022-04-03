@@ -70,9 +70,9 @@ class Main {
 }
 
 class Daoshuri extends Core {
-  constructor(kernel) {
+  constructor(app) {
     super({
-      kernel: kernel,
+      app,
       modId: "daoshuri",
       modName: "倒数日",
       version: "1",

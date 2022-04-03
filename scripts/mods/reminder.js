@@ -131,7 +131,6 @@ class ReminderLib {
 class Main {
   constructor(core) {
     this.Core = core;
-    this.Kernel = this.Core.kernel;
     this.$ = this.Core.$;
     this.ReminderLib = new ReminderLib();
   }
@@ -287,9 +286,9 @@ class Main {
 }
 
 class Reminder extends Core {
-  constructor(kernel) {
+  constructor(app) {
     super({
-      kernel: kernel,
+      app,
       modId: "reminder",
       modName: "提醒事项",
       version: "1",

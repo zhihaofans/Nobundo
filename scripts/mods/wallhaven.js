@@ -4,7 +4,6 @@ const { Core } = require("../../Core.js/core"),
 class Main {
   constructor(core) {
     this.Core = core;
-    this.Kernel = core.kernel;
     this.Http = new core.Http(5);
     this.keychainId = {
       apiKey: "apikey",
@@ -93,9 +92,9 @@ class Main {
 }
 
 class Wallhaven extends Core {
-  constructor(kernel) {
+  constructor(app) {
     super({
-      kernel: kernel,
+      app,
       modId: "wallhaven",
       modName: "Wallhaven",
       version: "1",

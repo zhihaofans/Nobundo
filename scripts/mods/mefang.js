@@ -137,9 +137,9 @@ class MefangUi {
 }
 
 class Mefang extends ModCore {
-  constructor(kernel) {
+  constructor(app) {
     super({
-      kernel: kernel,
+      app,
       modId: "mefang",
       modName: "么方运动",
       version: "1",

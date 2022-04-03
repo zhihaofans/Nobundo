@@ -668,9 +668,9 @@ class Main {
 }
 
 class Bilibili extends Core {
-  constructor(kernel) {
+  constructor(app) {
     super({
-      kernel: kernel,
+      app,
       modId: "bilibili",
       modName: "哔哩哔哩",
       version: "5b",

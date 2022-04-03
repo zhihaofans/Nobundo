@@ -1,9 +1,9 @@
 const { Core } = require("../../Core.js/core"),
   { ModuleLoader } = require("../../Core.js/core.module");
 class Example extends Core {
-  constructor(kernel) {
+  constructor(app) {
     super({
-      kernel: kernel,
+      app,
       modId: "example",
       modName: "例子",
       version: "6",

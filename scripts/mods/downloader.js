@@ -238,9 +238,9 @@ class Main {
 }
 
 class Downloader extends Core {
-  constructor(kernel) {
+  constructor(app) {
     super({
-      kernel: kernel,
+      app,
       modId: "downloader",
       modName: "下载器",
       version: "1a",

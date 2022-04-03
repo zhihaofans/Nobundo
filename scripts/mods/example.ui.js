@@ -4,7 +4,6 @@ const { CoreModule } = require("../../Core.js/core.module"),
 class Main {
   constructor(core) {
     this.Core = core;
-    this.Kernel = this.Core.kernel;
     this.Http = new this.Core.Http(5);
     this.$ = this.Core.$;
   }

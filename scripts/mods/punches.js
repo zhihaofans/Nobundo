@@ -86,7 +86,7 @@ class DataSql {
 class PunchesApi {
   constructor(core) {
     this.SQL = new DataSql({
-      dataDir: core.Kernel.DATA_DIR.LOCAL
+      dataDir: core.App.DATA_DIR.LOCAL
     });
     this.SQL.init();
   }
@@ -193,9 +193,9 @@ class PunchesUi {
 }
 
 class Punches extends Core {
-  constructor(kernel) {
+  constructor(app) {
     super({
-      kernel: kernel,
+      app,
       modId: "punches",
       modName: "打卡",
       version: "1",

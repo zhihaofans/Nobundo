@@ -83,7 +83,6 @@ class Douyin {
 class Main {
   constructor(core) {
     this.Core = core;
-    this.Kernel = core.kernel;
     this.$ = core.$;
     this.apiList = [
       {
@@ -125,9 +124,9 @@ class Main {
 }
 
 class FreeApi extends Core {
-  constructor(kernel) {
+  constructor(app) {
     super({
-      kernel: kernel,
+      app,
       modId: "free_api",
       modName: "免费Api",
       version: "1",

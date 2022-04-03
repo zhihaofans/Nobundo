@@ -1,5 +1,4 @@
-const { Kernel } = require("../Core.js/kernel"),
-  { AppKernel } = require("../Core.js/app"),
+const { AppKernel } = require("../Core.js/app"),
   { ModLoader } = require("../Core.js/core"),
   ui = require("../Core.js/ui"),
   listKit = new ui.ListKit(),
@@ -16,44 +15,12 @@ const { Kernel } = require("../Core.js/kernel"),
     "punches.js"
   ];
 
-class KernelIndex extends Kernel {
-  constructor({ app, appName, modDir, debug }) {
-    super({
-      appName,
-      useSqlite: true,
-      debug,
-      modDir
-    });
-    this.App = app;
-    this.DATA_DIR = app.DATA_DIR;
-    this.info = app.info;
-    this.error = app.error;
-    this.warn = app.warn;
-  }
-  init() {
-    this.loadCoreMods(this.MOD_DIR, coreModList);
-    listKit.renderIdx(
-      this.APP_NAME,
-      this.REG_CORE_MOD_LIST.map(coreMod => coreMod.CORE_INFO.NAME),
-      (section, row) => {
-        this.REG_CORE_MOD_LIST[row].run();
-      }
-    );
-  }
-}
 class App extends AppKernel {
   constructor({ appId, modDir, l10nPath }) {
     super({ appId, modDir, l10nPath });
-    this.kernelIndex = new KernelIndex({
-      app: this,
-      appName: this.AppInfo.name,
-      modDir: this.MOD_DIR,
-      debug: this.DEBUG
-    });
     this.modLoader = new ModLoader({ modDir, app: this });
   }
   init() {
-    //this.kernelIndex.init();
     this.initModList();
     this.info(`启动耗时${new Date().getTime() - this.START_TIME}ms`);
   }

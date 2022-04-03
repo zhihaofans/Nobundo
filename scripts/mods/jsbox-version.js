@@ -260,9 +260,9 @@ class Main {
 }
 
 class Version extends Core {
-  constructor(kernel) {
+  constructor(app) {
     super({
-      kernel: kernel,
+      app,
       modId: "jsbox-version",
       modName: "JSBox新功能测试",
       version: "3",
