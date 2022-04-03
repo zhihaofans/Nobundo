@@ -11,8 +11,9 @@ class CoreModule {
 class ModuleLoader {
   constructor(core) {
     this.Core = core;
-    this.Kernel = this.Core.Kernel;
-    this.MOD_DIR = this.Kernel.MOD_DIR;
+    this.App = core.App;
+    this.Kernel = this.App.kernelIndex;
+    this.MOD_DIR = this.App.MOD_DIR;
     this.ModuleList = {};
   }
   addModule(fileName) {

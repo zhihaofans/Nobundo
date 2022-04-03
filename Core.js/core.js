@@ -3,7 +3,6 @@ const CORE_VERSION = 3,
 class Core {
   constructor({
     app,
-    kernel,
     modId,
     modName,
     version,
@@ -12,7 +11,7 @@ class Core {
     ignoreCoreVersion
   }) {
     this.App = app;
-    this.Kernel = kernel;
+    this.Kernel = app.kernelIndex;
     this.Storage = require("./storage");
     this.Http = require("./lib").Http;
     this.$ = $;
@@ -101,8 +100,16 @@ class ModLoader {
   }
   addModByList(fileNameList) {
     fileNameList.map(fileName => {
-      const thisMod = require(this.MOD_DIR + fileName);
-      this.addMod(new thisMod(this.Kernel));
+      try {
+        const thisMod = require(this.MOD_DIR + fileName);
+        this.addMod(new thisMod(this.App));
+      } catch (error) {
+        $console.error({
+          message: error.message,
+          fileName,
+          name: "ModLoader.addModByList"
+        });
+      }
     });
   }
   getMod(modId) {

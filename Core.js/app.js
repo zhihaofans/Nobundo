@@ -3,6 +3,7 @@ const START_TIME = new Date().getTime(),
   NOW_JSBOX_VERSION = Number.parseInt($app.info.build),
   { UserUUID } = require("./uuid"),
   { VersionException } = require("./object"),
+  { Kernel } = require("./kernel"),
   $ = require("./$");
 class AppKernel {
   constructor({ appId, modDir, l10nPath }) {
@@ -30,6 +31,11 @@ class AppKernel {
     }
     this.checkJsboxVersion();
     this.WIDGET_MOD_ID = undefined;
+    this.kernelIndex = new Kernel({
+      appName: this.AppInfo.name,
+      modDir: this.MOD_DIR,
+      debug: this.DEBUG
+    });
   }
   l10n(l10nRes) {
     const result = {};
