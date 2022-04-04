@@ -245,7 +245,7 @@ class Downloader extends Core {
       modName: "下载器",
       version: "1a",
       author: "zhihaofans",
-      needCoreVersion: 3
+      needCoreVersion: 4
     });
     this.main = new Main(this);
   }

@@ -131,7 +131,7 @@ class FreeApi extends Core {
       modName: "免费Api",
       version: "1",
       author: "zhihaofans",
-      needCoreVersion: 3
+      needCoreVersion: 4
     });
   }
   run() {

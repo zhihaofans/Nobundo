@@ -144,7 +144,7 @@ class Mefang extends ModCore {
       modName: "么方运动",
       version: "1",
       author: "zhihaofans",
-      needCoreVersion: 3
+      needCoreVersion: 4
     });
     this.ui = new MefangUi(this);
   }

@@ -1,4 +1,4 @@
-const CORE_VERSION = 3,
+const CORE_VERSION = 4,
   $ = require("./$");
 class Core {
   constructor({
@@ -115,7 +115,6 @@ class ModLoader {
   }
   runMod(modId) {
     const thisMod = this.modList.mods[modId];
-    $console.warn(thisMod);
     try {
       thisMod.run();
     } catch (error) {

@@ -8,7 +8,7 @@ class Example extends Core {
       modName: "例子",
       version: "6",
       author: "zhihaofans",
-      needCoreVersion: 3
+      needCoreVersion: 4
     });
     this.ModuleLoader = new ModuleLoader(this);
   }

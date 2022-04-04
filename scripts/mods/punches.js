@@ -200,7 +200,7 @@ class Punches extends Core {
       modName: "打卡",
       version: "1",
       author: "zhihaofans",
-      needCoreVersion: 3
+      needCoreVersion: 4
     });
   }
   run() {

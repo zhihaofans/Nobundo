@@ -267,7 +267,7 @@ class Version extends Core {
       modName: "JSBox新功能测试",
       version: "3",
       author: "zhihaofans",
-      needCoreVersion: 3
+      needCoreVersion: 4
     });
   }
   run() {

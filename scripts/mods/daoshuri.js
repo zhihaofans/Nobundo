@@ -77,7 +77,7 @@ class Daoshuri extends Core {
       modName: "倒数日",
       version: "1",
       author: "zhihaofans",
-      needCoreVersion: 3
+      needCoreVersion: 4
     });
   }
   run() {
