@@ -1,6 +1,5 @@
 class UserUUID {
   constructor(app) {
-    this.AppKernel = app;
     this.App = app;
     this.DATA_DIR = this.App.DATA_DIR.ICLOUD;
     this.KEYCHAIN_DOMAIN = "zhihaofans.corejs";

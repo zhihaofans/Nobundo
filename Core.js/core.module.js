@@ -12,7 +12,6 @@ class ModuleLoader {
   constructor(core) {
     this.Core = core;
     this.App = core.App;
-    this.Kernel = this.App.kernelIndex;
     this.MOD_DIR = this.App.MOD_DIR;
     this.ModuleList = {};
   }

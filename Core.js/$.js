@@ -54,9 +54,6 @@ const alert = {
       });
     }
   },
-  getUUID = () => {
-    return $text.uuid;
-  },
   http = {
     get: async ({ url, header, timeout }) => {
       return await $http.get({
@@ -172,16 +169,18 @@ const alert = {
     pickDateAndTime: async () => {
       return await $picker.date({ props: { mode: 2 } });
     }
-  },
-  toInt = data => {
-    return Number.parseInt(data);
   };
 module.exports = {
   alert,
-  getUUID,
+  getUUID: () => {
+    return $text.uuid;
+  },
   file,
   http,
+  info: () => {},
   share,
   time,
-  toInt
+  toInt: data => {
+    return Number.parseInt(data);
+  }
 };

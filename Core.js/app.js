@@ -31,11 +31,6 @@ class AppKernel {
     }
     this.checkJsboxVersion();
     this.WIDGET_MOD_ID = undefined;
-    this.kernelIndex = new Kernel({
-      appName: this.AppInfo.name,
-      modDir: this.MOD_DIR,
-      debug: this.DEBUG
-    });
   }
   l10n(l10nRes) {
     const result = {};

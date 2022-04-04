@@ -11,7 +11,6 @@ class Core {
     ignoreCoreVersion
   }) {
     this.App = app;
-    this.Kernel = app.kernelIndex;
     this.Storage = require("./storage");
     this.Http = require("./lib").Http;
     this.$ = $;
@@ -25,9 +24,9 @@ class Core {
       IGNORE_CORE_VERSION: ignoreCoreVersion,
       KEYCHAIN_DOMAIN: `nobundo.mods.${author}.${modId}`
     };
-    this.SQLITE_FILE = this.Kernel.DEFAULE_SQLITE_FILE;
+    this.SQLITE_FILE = this.App.DEFAULE_SQLITE_FILE;
     this.SQLITE =
-      this.CORE_INFO.DATABASE_ID.length > 0 && this.Kernel.DEFAULE_SQLITE_FILE
+      this.CORE_INFO.DATABASE_ID.length > 0 && this.App.DEFAULE_SQLITE_FILE
         ? this.initSQLite()
         : undefined;
     this.Keychain = new this.Storage.Keychain(this.CORE_INFO.KEYCHAIN_DOMAIN);
@@ -61,7 +60,6 @@ class Core {
 class ModLoader {
   constructor({ app, modDir }) {
     this.App = app;
-    this.Kernel = app.kernelIndex;
     this.MOD_DIR = modDir;
     this.modList = { id: [], mods: {} };
     this.WIDGET_MOD_ID = undefined;
