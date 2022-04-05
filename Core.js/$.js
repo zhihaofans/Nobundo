@@ -135,31 +135,7 @@ class Datetime {
   getSecondUnixTime() {
     return Math.round(new Date().getTime() / 1000);
   }
-}
-
-const time = {
-  getUnixTime: () => {
-    return new Date().getTime();
-  },
-  getSecondUnixTime: () => {
-    return Math.round(new Date().getTime() / 1000);
-  },
-  getTodayWhatTimeDate: ({ hours, minutes, seconds, milliseconds }) => {
-    const nowDate = new Date(),
-      todayYear = nowDate.getFullYear(),
-      todayMonth = nowDate.getMonth() + 1,
-      todayDate = nowDate.getDate();
-    return new Date(
-      todayYear,
-      todayMonth - 1,
-      todayDate,
-      hours || 0,
-      minutes || 0,
-      seconds || 0,
-      milliseconds || 0
-    );
-  },
-  getTomorrowWhatTimeDate: ({ hours, minutes, seconds, milliseconds }) => {
+  getTomorrowWhatTimeDate({ hours, minutes, seconds, milliseconds }) {
     const nowDate = new Date(),
       todayYear = nowDate.getFullYear(),
       todayMonth = nowDate.getMonth() + 1,
@@ -173,17 +149,18 @@ const time = {
       seconds || 0,
       milliseconds || 0
     );
-  },
-  pickDate: async () => {
+  }
+  async pickDate() {
     return await $picker.date({ props: { mode: 1 } });
-  },
-  pickTime: async () => {
+  }
+  async pickTime() {
     return await $picker.date({ props: { mode: 0 } });
-  },
-  pickDateAndTime: async () => {
+  }
+  async pickDateAndTime() {
     return await $picker.date({ props: { mode: 2 } });
   }
-};
+}
+
 module.exports = {
   alert: new Alert(),
   getUUID: () => {
