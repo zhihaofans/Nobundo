@@ -77,6 +77,26 @@ class DataSql {
       rs.close();
     });
   }
+  punchIn({ groupId, message, type, data }) {
+    if (groupId && title) {
+      const uuid = $text.uuid,
+        time = new Date().getTime(),
+        sql = `INSERT INTO ${this.SQL_TABLE_ID.PUNCHES_ITEMS}(id,groupId,time,message,type,data) VALUES(?,?,?,?,?,?)`,
+        args = [uuid, groupId, time, message || "", type || "", data || ""],
+        db = this.getSqlite(),
+        result = db.update({
+          sql,
+          args
+        });
+      if (result.error) {
+        $console.warn(sql);
+        $console.error(result.error);
+      }
+      return result.result;
+    } else {
+      return false;
+    }
+  }
   init() {
     $console.info(this.createPunchesItems());
     $console.info(this.createPunchesGroup());
