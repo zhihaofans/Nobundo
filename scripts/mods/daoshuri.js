@@ -29,6 +29,7 @@ class Main {
     this.DSR = new DaoshuriKit();
   }
   init() {
+    //TODO: 加个新增倒数事项的功能
     const mainViewList = ["选择日期"],
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
