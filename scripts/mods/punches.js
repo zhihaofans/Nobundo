@@ -18,7 +18,7 @@ class DataSql {
   }
   createPunchesItems() {
     const db = this.getSqlite(),
-      sql = `CREATE TABLE ${this.SQL_TABLE_ID.PUNCHES_ITEMS}(id TEXT NOT NULL PRIMARY KEY, groupId TEXT NOT NULL,time INTEGER NOT NULL,message TEXT,type TEXT NOT NULL,data TEXT NOT NULL);`,
+      sql = `CREATE TABLE ${this.SQL_TABLE_ID.PUNCHES_ITEMS}(id TEXT NOT NULL PRIMARY KEY, groupId TEXT NOT NULL,time INTEGER NOT NULL,message TEXT,type TEXT,data TEXT);`,
       result = db.update(sql);
     if (result.error) {
       $console.warn(sql);
@@ -78,7 +78,7 @@ class DataSql {
     });
   }
   punchIn({ groupId, message, type, data }) {
-    if (groupId && title) {
+    if (groupId.length > 0) {
       const uuid = $text.uuid,
         time = new Date().getTime(),
         sql = `INSERT INTO ${this.SQL_TABLE_ID.PUNCHES_ITEMS}(id,groupId,time,message,type,data) VALUES(?,?,?,?,?,?)`,
@@ -149,6 +149,7 @@ class PunchesUi {
     this.Api = new PunchesApi(core);
   }
   initUi() {
+    //TODO: 打卡、搜索、多种打卡类型、额外记录打卡数据
     $ui.push({
       props: {
         title: "",
