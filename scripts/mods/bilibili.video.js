@@ -1,4 +1,4 @@
-const { CoreModule } = require("../../Core.js/core.module"),
+const { CoreModule } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 

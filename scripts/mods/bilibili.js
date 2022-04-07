@@ -1,6 +1,5 @@
-const { Core } = require("../../Core.js/core"),
+const { Core ,ModuleLoader} = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
-  { ModuleLoader } = require("../../Core.js/core.module"),
   listKit = new uiKit.ListKit();
 class DataStorage {
   constructor(core) {

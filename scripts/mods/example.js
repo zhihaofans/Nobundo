@@ -1,5 +1,4 @@
-const { Core } = require("../../Core.js/core"),
-  { ModuleLoader } = require("../../Core.js/core.module");
+const { Core, ModuleLoader } = require("../../Core.js/core");
 class Example extends Core {
   constructor(app) {
     super({
