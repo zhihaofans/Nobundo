@@ -6,9 +6,7 @@
 
 - `app.js`：(新)应用核心，提供应用全局变量、功能。
 
-- `core.js`：提供mod核心(Core)和mod加载功能(Modloader)。
-
-- `core.module.js`：为mod提供模块功能。
+- `core.js`：提供mod核心(Core)和mod加载功能(Modloader)，为mod提供模块功能(module)。
 
 - `storage.js`：提供数据储存功能，如数据库、Keychain、Cache、文件。
 

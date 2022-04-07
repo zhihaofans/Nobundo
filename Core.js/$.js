@@ -22,6 +22,41 @@ class Alert {
     });
   }
 }
+class Datetime {
+  constructor(name) {
+    this.NAME = name;
+  }
+  getUnixTime() {
+    return new Date().getTime();
+  }
+  getSecondUnixTime() {
+    return Math.round(new Date().getTime() / 1000);
+  }
+  getTomorrowWhatTimeDate({ hours, minutes, seconds, milliseconds }) {
+    const nowDate = new Date(),
+      todayYear = nowDate.getFullYear(),
+      todayMonth = nowDate.getMonth() + 1,
+      todayDate = nowDate.getDate();
+    return new Date(
+      todayYear,
+      todayMonth - 1,
+      todayDate + 1,
+      hours || 0,
+      minutes || 0,
+      seconds || 0,
+      milliseconds || 0
+    );
+  }
+  async pickDate() {
+    return await $picker.date({ props: { mode: 1 } });
+  }
+  async pickTime() {
+    return await $picker.date({ props: { mode: 0 } });
+  }
+  async pickDateAndTime() {
+    return await $picker.date({ props: { mode: 2 } });
+  }
+}
 class File {
   constructor() {}
   isFile(filePath) {
@@ -140,41 +175,7 @@ class Share {
     return $context.text;
   }
 }
-class Datetime {
-  constructor(name) {
-    this.NAME = name;
-  }
-  getUnixTime() {
-    return new Date().getTime();
-  }
-  getSecondUnixTime() {
-    return Math.round(new Date().getTime() / 1000);
-  }
-  getTomorrowWhatTimeDate({ hours, minutes, seconds, milliseconds }) {
-    const nowDate = new Date(),
-      todayYear = nowDate.getFullYear(),
-      todayMonth = nowDate.getMonth() + 1,
-      todayDate = nowDate.getDate();
-    return new Date(
-      todayYear,
-      todayMonth - 1,
-      todayDate + 1,
-      hours || 0,
-      minutes || 0,
-      seconds || 0,
-      milliseconds || 0
-    );
-  }
-  async pickDate() {
-    return await $picker.date({ props: { mode: 1 } });
-  }
-  async pickTime() {
-    return await $picker.date({ props: { mode: 0 } });
-  }
-  async pickDateAndTime() {
-    return await $picker.date({ props: { mode: 2 } });
-  }
-}
+
 class Str {
   constructor() {}
   hasString(string) {
@@ -187,6 +188,7 @@ class Str {
 
 module.exports = {
   alert: new Alert(),
+  dateTime:new Datetime(),
   error,
   getUUID,
   info,
