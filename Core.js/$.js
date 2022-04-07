@@ -1,3 +1,18 @@
+function error(message) {
+  $console.error(message);
+}
+function getUUID() {
+  return $text.uuid;
+}
+function info(message) {
+  $console.info(message);
+}
+function toInt(data) {
+  return Number.parseInt(data);
+}
+function warn(message) {
+  $console.warn(message);
+}
 class Alert {
   constructor() {}
   show(title, message) {
@@ -160,18 +175,26 @@ class Datetime {
     return await $picker.date({ props: { mode: 2 } });
   }
 }
+class Str {
+  constructor() {}
+  hasString(string) {
+    return this.isString(string) && string.length > 0;
+  }
+  isString(string) {
+    return typeof string == "string";
+  }
+}
 
 module.exports = {
   alert: new Alert(),
-  getUUID: () => {
-    return $text.uuid;
-  },
+  error,
+  getUUID,
+  info,
   file: new File(),
   http: new Http(),
-  info: () => {},
   share: new Share(),
+  string: new Str(),
   time: new Datetime(),
-  toInt: data => {
-    return Number.parseInt(data);
-  }
+  toInt,
+  warn
 };
