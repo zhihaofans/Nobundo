@@ -5,9 +5,9 @@ class Example extends Core {
       app,
       modId: "example",
       modName: "例子",
-      version: "6",
+      version: "6a",
       author: "zhihaofans",
-      needCoreVersion: 4
+      coreVersion: 5
     });
     this.ModuleLoader = new ModuleLoader(this);
   }

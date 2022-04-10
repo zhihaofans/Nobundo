@@ -4,7 +4,6 @@ const { CoreModule } = require("../../Core.js/core"),
 class Main {
   constructor(core) {
     this.Core = core;
-    this.Http = new this.Core.Http(5);
     this.$ = this.Core.$;
   }
   init() {
@@ -35,7 +34,7 @@ class ExampleModule extends CoreModule {
       coreId: "example",
       moduleId: "example.ui",
       moduleName: "例子ui",
-      version: "1",
+      version: "1a",
       author: "zhihaofans"
     });
     this.Core = core;
