@@ -1,4 +1,4 @@
-const { Core ,ModuleLoader} = require("../../Core.js/core"),
+const { Core, ModuleLoader } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 class DataStorage {
