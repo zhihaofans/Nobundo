@@ -1,4 +1,4 @@
-const CORE_VERSION = 4,
+const CORE_VERSION = 5,
   $ = require("./$");
 class Core {
   constructor({
@@ -8,18 +8,19 @@ class Core {
     version,
     author,
     needCoreVersion,
-    ignoreCoreVersion
+    ignoreCoreVersion,
+    coreVersion
   }) {
     this.App = app;
     this.Storage = require("./storage");
-    this.Http = require("./lib").Http;
+    this.Http = $.http;
     this.$ = $;
     this.CORE_INFO = {
       ID: modId,
       NAME: modName,
       VERSION: version,
       AUTHOR: author,
-      CORE_VERSION: needCoreVersion,
+      CORE_VERSION: coreVersion || needCoreVersion,
       DATABASE_ID: modId,
       IGNORE_CORE_VERSION: ignoreCoreVersion,
       KEYCHAIN_DOMAIN: `nobundo.mods.${author}.${modId}`
@@ -57,14 +58,14 @@ class Core {
     return this.SQLITE.setSimpleData(this.CORE_INFO.DATABASE_ID, key, value);
   }
 }
-class ModLoader {
+class CoreLoader {
   constructor({ app, modDir }) {
     this.App = app;
     this.MOD_DIR = modDir;
     this.modList = { id: [], mods: {} };
     this.WIDGET_MOD_ID = undefined;
   }
-  addMod(modCore) {
+  addCore(modCore) {
     if (typeof modCore.run == "function") {
       if (
         modCore.CORE_INFO.ID.length > 0 &&
@@ -88,6 +89,16 @@ class ModLoader {
           }
         } else {
           $console.error({ needUpdateCore });
+          const modID = modCore.CORE_INFO.ID;
+          if (
+            this.modList.id.indexOf(modID) < 0 &&
+            this.modList.mods[modID] == undefined
+          ) {
+            this.modList.id.push(modID);
+            this.modList.mods[modID] = modCore;
+          } else {
+            $console.error(`modID(${modID})已存在`);
+          }
         }
       } else {
         $console.error(3);
@@ -96,11 +107,11 @@ class ModLoader {
       $console.error(4);
     }
   }
-  addModByList(fileNameList) {
+  addCoreByList(fileNameList) {
     fileNameList.map(fileName => {
       try {
         const thisMod = require(this.MOD_DIR + fileName);
-        this.addMod(new thisMod(this.App));
+        this.addCore(new thisMod(this.App));
       } catch (error) {
         $console.error({
           message: error.message,
@@ -110,10 +121,10 @@ class ModLoader {
       }
     });
   }
-  getMod(modId) {
+  getCore(modId) {
     return this.modList.mods[modId];
   }
-  runMod(modId) {
+  runCore(modId) {
     const thisMod = this.modList.mods[modId];
     try {
       thisMod.run();
@@ -132,7 +143,7 @@ class ModLoader {
       });
     }
   }
-  setWidgetMod(modId) {
+  setWidgetCore(modId) {
     if (
       this.modList.id.indexOf(modId) >= 0 &&
       typeof this.modList.mods[modId].runWidget == "function"
@@ -141,7 +152,7 @@ class ModLoader {
       this.App.WIDGET_MOD_ID = modId;
     }
   }
-  runWidgetMod() {
+  runWidgetCore() {
     const modId = this.WIDGET_MOD_ID,
       thisMod = this.modList.mods[modId];
     $console.warn(thisMod);
@@ -247,7 +258,7 @@ class ModuleLoader {
 module.exports = {
   __VERSION__: CORE_VERSION,
   Core,
+  CoreLoader,
   CoreModule,
-  ModLoader,
   ModuleLoader
 };

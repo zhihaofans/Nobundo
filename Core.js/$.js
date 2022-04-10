@@ -188,7 +188,7 @@ class Str {
 
 module.exports = {
   alert: new Alert(),
-  dateTime:new Datetime(),
+  dateTime: new Datetime(),
   error,
   getUUID,
   info,
