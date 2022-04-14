@@ -12,7 +12,8 @@ const { AppKernel } = require("../Core.js/app"),
     "free-api.js",
     "example.js",
     "mefang.js",
-    "punches.js"
+    "punches.js",
+    "context.js"
   ];
 
 class App extends AppKernel {
@@ -27,12 +28,12 @@ class App extends AppKernel {
   initModList() {
     this.coreLoader.addCoreByList(coreModList);
 
-    switch ($app.env) {
-      case $env.widget:
+    switch (true) {
+      case this.isWidgetEnv():
         this.coreLoader.setWidgetCore("example");
         this.coreLoader.runWidgetCore();
         break;
-      default:
+      case this.isAppEnv():
         listKit.renderIdx(
           this.AppInfo.name,
           this.coreLoader.modList.id.map(modId => {
@@ -47,6 +48,25 @@ class App extends AppKernel {
             this.coreLoader.runCore(this.coreLoader.modList.id[row]);
           }
         );
+        break;
+      case this.isActionEnv() || this.isSafariEnv():
+        this.coreLoader.setContextCore("context");
+        this.coreLoader.runContextCore();
+        break;
+      default:
+        $ui.alert({
+          title: "启动失败",
+          message: "不支持该启动方式",
+          actions: [
+            {
+              title: "OK",
+              disabled: false, // Optional
+              handler: () => {
+                $app.close();
+              }
+            }
+          ]
+        });
     }
   }
 }
@@ -62,7 +82,7 @@ function run() {
     $console.error(error);
     $ui.alert({
       title: "app.js throw",
-      message: error.message,
+      message: error.message + "\n" + error.name,
       actions: [
         {
           title: "OK",
