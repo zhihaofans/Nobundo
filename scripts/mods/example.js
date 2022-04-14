@@ -34,5 +34,9 @@ class Example extends Core {
       }
     });
   }
+  runApi() {
+    //TODO:允许其他Mod调用
+    this.allowApi = true;
+  }
 }
 module.exports = Example;
