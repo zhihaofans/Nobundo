@@ -4,7 +4,7 @@ const { Core } = require("../../Core.js/core"),
 class Main {
   constructor(core) {
     this.Core = core;
-    this.$ = require("/Core.js/$");
+    this.$ = core.$;
     this.isShare = this.$.share.isAction();
   }
   init() {

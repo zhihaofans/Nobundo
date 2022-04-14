@@ -131,7 +131,7 @@ class ReminderLib {
 class Main {
   constructor(core) {
     this.Core = core;
-    this.$ = this.Core.$;
+    this.$ = core.$;
     this.ReminderLib = new ReminderLib();
   }
   init() {
@@ -187,7 +187,9 @@ class Main {
                 case 0:
                   this.ReminderLib.create({
                     title: text,
-                    alarmDate: this.$.time.getTodayWhatTimeDate({ hours: 20 }),
+                    alarmDate: this.$.dateTime.getTodayWhatTimeDate({
+                      hours: 20
+                    }),
                     handler: resp => {
                       $console.info(resp);
                       if (resp.status == 1 && resp.error == null) {
@@ -202,7 +204,9 @@ class Main {
                 case 1:
                   this.ReminderLib.create({
                     title: text,
-                    alarmDate: this.$.time.getTodayWhatTimeDate({ hours: 21 }),
+                    alarmDate: this.$.dateTime.getTodayWhatTimeDate({
+                      hours: 21
+                    }),
                     handler: resp => {
                       $console.info(resp);
                       if (resp.status == 1 && resp.error == null) {
@@ -217,7 +221,9 @@ class Main {
                 case 2:
                   this.ReminderLib.create({
                     title: text,
-                    alarmDate: this.$.time.getTodayWhatTimeDate({ hours: 22 }),
+                    alarmDate: this.$.dateTime.getTodayWhatTimeDate({
+                      hours: 22
+                    }),
                     handler: resp => {
                       $console.info(resp);
                       if (resp.status == 1 && resp.error == null) {
@@ -232,7 +238,9 @@ class Main {
                 case 3:
                   this.ReminderLib.create({
                     title: text,
-                    alarmDate: this.$.time.getTodayWhatTimeDate({ hours: 23 }),
+                    alarmDate: this.$.dateTime.getTodayWhatTimeDate({
+                      hours: 23
+                    }),
                     handler: resp => {
                       $console.info(resp);
                       if (resp.status == 1 && resp.error == null) {
@@ -247,7 +255,7 @@ class Main {
                 case 4:
                   this.ReminderLib.create({
                     title: text,
-                    alarmDate: this.$.time.getTomorrowWhatTimeDate({
+                    alarmDate: this.$.dateTime.getTomorrowWhatTimeDate({
                       hours: 8
                     }),
                     handler: resp => {
