@@ -3,7 +3,6 @@ const START_TIME = new Date().getTime(),
   NOW_JSBOX_VERSION = Number.parseInt($app.info.build),
   { UserUUID } = require("./uuid"),
   { VersionException } = require("./object"),
-  { Kernel } = require("./kernel"),
   $ = require("./$");
 class AppKernel {
   constructor({ appId, modDir, l10nPath }) {
@@ -30,7 +29,6 @@ class AppKernel {
       this.kernelDebug(`debug:${this.DEBUG}`);
     }
     this.checkJsboxVersion();
-    this.WIDGET_MOD_ID = undefined;
   }
   l10n(l10nRes) {
     const result = {};
@@ -106,6 +104,21 @@ class AppKernel {
         needVersion: NEED_JSBOX_VERSION
       });
     }
+  }
+  isAppEnv() {
+    return $app.env == $env.app;
+  }
+  isActionEnv() {
+    return $app.env == $env.action;
+  }
+  isSafariEnv() {
+    return $app.env == $env.safari;
+  }
+  isKeyboardEnv() {
+    return $app.env == $env.keyboard;
+  }
+  isWidgetEnv() {
+    return $app.env == $env.widget;
   }
 }
 
