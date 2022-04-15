@@ -13,7 +13,7 @@ const { AppKernel } = require("../Core.js/app"),
     "example.js",
     "mefang.js",
     "punches.js",
-    "context.js"
+    "action_extension.js"
   ];
 
 class App extends AppKernel {
@@ -50,8 +50,8 @@ class App extends AppKernel {
         );
         break;
       case this.isActionEnv() || this.isSafariEnv():
-        this.coreLoader.setContextCore("context");
-        this.coreLoader.runContextCore();
+        this.coreLoader.setActionCore("action_extension");
+        this.coreLoader.runActionCore();
         break;
       default:
         $ui.alert({

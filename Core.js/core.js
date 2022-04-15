@@ -22,7 +22,6 @@ class Core {
       AUTHOR: author,
       CORE_VERSION: coreVersion || needCoreVersion,
       DATABASE_ID: modId,
-      IGNORE_CORE_VERSION: ignoreCoreVersion,
       KEYCHAIN_DOMAIN: `nobundo.mods.${author}.${modId}`
     };
     this.SQLITE_FILE = this.App.DEFAULE_SQLITE_FILE;
@@ -64,7 +63,7 @@ class CoreLoader {
     this.MOD_DIR = modDir;
     this.modList = { id: [], mods: {} };
     this.WIDGET_MOD_ID = undefined;
-    this.CONCEXT_MOD_ID = undefined;
+    this.ACTION_MOD_ID = undefined;
   }
   addCore(modCore) {
     if (
@@ -175,16 +174,16 @@ class CoreLoader {
       });
     }
   }
-  setContextCore(coreId) {
+  setActionCore(coreId) {
     if (
       this.modList.id.indexOf(coreId) >= 0 &&
       typeof this.modList.mods[coreId].runContext == "function"
     ) {
-      this.CONTEXT_CORE_ID = coreId;
+      this.ACTION_MOD_ID = coreId;
     }
   }
-  runContextCore() {
-    const coreId = this.CONTEXT_CORE_ID;
+  runActionCore() {
+    const coreId = this.ACTION_MOD_ID;
     if (coreId && coreId.length >= 0) {
       const thisCore = this.modList.mods[coreId];
       try {

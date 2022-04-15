@@ -2,11 +2,11 @@ const { Core } = require("../../Core.js/core"),
   ui = require("../../Core.js/ui"),
   listKit = new ui.ListKit();
 
-class Context extends Core {
+class ActionExtension extends Core {
   constructor(app) {
     super({
       app,
-      modId: "context",
+      modId: "action_extension",
       modName: "内容解析",
       version: "1",
       author: "zhihaofans",
@@ -29,7 +29,7 @@ class Context extends Core {
       ]
     });
   }
-  runContext() {
+  runAction() {
     if (this.isSafari) {
       const result = { url: [], text: [] },
         safariItems = $context.safari.items;
@@ -59,6 +59,7 @@ class Context extends Core {
       this.run();
     }
   }
+  runSafari() {}
   link(url) {}
 }
-module.exports = Context;
+module.exports = ActionExtension;
