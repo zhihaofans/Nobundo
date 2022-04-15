@@ -34,7 +34,7 @@ class Example extends Core {
       }
     });
   }
-  runApi() {
+  runApi({ url, data, callback }) {
     //TODO:允许其他Mod调用
     this.allowApi = true;
   }

@@ -25,7 +25,7 @@ class DaoshuriKit {
 class Main {
   constructor(core) {
     this.Core = core;
-    this.$ = require("/Core.js/$");
+    this.$ = core.$;
     this.DSR = new DaoshuriKit();
   }
   init() {
@@ -78,7 +78,7 @@ class Daoshuri extends Core {
       modName: "倒数日",
       version: "1",
       author: "zhihaofans",
-      needCoreVersion: 4
+      coreVersion: 5
     });
   }
   run() {

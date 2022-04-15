@@ -4,7 +4,7 @@ const { Core } = require("../../Core.js/core"),
 class Main {
   constructor(core) {
     this.Core = core;
-    this.Http = new core.Http(5);
+    this.Http = core.Http;
     this.keychainId = {
       apiKey: "apikey",
       nextseed: "nextseed"
@@ -35,6 +35,7 @@ class Main {
     }
   }
   setApikey() {
+    //TODO
     $ui.error("TODO");
   }
   async random(categories = "111") {
@@ -99,7 +100,7 @@ class Wallhaven extends Core {
       modName: "Wallhaven",
       version: "1",
       author: "zhihaofans",
-      needCoreVersion: 4
+      coreVersion: 4
     });
   }
   run() {
