@@ -7,7 +7,7 @@ class ActionExtension extends Core {
     super({
       app,
       modId: "action_extension",
-      modName: "内容解析",
+      modName: "分享内容解析",
       version: "1",
       author: "zhihaofans",
       needCoreVersion: 4
@@ -19,7 +19,7 @@ class ActionExtension extends Core {
   run() {
     $ui.alert({
       title: "启动失败",
-      message: "请通过分享、Safari打开本Mod",
+      message: "请通过分享打开本Mod",
       actions: [
         {
           title: "OK",
