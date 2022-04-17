@@ -224,7 +224,6 @@ class ModuleLoader {
       return false;
     }
     const modulePath = this.MOD_DIR + fileName;
-    $console.info({ modulePath });
     if (this.Core.CORE_INFO.ID.length <= 0) {
       $console.error({
         name: "core.module.ModuleLoader.addModule",
@@ -233,7 +232,6 @@ class ModuleLoader {
       });
       return false;
     }
-
     if (!$file.exists(modulePath) || $file.isDirectory(modulePath)) {
       $console.error({
         name: "core.module.ModuleLoader.addModule",

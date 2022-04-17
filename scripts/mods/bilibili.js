@@ -6,18 +6,21 @@ class DataStorage {
     this.Core = core;
     this.Keychain = core.Keychain;
   }
-  setKeychain(key, value) {
+  setData(key, value) {
     return this.Keychain.set(key, value);
   }
-  getKeychain(key, defaultValue = undefined) {
+  getData(key, defaultValue = undefined) {
     return this.Keychain.get(key) || defaultValue;
+  }
+  removeData(key) {
+    return this.Keychain.remove(key);
   }
 }
 
 class User {
-  constructor({ core }) {
+  constructor(core) {
     this.Core = core;
-    this.Api = new BilibiliApi({ core });
+    this.Api = new BilibiliApi(core);
     this.DS = new DataStorage(core);
   }
   loginByQrcode() {
@@ -75,8 +78,8 @@ class User {
         oauthKey = qrcodeData.oauthKey,
         qrcodeImage = $qrcode.encode(qrcodeUrl);
       $ui.loading(false);
-      this.DS.setKeychain("user.login.qrcode.oauthkey", oauthKey);
-      this.DS.setKeychain("user.login.qrcode.oauthkey.ts", ts);
+      this.DS.setData("user.login.qrcode.oauthkey", oauthKey);
+      this.DS.setData("user.login.qrcode.oauthkey.ts", ts);
       $ui.push({
         props: {
           title: "扫描二维码"
@@ -166,8 +169,8 @@ class User {
     });
   }
   async checkWebQrcodeStatus(token) {
-    const oauthKey = this.DS.getKeychain("user.login.qrcode.oauthkey"),
-      ts = this.DS.getKeychain("user.login.qrcode.ts");
+    const oauthKey = this.DS.getData("user.login.qrcode.oauthkey"),
+      ts = this.DS.getData("user.login.qrcode.ts");
     $console.info({
       oauthKey,
       ts,
@@ -493,10 +496,10 @@ class Vip {
   }
 }
 class BilibiliApi {
-  constructor({ core }) {
+  constructor(core) {
     this.Core = core;
     this.$ = core.$;
-    this.Http = this.Core.http;
+    this.Http = core.http;
   }
   getAppsecByAppkey(appkey) {
     const keyAndSec = {
