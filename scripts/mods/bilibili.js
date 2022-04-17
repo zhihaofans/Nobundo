@@ -5,48 +5,6 @@ class DataStorage {
   constructor(core) {
     this.Core = core;
     this.Keychain = core.Keychain;
-    this.STORAGE_TYPE = {
-      CACHE: 0,
-      PREFS: 1,
-      SQLITE: 2,
-      KEYCHAIN: 3
-    };
-  }
-  saveData({ type, id, data }) {
-    if (id.length > 0 && data.length > 0) {
-      switch (type) {
-        case this.STORAGE_TYPE.KEYCHAIN:
-          return this.Keychain.set(id, data);
-        default:
-          return undefined;
-      }
-    } else {
-      return undefined;
-    }
-  }
-  loadData({ type, id, defaultData }) {
-    if (id.length > 0) {
-      switch (type) {
-        case this.STORAGE_TYPE.KEYCHAIN:
-          return this.Keychain.get(id) || defaultData;
-        default:
-          return undefined;
-      }
-    } else {
-      return undefined;
-    }
-  }
-  removeData({ type, id }) {
-    if (id.length > 0) {
-      switch (type) {
-        case this.STORAGE_TYPE.KEYCHAIN:
-          return this.Keychain.remove(id);
-        default:
-          return undefined;
-      }
-    } else {
-      return undefined;
-    }
   }
   setKeychain(key, value) {
     return this.Keychain.set(key, value);
@@ -685,7 +643,6 @@ class Bilibili extends Core {
   }
   run() {
     this.ModuleLoader.addModule("bilibili.video.js");
-    this.ModuleLoader.addModule("bilibili.user.js");
     const main = new Main(this);
     main.init();
   }
