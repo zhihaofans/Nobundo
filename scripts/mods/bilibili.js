@@ -359,9 +359,14 @@ class User {
     $console.info({ success });
   }
   getCookies() {
-    const cookies = JSON.parse(this.DS.getKeychain("user.login.cookies"));
-    $console.info({ cookies });
-    return cookies;
+    const cookiesJson = this.DS.getKeychain("user.login.cookies");
+    if (cookiesJson) {
+      const cookies = JSON.parse();
+      $console.info({ cookies });
+      return cookies;
+    } else {
+      return undefined;
+    }
   }
   async getUserInfo() {
     const cookie = this.getCookies(),
@@ -533,7 +538,7 @@ class BilibiliApi {
   constructor({ core }) {
     this.Core = core;
     this.$ = core.$;
-    this.Http = new this.Core.Http(5);
+    this.Http = this.Core.http;
   }
   getAppsecByAppkey(appkey) {
     const keyAndSec = {
@@ -680,6 +685,7 @@ class Bilibili extends Core {
   }
   run() {
     this.ModuleLoader.addModule("bilibili.video.js");
+    this.ModuleLoader.addModule("bilibili.user.js");
     const main = new Main(this);
     main.init();
   }

@@ -6,7 +6,7 @@ class User {
   constructor({ core }) {
     this.Core = core;
     this.$ = core.$;
-    this.Http = new this.Core.Http(5);
+    this.Http = this.Core.http;
   }
   async getLaterToWatch(cookie) {
     $ui.loading(true);
