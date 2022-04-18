@@ -349,10 +349,10 @@ class User {
   }
 }
 class Vip {
-  constructor({ core }) {
+  constructor(core) {
     this.Core = core;
     this.$ = core.$;
-    this.User = new User({ core });
+    this.User = new User(core);
   }
   async getPrivilegeStatus() {
     $ui.loading(true);
@@ -545,7 +545,7 @@ class BilibiliApi {
       params = { appkey, local_id, ts },
       sign = this.getSign(params, appkey, appSec),
       url = `https://passport.bilibili.com/x/passport-tv-login/qrcode/auth_code?appkey=${appkey}&appSec=${appSec}&ts=${ts}&sign=${sign}`,
-      result = this.$.http.post({
+      result = this.Http.post({
         url,
         header,
         timeout
@@ -557,7 +557,7 @@ class BilibiliApi {
     const url = "https://passport.bilibili.com/qrcode/getLoginUrl",
       header = {},
       timeout = 5,
-      result = await this.$.http.get({
+      result = await this.Http.get({
         url,
         header,
         timeout
@@ -571,7 +571,7 @@ class BilibiliApi {
       timeout = 5,
       gourl = "https://www.bilibili.com/",
       url = `https://passport.bilibili.com/qrcode/getLoginInfo?oauthKey=${oauthKey}&gourl=${gourl}`,
-      result = await this.$.http.post({
+      result = await this.Http.post({
         url,
         header,
         timeout
@@ -583,7 +583,7 @@ class BilibiliApi {
     const url = "https://api.bilibili.com/x/web-interface/nav",
       header = { cookie },
       timeout = 5,
-      result = await this.$.http.get({
+      result = await this.Http.get({
         url,
         header,
         timeout
@@ -596,10 +596,11 @@ class BilibiliApi {
 class Main {
   constructor(core) {
     this.Core = core;
-    this.User = new User({ core });
-    this.Vip = new Vip({ core });
+    this.User = new User(core);
+    this.Vip = new Vip(core);
     this.Video = this.Core.ModuleLoader.getModule("bilibili.video");
     this.VideoUser = this.Video.getUser();
+    this.UserModule = this.Core.ModuleLoader.getModule("bilibili.user");
   }
   init() {
     const mainViewList = [
@@ -624,7 +625,7 @@ class Main {
             this.Vip.getPrivilegeStatus();
             break;
           case 4:
-            this.VideoUser.getLaterToWatch(this.User.getCookies());
+            this.VideoUser.getLaterToWatch(this.UserModule.Login.Data.cookie());
             break;
         }
       };
@@ -646,6 +647,7 @@ class Bilibili extends Core {
   }
   run() {
     this.ModuleLoader.addModule("bilibili.video.js");
+    this.ModuleLoader.addModule("bilibili.user.js");
     const main = new Main(this);
     main.init();
   }
