@@ -238,7 +238,7 @@ class User {
           const cookies = { DedeUserID, DedeUserID__ckMd5, SESSDATA, bili_jct };
           $console.info({ scanTs, cookies });
           const success = this.DS.setKeychain(
-            "user.login.cookies",
+            "user.login.cookie",
             JSON.stringify(cookies)
           );
           $console.info({ success });
@@ -315,14 +315,14 @@ class User {
   removeCookies() {
     const success = this.DS.removeData({
       type: this.DS.STORAGE_TYPE.KEYCHAIN,
-      id: "user.login.cookies"
+      id: "user.login.cookie"
     });
     $console.info({ success });
   }
   getCookies() {
-    const cookiesJson = this.DS.getKeychain("user.login.cookies");
+    const cookiesJson = this.DS.getData("user.login.cookie");
     if (cookiesJson) {
-      const cookies = JSON.parse();
+      const cookies = JSON.parse(cookiesJson);
       $console.info({ cookies });
       return cookies;
     } else {
@@ -625,7 +625,7 @@ class Main {
             this.Vip.getPrivilegeStatus();
             break;
           case 4:
-            this.VideoUser.getLaterToWatch(this.UserModule.Login.Data.cookie());
+            this.VideoUser.getLaterToWatch(this.UserModule.getCookie());
             break;
         }
       };
