@@ -601,6 +601,7 @@ class Main {
     this.Video = this.Core.ModuleLoader.getModule("bilibili.video");
     this.VideoUser = this.Video.getUser();
     this.UserModule = this.Core.ModuleLoader.getModule("bilibili.user");
+    this.isLoading = false;
   }
   init() {
     const mainViewList = [
@@ -619,7 +620,17 @@ class Main {
             this.User.checkLoginCache();
             break;
           case 2:
-            this.User.getUserInfo();
+            //            this.User.getUserInfo();
+            if (this.isLoading) {
+              sender.cell(indexPath).stopLoading();
+              this.isLoading = false;
+            } else {
+              sender.cell(indexPath).startLoading({
+                color: $color("#FF0000")
+              });
+              this.isLoading = true;
+            }
+
             break;
           case 3:
             this.Vip.getPrivilegeStatus();
