@@ -609,7 +609,8 @@ class Main {
         "查看登录数据",
         "查看用户信息",
         "查看大会员特权",
-        "稍后再看"
+        "稍后再看",
+        "login"
       ],
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
@@ -637,6 +638,9 @@ class Main {
             break;
           case 4:
             this.VideoUser.getLaterToWatch(this.UserModule.getCookie());
+            break;
+          case 5:
+            this.UserModule.login(sender.cell(indexPath));
             break;
         }
       };

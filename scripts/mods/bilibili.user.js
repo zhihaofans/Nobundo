@@ -12,6 +12,13 @@ class UserData {
     }
     return this.Keychain.get(keychainId);
   }
+  uid(uidStr) {
+    const keychainId = "user.login.uid";
+    if (uidStr != undefined && uidStr.length > 0) {
+      this.Keychain.set(keychainId, uidStr);
+    }
+    return this.Keychain.get(keychainId);
+  }
 }
 
 class UserLogin {
@@ -24,7 +31,6 @@ class UserLogin {
   }
   login() {}
   async getWebLoginKey() {
-    $ui.loading(true);
     const url = "https://passport.bilibili.com/qrcode/getLoginUrl",
       header = {},
       timeout = 5,
@@ -51,7 +57,7 @@ class UserLogin {
   async loginByWebOauthkey(oauthkey) {
     if (oauthkey != undefined && oauthkey.length > 0) {
       const timeout = 5,
-        url = `https://passport.bilibili.com/qrcode/getLoginInfo?oauthKey=${oauthKey}`,
+        url = `https://passport.bilibili.com/qrcode/getLoginInfo?oauthKey=${oauthkey}`,
         resp = await this.Http.post({
           url,
           timeout
@@ -89,24 +95,16 @@ class UserLogin {
             bili_jct = setCookie.substring(bili_jct_left, bili_jct_right);
           //cookie
           const cookie = { DedeUserID, DedeUserID__ckMd5, SESSDATA, bili_jct },
-            success = this.Data.cookie(JSON.stringify(cookie));
-          $console.info({ scanTs, cookie, success });
+            cookieSuccess = this.Data.cookie(JSON.stringify(cookie)),
+            uidSuccess = this.Data.uid(DedeUserID);
+          $console.info({ scanTs, cookieSuccess, uidSuccess });
           return cookie;
         } else {
-          $ui.alert({
-            title: "错误",
-            message: result.message,
-            actions: [
-              {
-                title: "OK",
-                disabled: false,
-                handler: () => {}
-              }
-            ]
-          });
+          return undefined;
         }
       }
     } else {
+      return undefined;
     }
   }
 }
@@ -127,6 +125,16 @@ class BilibiliUser extends CoreModule {
   }
   isLogin() {
     return this.Login.isLogin();
+  }
+  async login(listItem) {
+    listItem.startLoading({
+      color: $color("#FF0000")
+    });
+    const loginKey = await this.Login.getWebLoginKey();
+    $console.warn({
+      loginKey
+    });
+    listItem.stopLoading();
   }
 }
 module.exports = BilibiliUser;
