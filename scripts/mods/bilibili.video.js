@@ -98,7 +98,7 @@ class BilibiliVideo extends CoreModule {
       coreId: "bilibili",
       moduleId: "bilibili.video",
       moduleName: "哔哩哔哩视频",
-      version: "1",
+      version: "1"
       //author: "zhihaofans"
     });
     this.Core = core;
