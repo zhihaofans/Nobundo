@@ -597,10 +597,11 @@ class Main {
   constructor(core) {
     this.Core = core;
     this.User = new User(core);
-    this.Vip = new Vip(core);
+
     this.Video = this.Core.ModuleLoader.getModule("bilibili.video");
     this.VideoUser = this.Video.getUser();
     this.UserModule = this.Core.ModuleLoader.getModule("bilibili.user");
+    this.Vip = this.UserModule.Vip;
     this.isLoading = false;
   }
   init() {
@@ -633,7 +634,11 @@ class Main {
 
             break;
           case 3:
-            this.Vip.getPrivilegeStatus();
+            try {
+              this.Vip.getPrivilegeStatus();
+            } catch (error) {
+              $console.error(error);
+            }
             break;
           case 4:
             this.VideoUser.getLaterToWatch(this.UserModule.getCookie());
