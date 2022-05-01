@@ -50,6 +50,7 @@ class UserLogin {
         obj = new Object();
       obj.url = qrcodeUrl;
       obj.oauthKey = oauthKey;
+      obj.qrcode = qrcodeImage;
       return obj;
     }
     return undefined;
@@ -98,6 +99,11 @@ class UserLogin {
             cookieSuccess = this.Data.cookie(JSON.stringify(cookie)),
             uidSuccess = this.Data.uid(DedeUserID);
           $console.info({ scanTs, cookieSuccess, uidSuccess });
+          if (cookieSuccess && uidSuccess && cookie != undefined) {
+            $ui.success("登录成功，请返回");
+          } else {
+            $ui.error("登录失败，空白cookie");
+          }
           return cookie;
         } else {
           return undefined;
@@ -116,7 +122,7 @@ class BilibiliUser extends CoreModule {
       moduleId: "bilibili.user",
       moduleName: "哔哩哔哩用户模块",
       version: "1",
-      author: "zhihaofans"
+      //author: "zhihaofans"
     });
     this.Login = new UserLogin(core);
   }
@@ -130,11 +136,25 @@ class BilibiliUser extends CoreModule {
     listItem.startLoading({
       color: $color("#FF0000")
     });
-    const loginKey = await this.Login.getWebLoginKey();
+    const loginKey = await this.Login.getWebLoginKey(),
+      lisiItem = ["查看二维码", "已扫二维码"],
+      didSelect = (sender, indexPath, data) => {
+        switch (indexPath.row) {
+          case 0:
+            $quicklook.open({
+              image: loginKey.qrcode
+            });
+            break;
+          case 1:
+            this.Login.loginByWebOauthkey(loginKey.oauthKey);
+            break;
+        }
+      };
     $console.warn({
       loginKey
     });
     listItem.stopLoading();
+    listKit.pushString("二维码登录", lisiItem, didSelect);
   }
 }
 module.exports = BilibiliUser;
