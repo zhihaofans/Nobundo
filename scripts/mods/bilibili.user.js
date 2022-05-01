@@ -67,7 +67,6 @@ class UserLogin {
         const result = resp.data,
           response = resp.response;
         $console.info(result);
-        $console.info(response.headers);
         if (result.status) {
           const scanTs = result.ts,
             setCookie = response.headers["Set-Cookie"];
@@ -106,6 +105,7 @@ class UserLogin {
           }
           return cookie;
         } else {
+          $ui.error(result.message);
           return undefined;
         }
       }
@@ -121,7 +121,7 @@ class BilibiliUser extends CoreModule {
       coreId: "bilibili",
       moduleId: "bilibili.user",
       moduleName: "哔哩哔哩用户模块",
-      version: "1",
+      version: "1"
       //author: "zhihaofans"
     });
     this.Login = new UserLogin(core);

@@ -609,13 +609,12 @@ class Main {
         "查看登录数据",
         "查看用户信息",
         "查看大会员特权",
-        "稍后再看",
-        "login"
+        "稍后再看"
       ],
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
           case 0:
-            this.User.loginByQrcode();
+            this.UserModule.login(sender.cell(indexPath));
             break;
           case 1:
             this.User.checkLoginCache();
@@ -638,9 +637,6 @@ class Main {
             break;
           case 4:
             this.VideoUser.getLaterToWatch(this.UserModule.getCookie());
-            break;
-          case 5:
-            this.UserModule.login(sender.cell(indexPath));
             break;
         }
       };
