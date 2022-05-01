@@ -35,7 +35,7 @@ class ExampleModule extends CoreModule {
       moduleId: "example.ui",
       moduleName: "例子ui",
       version: "1a",
-      author: "zhihaofans"
+      //author: "zhihaofans"
     });
     this.Core = core;
   }
