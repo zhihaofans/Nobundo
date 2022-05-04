@@ -553,32 +553,7 @@ class BilibiliApi {
     $console.info({ params, appSec, url });
     return result;
   }
-  async getWebLoginQrcode() {
-    const url = "https://passport.bilibili.com/qrcode/getLoginUrl",
-      header = {},
-      timeout = 5,
-      result = await this.Http.get({
-        url,
-        header,
-        timeout
-      });
-    $console.warn(result);
-    return result.data;
-  }
-  async loginByWebQrcode(oauthKey) {
-    $console.info(oauthKey);
-    const header = {},
-      timeout = 5,
-      gourl = "https://www.bilibili.com/",
-      url = `https://passport.bilibili.com/qrcode/getLoginInfo?oauthKey=${oauthKey}&gourl=${gourl}`,
-      result = await this.Http.post({
-        url,
-        header,
-        timeout
-      });
-    $console.warn(result);
-    return result;
-  }
+  
   async getUserInfo(cookie) {
     const url = "https://api.bilibili.com/x/web-interface/nav",
       header = { cookie },
@@ -635,7 +610,7 @@ class Main {
             break;
           case 3:
             try {
-              this.Vip.getPrivilegeStatus();
+              this.Vip.getPrivilegeStatus(sender.cell(indexPath));
             } catch (error) {
               $console.error(error);
             }

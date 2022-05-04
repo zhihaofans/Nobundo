@@ -119,7 +119,10 @@ class Vip {
     this.Module = coreModule;
     this.Core = coreModule.Core;
   }
-  async getPrivilegeStatus() {
+  async getPrivilegeStatus(listItem) {
+    listItem.startLoading({
+      color: $color("#FF0000")
+    });
     const cookie = this.Module.getCookie(),
       header = { cookie },
       url = "https://api.bilibili.com/x/vip/privilege/my",
@@ -131,6 +134,7 @@ class Vip {
       }),
       response = resp.response;
     $console.info({ resp, header });
+    listItem.stopLoading();
     if (resp.error) {
       $ui.alert({
         title: `请求错误(${response.code})`,
