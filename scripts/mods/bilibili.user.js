@@ -151,38 +151,53 @@ class Vip {
       const result = resp.data;
       if (result.code == 0) {
         const privilegeList = result.data.list,
-          privilegeStr = { 1: "B币", 2: "会员购优惠券", 3: "漫画福利券" },
-          didSelect = (sender, indexPath, data) => {
-            $console.info({
-              indexPath
-            });
-            const thisPrivilege = privilegeList[indexPath.row];
-            if (thisPrivilege.state == 1) {
-              $ui.alert({
-                title: "领取失败",
-                message: privilegeStr[thisPrivilege.type] + "已领取",
-                actions: [
-                  {
-                    title: "OK",
-                    disabled: false, // Optional
-                    handler: () => {}
+          privilegeStr = { 1: "B币", 2: "会员购优惠券", 3: "漫画福利券" };
+        $ui.push({
+          props: {
+            title: this.TITLE
+          },
+          views: [
+            {
+              type: "list",
+              props: {
+                data: privilegeList.map(privilege => {
+                  const privilegeStatus =
+                      privilege.state == 1 ? "(已领取)" : "(未领取)",
+                    privilegeTitle = privilegeStr[privilege.type] || "未知";
+                  return privilegeTitle + privilegeStatus;
+                })
+              },
+              layout: $layout.fill,
+              events: {
+                didSelect: (sender, indexPath, _data) => {
+                  const clickItem = sender.cell(indexPath);
+                  clickItem.startLoading({
+                    color: $color("#FF0000")
+                  });
+                  const thisPrivilege = privilegeList[indexPath.row];
+                  if (thisPrivilege.state == 1) {
+                    clickItem.stopLoading();
+                    $ui.alert({
+                      title: "领取失败",
+                      message: privilegeStr[thisPrivilege.type] + "已领取",
+                      actions: [
+                        {
+                          title: "OK",
+                          disabled: false, // Optional
+                          handler: () => {}
+                        }
+                      ]
+                    });
+                  } else {
+                    this.receivePrivilege(thisPrivilege.type);
+
+                    clickItem.stopLoading();
                   }
-                ]
-              });
-            } else {
-              //              this.receivePrivilege(thisPrivilege.type);
+                }
+              }
             }
-          };
-        listKit.pushString(
-          "大会员特权",
-          privilegeList.map(privilege => {
-            const privilegeStatus =
-                privilege.state == 1 ? "(已领取)" : "(未领取)",
-              privilegeTitle = privilegeStr[privilege.type] || "未知";
-            return privilegeTitle + privilegeStatus;
-          }),
-          didSelect
-        );
+          ]
+        });
       } else {
         $ui.alert({
           title: `请求失败(${result.code})`,
@@ -197,6 +212,29 @@ class Vip {
         });
       }
     }
+  }
+  async receivePrivilege(typeId) {
+    const cookie = this.Module.getCookie(),
+      header = { cookie },
+      bili_jct = cookie.bili_jct,
+      url = `https://api.bilibili.com/x/vip/privilege/receive?type=${typeId}&csrf=${bili_jct}`,
+      timeout = 5,
+      resp = await this.$.http.post({
+        url,
+        header,
+        timeout
+      }),
+      response = resp.response,
+      result = resp.data,
+      resultCodeList = {
+        "-101": "账号未登录",
+        "-111": "csrf 校验失败",
+        "-400": "请求错误",
+        "69800": "网络繁忙 请稍后再试",
+        "69801": "你已领取过该权益",
+        "0": "成功"
+      };
+    $console.info({ resp, message: resultCodeList[result.code] });
   }
 }
 
