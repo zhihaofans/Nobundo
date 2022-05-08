@@ -114,6 +114,96 @@ class UserLogin {
     }
   }
 }
+class UserInfo {
+  constructor(coreModule) {
+    this.Module = coreModule;
+    this.Http = coreModule.Core.Http;
+    this.Data = new UserData(coreModule.Core.Keychain);
+  }
+  async getLaterToWatch() {
+    $ui.loading(true);
+    const url = "https://api.bilibili.com/x/v2/history/toview",
+      header = { cookie: this.Data.cookie() },
+      timeout = 5,
+      resp = await this.Http.get({
+        url,
+        header,
+        timeout
+      });
+    $console.info({ resp });
+    if (resp.error) {
+      $ui.loading(false);
+      $ui.alert({
+        title: "获取失败",
+        message: resp.error.message,
+        actions: [
+          {
+            title: "OK",
+            disabled: false, // Optional
+            handler: () => {}
+          }
+        ]
+      });
+    } else {
+      $ui.loading(false);
+      const result = resp.data;
+      if (result) {
+        if (result.code == 0) {
+          const data = result.data,
+            listCount = data.count,
+            later2watchList = data.list;
+          if (listCount > 0) {
+            $ui.push({
+              props: {
+                title: `稍后再看共${listCount}个视频`
+              },
+              views: [
+                {
+                  type: "list",
+                  props: {
+                    autoRowHeight: true,
+                    estimatedRowHeight: 44,
+                    data: later2watchList.map(thisVideo => {
+                      return {
+                        title: `@${thisVideo.owner.name}(${thisVideo.owner.mid})`,
+                        rows: [thisVideo.title]
+                      };
+                    })
+                  },
+                  layout: $layout.fill,
+                  events: {
+                    didSelect: (_sender, indexPath, _data) => {
+                      const thisVideo = later2watchList[indexPath.section],
+                        row = indexPath.row;
+                      $app.openURL(thisVideo.short_link_v2);
+                    }
+                  }
+                }
+              ]
+            });
+          } else {
+            $ui.error("请添加视频");
+          }
+        } else {
+          $ui.alert({
+            title: `错误${result.code}`,
+            message: result.message,
+            actions: [
+              {
+                title: "OK",
+                disabled: false, // Optional
+                handler: () => {}
+              }
+            ]
+          });
+        }
+      } else {
+        $ui.error("空白请求结果");
+      }
+    }
+  }
+}
+
 class Vip {
   constructor(coreModule) {
     this.Module = coreModule;
@@ -249,6 +339,7 @@ class BilibiliUser extends CoreModule {
     });
     this.Core = core;
     this.Login = new UserLogin(core);
+    this.Info = new UserInfo(this);
     this.Vip = new Vip(this);
   }
   getCookie() {
