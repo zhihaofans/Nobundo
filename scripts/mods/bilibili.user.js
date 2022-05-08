@@ -189,9 +189,7 @@ class Vip {
                       ]
                     });
                   } else {
-                    this.receivePrivilege(thisPrivilege.type);
-
-                    clickItem.stopLoading();
+                    this.receivePrivilege(thisPrivilege.type, clickItem);
                   }
                 }
               }
@@ -213,13 +211,13 @@ class Vip {
       }
     }
   }
-  async receivePrivilege(typeId) {
+  async receivePrivilege(typeId, clickItem) {
     const cookie = this.Module.getCookie(),
       header = { cookie },
       bili_jct = cookie.bili_jct,
       url = `https://api.bilibili.com/x/vip/privilege/receive?type=${typeId}&csrf=${bili_jct}`,
       timeout = 5,
-      resp = await this.$.http.post({
+      resp = await this.Core.$.http.post({
         url,
         header,
         timeout
@@ -233,8 +231,10 @@ class Vip {
         "69800": "网络繁忙 请稍后再试",
         "69801": "你已领取过该权益",
         "0": "成功"
-      };
-    $console.info({ resp, message: resultCodeList[result.code] });
+      },
+      message = resultCodeList[result.code];
+    clickItem.stopLoading();
+    $console.info({ resp, message });
   }
 }
 

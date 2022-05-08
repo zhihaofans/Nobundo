@@ -320,14 +320,7 @@ class User {
     $console.info({ success });
   }
   getCookies() {
-    const cookiesJson = this.DS.getData("user.login.cookie");
-    if (cookiesJson) {
-      const cookies = JSON.parse(cookiesJson);
-      $console.info({ cookies });
-      return cookies;
-    } else {
-      return undefined;
-    }
+    return this.Core.UserModule.getCookie();
   }
   async getUserInfo() {
     const cookie = this.getCookies(),
@@ -348,153 +341,7 @@ class User {
     });
   }
 }
-class Vip {
-  constructor(core) {
-    this.Core = core;
-    this.$ = core.$;
-    this.User = new User(core);
-  }
-  async getPrivilegeStatus() {
-    $ui.loading(true);
-    const cookie = this.User.getCookies(),
-      header = { cookie },
-      url = "https://api.bilibili.com/x/vip/privilege/my",
-      timeout = 5,
-      resp = await this.$.http.get({
-        url,
-        header,
-        timeout
-      }),
-      response = resp.response;
-    $console.info({ resp });
-    $ui.loading(false);
-    if (resp.error) {
-      $ui.alert({
-        title: `请求错误(${response.code})`,
-        message: resp.error.localizedDescription,
-        actions: [
-          {
-            title: "OK",
-            disabled: false,
-            handler: () => {}
-          }
-        ]
-      });
-    } else {
-      const result = resp.data;
-      if (result.code == 0) {
-        const privilegeList = result.data.list,
-          privilegeStr = { 1: "B币", 2: "会员购优惠券", 3: "漫画福利券" },
-          didSelect = (sender, indexPath, data) => {
-            $console.info({
-              indexPath
-            });
-            const thisPrivilege = privilegeList[indexPath.row];
-            if (thisPrivilege.state == 1) {
-              $ui.alert({
-                title: "领取失败",
-                message: privilegeStr[thisPrivilege.type] + "已领取",
-                actions: [
-                  {
-                    title: "OK",
-                    disabled: false, // Optional
-                    handler: () => {}
-                  }
-                ]
-              });
-            } else {
-              this.receivePrivilege(thisPrivilege.type);
-            }
-          };
-        listKit.pushString(
-          "大会员特权",
-          privilegeList.map(privilege => {
-            const privilegeStatus =
-              privilege.state == 1 ? "(已领取)" : "未领取";
-            return privilegeStr[privilege.type] + privilegeStatus;
-          }),
-          didSelect
-        );
-      } else {
-        $ui.alert({
-          title: `请求失败(${result.code})`,
-          message: result.message,
-          actions: [
-            {
-              title: "OK",
-              disabled: false,
-              handler: () => {}
-            }
-          ]
-        });
-      }
-    }
-  }
-  async receivePrivilege(typeId) {
-    $ui.loading(true);
-    const cookie = this.User.getCookies(),
-      header = { cookie },
-      bili_jct = cookie.bili_jct,
-      url = `https://api.bilibili.com/x/vip/privilege/receive?type=${typeId}&csrf=${bili_jct}`,
-      timeout = 5,
-      resp = await this.$.http.post({
-        url,
-        header,
-        timeout
-      }),
-      response = resp.response,
-      resultCodeList = {
-        "-101": "账号未登录",
-        "-111": "csrf 校验失败",
-        "-400": "请求错误",
-        "69800": "网络繁忙 请稍后再试",
-        "69801": "你已领取过该权益",
-        "0": "成功"
-      };
-    $console.info({ resp });
-    $ui.loading(false);
-    if (resp.error) {
-      $ui.alert({
-        title: `请求错误(${response.code})`,
-        message: resp.error.localizedDescription,
-        actions: [
-          {
-            title: "OK",
-            disabled: false,
-            handler: () => {}
-          }
-        ]
-      });
-    } else {
-      const result = resp.data;
-      if (result.code == 0) {
-        $ui.alert({
-          title: "领取成功",
-          message: "",
-          actions: [
-            {
-              title: "OK",
-              disabled: false,
-              handler: () => {}
-            }
-          ]
-        });
-      } else {
-        $ui.alert({
-          title: `领取失败(${result.code})`,
-          message: resultCodeList[result.code.toString()],
-          actions: [
-            {
-              title: "OK",
-              disabled: false,
-              handler: () => {}
-            }
-          ]
-        });
-      }
-    }
-  }
-}
+
 class BilibiliApi {
   constructor(core) {
     this.Core = core;
@@ -553,7 +400,7 @@ class BilibiliApi {
     $console.info({ params, appSec, url });
     return result;
   }
-  
+
   async getUserInfo(cookie) {
     const url = "https://api.bilibili.com/x/web-interface/nav",
       header = { cookie },
