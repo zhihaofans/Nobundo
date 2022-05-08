@@ -74,7 +74,7 @@ class Daoshuri extends Core {
   constructor(app) {
     super({
       app,
-      modId: "daoshuri",
+      modId: "day_master",
       modName: "倒数日",
       version: "1",
       author: "zhihaofans",
