@@ -166,9 +166,9 @@ class UserInfo {
                     estimatedRowHeight: 44,
                     data: later2watchList.map(thisVideo => {
                       return {
-                        title: `@${thisVideo.owner.name}(${thisVideo.owner.mid})`,
+                        title: `${thisVideo.owner.mid}@${thisVideo.owner.name}`,
                         rows: [
-                          `av${thisVideo.avid}|${thisVideo.bvid}`,
+                          `av${thisVideo.aid} | ${thisVideo.bvid}`,
                           thisVideo.title
                         ]
                       };

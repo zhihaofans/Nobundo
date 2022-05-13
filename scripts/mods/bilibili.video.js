@@ -6,14 +6,17 @@ class VideoInfo {
   constructor(coreModule) {
     this.Module = coreModule;
     this.Http = coreModule.Core.Http;
-    this.UserModule = coreModule.Core.ModuleLoader.getModule("bilibili.user");
   }
   async getVideoInfo(bvid = "BV17x411w7KC") {
-    const url = `http://api.bilibili.com/x/web-interface/view?vid=${bvid}`,
+    const cookie = this.Module.Core.ModuleLoader.getModule(
+        "bilibili.user"
+      ).getCookie(),
+      url = `https://api.bilibili.com/x/web-interface/view?bvid=${bvid}`,
       resp = await this.Http.get({
         url,
+        timeout:5,
         header: {
-          cookie: this.UserModule.getCookie()
+          cookie
         }
       });
     $console.info({ response: resp.response });
@@ -34,7 +37,7 @@ class VideoInfo {
         $console.info(resultData);
         return resultData;
       } else {
-        $ui.error(result.code + codeMessageList[result.code.toString()]);
+        $console.error(result.code + codeMessageList[result.code.toString()]);
         return undefined;
       }
     }
@@ -48,7 +51,6 @@ class BilibiliVideo extends CoreModule {
       moduleId: "bilibili.video",
       moduleName: "哔哩哔哩视频",
       version: "1"
-      //author: "zhihaofans"
     });
     this.Core = core;
     this.Info = new VideoInfo(this);
@@ -63,12 +65,16 @@ class BilibiliVideo extends CoreModule {
             title: "视频id",
             items: [
               {
-                title: `bvid:${videoInfo}`,
+                title: videoInfo.bvid,
+                func: undefined
+              },{
+                title: "av"+videoInfo.aid,
                 func: undefined
               }
             ]
           }
         ];
+        $ui.loading(false);
         $ui.push({
           props: {
             title: bvid || "bv****"
@@ -100,9 +106,11 @@ class BilibiliVideo extends CoreModule {
           ]
         });
       } else {
-        $ui.error("空白请求结果");
+        $ui.loading(false);
+        $ui.error("空白请求结果,请检查视频id是否正确");
       }
     } else {
+      $ui.loading(false);
       $ui.error("请输入视频id");
     }
   }
