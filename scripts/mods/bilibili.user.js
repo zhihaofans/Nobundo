@@ -120,6 +120,7 @@ class UserInfo {
     this.Http = coreModule.Core.Http;
     this.Data = new UserData(coreModule.Core.Keychain);
   }
+  async getHistory() {}
   async getLaterToWatch() {
     $ui.loading(true);
     const url = "https://api.bilibili.com/x/v2/history/toview",
@@ -166,16 +167,39 @@ class UserInfo {
                     data: later2watchList.map(thisVideo => {
                       return {
                         title: `@${thisVideo.owner.name}(${thisVideo.owner.mid})`,
-                        rows: [thisVideo.title]
+                        rows: [
+                          `av${thisVideo.avid}|${thisVideo.bvid}`,
+                          thisVideo.title
+                        ]
                       };
                     })
                   },
                   layout: $layout.fill,
                   events: {
                     didSelect: (_sender, indexPath, _data) => {
-                      const thisVideo = later2watchList[indexPath.section],
-                        row = indexPath.row;
-                      $app.openURL(thisVideo.short_link_v2);
+                      const selectVideo = later2watchList[indexPath.section];
+                      $ui.menu({
+                        items: ["查看视频信息", "通过哔哩哔哩APP打开"],
+                        handler: (title, idx) => {
+                          switch (idx) {
+                            case 0:
+                              try {
+                                this.Module.Core.ModuleLoader.getModule(
+                                  "bilibili.video"
+                                ).showVideoInfo(selectVideo.bvid);
+                              } catch (error) {
+                                $console.error(error);
+                                $ui.error("Error");
+                              }
+                              break;
+                            case 1:
+                              $app.openURL(selectVideo.short_link_v2);
+
+                              break;
+                            default:
+                          }
+                        }
+                      });
                     }
                   }
                 }

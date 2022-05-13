@@ -58,10 +58,7 @@ class BilibiliApi {
 class Main {
   constructor(core) {
     this.Core = core;
-    //this.User = new User(core);
-
     this.Video = this.Core.ModuleLoader.getModule("bilibili.video");
-    this.VideoUser = this.Video.getUser();
     this.UserModule = this.Core.ModuleLoader.getModule("bilibili.user");
     this.Vip = this.UserModule.Vip;
     this.isLoading = false;
@@ -78,22 +75,6 @@ class Main {
         switch (indexPath.row) {
           case 0:
             this.UserModule.login(sender.cell(indexPath));
-            break;
-          case 1:
-            //            this.User.checkLoginCache();
-            break;
-          case 2:
-            //            this.User.getUserInfo();
-            if (this.isLoading) {
-              sender.cell(indexPath).stopLoading();
-              this.isLoading = false;
-            } else {
-              sender.cell(indexPath).startLoading({
-                color: $color("#FF0000")
-              });
-              this.isLoading = true;
-            }
-
             break;
           case 3:
             try {
