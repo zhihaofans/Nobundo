@@ -13,6 +13,9 @@ function toInt(data) {
 function warn(message) {
   $console.warn(message);
 }
+function isFunction(func) {
+  return func != undefined && typeof func == "function";
+}
 class Alert {
   constructor() {}
   show(title, message) {
@@ -205,6 +208,7 @@ module.exports = {
   error,
   getUUID,
   info,
+  isFunction,
   file: new File(),
   http: new Http(),
   share: new Share(),

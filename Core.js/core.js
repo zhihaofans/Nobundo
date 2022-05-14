@@ -195,6 +195,38 @@ class CoreLoader {
       $app.close();
     }
   }
+  isCoreSupportApi(coreId) {
+    if (coreId && coreId.length >= 0) {
+      const thisCore = this.modList.mods[coreId];
+      return thisCore != undefined && $.isFunction(thisCore.runApi);
+    }
+    return false;
+  }
+  runCoreApi(coreId, apiId, data) {
+    if (coreId && coreId.length >= 0) {
+      const thisCore = this.modList.mods[coreId];
+      if (thisCore != undefined && $.isFunction(thisCore.runApi)) {
+        try {
+          return thisCore.runApi(apiId, data);
+        } catch (error) {
+          $console.error(error);
+          return false;
+        }
+      } else {
+        $console.error({
+          func: "runCoreApi",
+          message: "need coreId"
+        });
+        return false;
+      }
+    } else {
+      $console.error({
+        func: "runCoreApi",
+        message: "need coreId"
+      });
+      return false;
+    }
+  }
 }
 class CoreModule {
   constructor({ coreId, moduleId, moduleName, author, version }) {
@@ -256,8 +288,11 @@ class ModuleLoader {
         });
         return false;
       }
-      if ((thisModule.AUTHOR = undefined || thisModule.AUTHOR.length <= 0)) {
+      if (thisModule.AUTHOR == undefined || thisModule.AUTHOR.length <= 0) {
         thisModule.AUTHOR = this.Core.CORE_INFO.AUTHOR;
+        $console.info(
+          `自动为模块${thisModule.CORE_ID}添加mod的作者(${this.Core.CORE_INFO.AUTHOR})`
+        );
       }
       this.ModuleList[thisModule.MODULE_ID] = thisModule;
       $console.info(
