@@ -101,20 +101,20 @@ class BilibiliVideo extends CoreModule {
                             url: videoInfo.pic
                           });
                           break;
-                        //                        case 1:
-                        //                          try {
-                        //                            $console.warn("try downloading");
-                        //                            this.Core.App.coreLoader.runCoreApi(
-                        //                              "downloader",
-                        //                              "start_downloader",
-                        //                              { url: videoInfo.pic }
-                        //                            );
-                        //                            $console.warn("finished try");
-                        //                          } catch (error) {
-                        //                            $console.error(error);
-                        //                            $ui.error("下载失败");
-                        //                          }
-                        //                          break;
+                        case 1:
+                          try {
+                            $console.warn("try downloading");
+                            this.Core.App.coreLoader.runCoreApi(
+                              "downloader",
+                              "start_downloading",
+                              { url: videoInfo.pic }
+                            );
+                            $console.warn("finished try");
+                          } catch (error) {
+                            $console.error(error);
+                            $ui.error("下载失败");
+                          }
+                          break;
                         default:
                       }
                     }
