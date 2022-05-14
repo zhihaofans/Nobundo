@@ -5,6 +5,7 @@ class Main {
   constructor(core) {
     this.Core = core;
     this.$ = core.$;
+    this.Http = core.$.http;
     this.isShare = this.$.share.isAction();
   }
   init() {
@@ -88,9 +89,12 @@ class Main {
     });
   }
   async checkUrl(url) {
+    $console.info({
+      url
+    });
     $ui.loading(true);
     const startQueryTime = 0,
-      headResult = await this.$.Http.head({
+      headResult = await this.Http.head({
         url
       }),
       resp = headResult.response;
@@ -262,8 +266,8 @@ class Downloader extends Core {
     switch (id) {
       case "start_downloading":
         this.main.checkUrl(data.url);
-        return true;
-      //        break;
+        //return true;
+        break;
       default:
         return undefined;
     }
