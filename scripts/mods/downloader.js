@@ -90,7 +90,7 @@ class Main {
   async checkUrl(url) {
     $ui.loading(true);
     const startQueryTime = 0,
-      headResult = await this.$.http.head({
+      headResult = await this.$.Http.head({
         url
       }),
       resp = headResult.response;
@@ -195,7 +195,7 @@ class Main {
               const row = indexPath.row;
             },
             ready: sender => {
-              const startTime = this.$.time.getUnixTime();
+              const startTime = this.$.dateTime.getUnixTime();
               $http.download({
                 url: url,
                 showsProgress: true, // Optional, default is true
@@ -252,6 +252,21 @@ class Downloader extends Core {
   run() {
     $ui.success("run");
     this.main.init();
+  }
+  runApi(id, data) {
+    $console.info({
+      func: "downloader.runApi",
+      id,
+      data
+    });
+    switch (id) {
+      case "start_downloading":
+        this.main.checkUrl(data.url);
+        return true;
+      //        break;
+      default:
+        return undefined;
+    }
   }
 }
 module.exports = Downloader;
