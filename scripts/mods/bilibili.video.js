@@ -1,6 +1,4 @@
-const { CoreModule } = require("../../Core.js/core"),
-  uiKit = require("../../Core.js/ui"),
-  listKit = new uiKit.ListKit();
+const { CoreModule } = require("../../Core.js/core");
 
 class VideoInfo {
   constructor(coreModule) {
@@ -14,12 +12,12 @@ class VideoInfo {
       url = `https://api.bilibili.com/x/web-interface/view?bvid=${bvid}`,
       resp = await this.Http.get({
         url,
-        timeout:5,
+        timeout: 5,
         header: {
           cookie
         }
       });
-    $console.info({ response: resp.response });
+    //    $console.info({ response: resp.response });
     if (resp.error) {
       return undefined;
     } else {
@@ -34,7 +32,7 @@ class VideoInfo {
           "62004": "稿件审核中"
         };
       if (result.code == 0) {
-        $console.info(resultData);
+        //        $console.info(resultData);
         return resultData;
       } else {
         $console.error(result.code + codeMessageList[result.code.toString()]);
@@ -67,12 +65,28 @@ class BilibiliVideo extends CoreModule {
               {
                 title: videoInfo.bvid,
                 func: undefined
-              },{
-                title: "av"+videoInfo.aid,
+              },
+              {
+                title: "av" + videoInfo.aid,
                 func: undefined
               }
             ]
+          },
+          {
+            title: "作者",
+            items: [
+              {
+                title: videoInfo.owner.mid
+              },
+              {
+                title: "@" + videoInfo.owner.name,
+                func: () => {
+                  $share.sheet([videoInfo.owner.name]);
+                }
+              }
+            ]
           }
+          
         ];
         $ui.loading(false);
         $ui.push({
@@ -85,8 +99,8 @@ class BilibiliVideo extends CoreModule {
               props: {
                 data: videoInfoList.map(listItem => {
                   return {
-                    title: listItem.title,
-                    rows: listItem.items.map(item => item.title)
+                    title: listItem.title.toString(),
+                    rows: listItem.items.map(item => item.title.toString())
                   };
                 })
               },
@@ -94,12 +108,17 @@ class BilibiliVideo extends CoreModule {
               events: {
                 didSelect: (_sender, indexPath, _data) => {
                   const section = indexPath.section;
-                  const row = indexPath.row;
-                  try {
-                    videoInfoList[section].items[row].func();
-                  } catch (error) {
-                    $console.error(error);
-                  }
+                  const row = indexPath.row,
+                    selectedItem = videoInfoList[section].items[row];
+                  if (
+                    selectedItem.func != undefined &&
+                    typeof selectedItem.func == "function"
+                  )
+                    try {
+                      selectedItem.func();
+                    } catch (error) {
+                      $console.error(error);
+                    }
                 }
               }
             }
@@ -107,7 +126,7 @@ class BilibiliVideo extends CoreModule {
         });
       } else {
         $ui.loading(false);
-        $ui.error("空白请求结果,请检查视频id是否正确");
+        $ui.error("空白请求结果,请检查视频id与设备网络");
       }
     } else {
       $ui.loading(false);

@@ -10,7 +10,8 @@ class UserData {
     if (newCookie != undefined && Object.keys(newCookie).length > 0) {
       this.Keychain.set(keychainId, JSON.stringify(newCookie));
     }
-    return JSON.parse(this.Keychain.get(keychainId));
+    const nowCookie=this.Keychain.get(keychainId)
+    return nowCookie?JSON.parse(nowCookie):undefined;
   }
   uid(uidStr) {
     const keychainId = "user.login.uid";
