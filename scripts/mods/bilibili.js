@@ -1,6 +1,33 @@
 const { Core, ModuleLoader } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
+class BilibiliLuncher {
+  constructor(name) {
+    this.NAME = name;
+  }
+  app(mode, id) {
+    $app.openURL(`bilibili://${mode}/${id}`);
+  }
+  video(vid) {
+    this.app("video", vid);
+  }
+  getVideoUrl(vid) {
+    return `bilibili://video/${vid}`;
+  }
+  live(roomid) {
+    this.app("live", roomid);
+  }
+  space(uid) {
+    this.app("space", uid);
+  }
+  article(id) {
+    this.app("article", id);
+  }
+  dynamic(id) {
+    this.app("following/detail", id);
+  }
+}
+
 class BilibiliApi {
   constructor(core) {
     this.Core = core;
@@ -69,7 +96,8 @@ class Main {
         "查看登录数据",
         "查看用户信息",
         "查看大会员特权",
-        "稍后再看"
+        "稍后再看",
+        "历史记录"
       ],
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
@@ -84,7 +112,10 @@ class Main {
             }
             break;
           case 4:
-            this.UserModule.Info.getLaterToWatch(this.UserModule.getCookie());
+            this.UserModule.Info.getLaterToWatch();
+            break;
+          case 5:
+            this.UserModule.Info.getHistory();
             break;
         }
       };
@@ -103,6 +134,7 @@ class Bilibili extends Core {
       needCoreVersion: 4
     });
     this.ModuleLoader = new ModuleLoader(this);
+    this.biliLuncher = new BilibiliLuncher();
   }
   run() {
     this.ModuleLoader.addModule("bilibili.video.js");

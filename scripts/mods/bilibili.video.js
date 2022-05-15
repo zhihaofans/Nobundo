@@ -32,7 +32,7 @@ class VideoInfo {
           "62004": "稿件审核中"
         };
       if (result.code == 0) {
-        //        $console.info(resultData);
+        //$console.info(resultData);
         return resultData;
       } else {
         $console.error(result.code + codeMessageList[result.code.toString()]);
@@ -51,6 +51,7 @@ class BilibiliVideo extends CoreModule {
       version: "1"
     });
     this.Core = core;
+    this.$ = core.$;
     this.Info = new VideoInfo(this);
   }
   async showVideoInfo(bvid) {
@@ -64,7 +65,7 @@ class BilibiliVideo extends CoreModule {
             items: [
               {
                 title: videoInfo.bvid,
-                func: undefined
+                func: () => {}
               },
               {
                 title: "av" + videoInfo.aid,
@@ -73,10 +74,24 @@ class BilibiliVideo extends CoreModule {
             ]
           },
           {
+            title: "标题",
+            items: [
+              {
+                title: videoInfo.title,
+                func: () => {
+                  $share.sheet([videoInfo.title]);
+                }
+              }
+            ]
+          },
+          {
             title: "作者",
             items: [
               {
-                title: videoInfo.owner.mid
+                title: videoInfo.owner.mid,
+                func: () => {
+                  this.Core.biliLuncher.space(videoInfo.owner.mid);
+                }
               },
               {
                 title: "@" + videoInfo.owner.name,
@@ -127,12 +142,14 @@ class BilibiliVideo extends CoreModule {
         $ui.loading(false);
         $ui.push({
           props: {
-            title: bvid || "bv****"
+            title: bvid
           },
           views: [
             {
               type: "list",
               props: {
+                autoRowHeight: true,
+                estimatedRowHeight: 10,
                 data: videoInfoList.map(listItem => {
                   return {
                     title: listItem.title.toString(),
@@ -142,16 +159,13 @@ class BilibiliVideo extends CoreModule {
               },
               layout: $layout.fill,
               events: {
-                didSelect: (_sender, indexPath, _data) => {
-                  const section = indexPath.section;
-                  const row = indexPath.row,
+                didSelect: (sender, indexPath, data) => {
+                  const section = indexPath.section,
+                    row = indexPath.row,
                     selectedItem = videoInfoList[section].items[row];
-                  if (
-                    selectedItem.func != undefined &&
-                    typeof selectedItem.func == "function"
-                  )
+                  if (this.$.isFunction(selectedItem.func))
                     try {
-                      selectedItem.func();
+                      selectedItem.func(sender, data);
                     } catch (error) {
                       $console.error(error);
                     }

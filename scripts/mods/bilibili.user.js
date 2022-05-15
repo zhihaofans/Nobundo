@@ -121,7 +121,111 @@ class UserInfo {
     this.Http = coreModule.Core.Http;
     this.Data = new UserData(coreModule.Core.Keychain);
   }
-  async getHistory() {}
+  async getHistory() {
+    $ui.loading(true);
+    const url = "http://api.bilibili.com/x/web-interface/history/cursor?ps=30",
+      header = { cookie: this.Data.cookie() },
+      timeout = 5,
+      resp = await this.Http.get({
+        url,
+        header,
+        timeout
+      });
+    $console.info({ resp });
+    if (resp.error) {
+      $ui.loading(false);
+      $ui.alert({
+        title: "获取失败",
+        message: resp.error.message,
+        actions: [
+          {
+            title: "OK",
+            disabled: false, // Optional
+            handler: () => {}
+          }
+        ]
+      });
+    } else {
+      $ui.loading(false);
+      const result = resp.data;
+      if (result) {
+        if (result.code == 0) {
+          const data = result.data,
+            historyList = data.list,
+            listCount = historyList.length;
+          if (listCount > 0) {
+            $ui.push({
+              props: {
+                title: `共${listCount}个历史记录`
+              },
+              views: [
+                {
+                  type: "list",
+                  props: {
+                    autoRowHeight: true,
+                    estimatedRowHeight: 44,
+                    data: historyList.map(thisHistory => {
+                      return {
+                        title: `${thisHistory.author_mid}@${thisHistory.author_name}`,
+                        rows: [
+                          `av${thisHistory.history.oid} | ${thisHistory.history.bvid}`,
+                          thisHistory.title
+                        ]
+                      };
+                    })
+                  },
+                  layout: $layout.fill,
+                  events: {
+                    didSelect: (_sender, indexPath, _data) => {
+                      const selectHistory = historyList[indexPath.section];
+                      $ui.menu({
+                        items: ["查看视频信息", "通过哔哩哔哩APP打开"],
+                        handler: (title, idx) => {
+                          switch (idx) {
+                            case 0:
+                              try {
+                                this.Module.Core.ModuleLoader.getModule(
+                                  "bilibili.video"
+                                ).showVideoInfo(selectHistory.history.bvid);
+                              } catch (error) {
+                                $console.error(error);
+                                $ui.error("Error");
+                              }
+                              break;
+                            case 1:
+                              //                              $app.openURL(selectHistory.short_link_v2);
+
+                              break;
+                            default:
+                          }
+                        }
+                      });
+                    }
+                  }
+                }
+              ]
+            });
+          } else {
+            $ui.error("空白历史记录");
+          }
+        } else {
+          $ui.alert({
+            title: `错误${result.code}`,
+            message: result.message,
+            actions: [
+              {
+                title: "OK",
+                disabled: false, // Optional
+                handler: () => {}
+              }
+            ]
+          });
+        }
+      } else {
+        $ui.error("空白请求结果");
+      }
+    }
+  }
   async getLaterToWatch() {
     $ui.loading(true);
     const url = "https://api.bilibili.com/x/v2/history/toview",
@@ -337,7 +441,6 @@ class Vip {
         header,
         timeout
       }),
-      response = resp.response,
       result = resp.data,
       resultCodeList = {
         "-101": "账号未登录",
