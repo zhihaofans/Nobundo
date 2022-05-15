@@ -213,7 +213,7 @@ class Main {
                   $console.warn(percentage);
                 },
                 handler: resp => {
-                  const finishDownloadTime = this.$.time.getUnixTime();
+                  const finishDownloadTime = this.$.dateTime.getUnixTime();
                   $ui.get("progress_download").progressColor = $color(
                     "#008000"
                   );
