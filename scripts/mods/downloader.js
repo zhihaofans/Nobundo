@@ -181,7 +181,7 @@ class Main {
                       id: "button_share",
                       title: "预览",
                       hidden: true,
-                      icon: $icon("023", $color("white"), $size(20, 20))
+                      icon: this.$.icon.getJsboxIcon("023")
                     },
                     layout: (make, view) => {
                       make.center.equalTo(view.super);
