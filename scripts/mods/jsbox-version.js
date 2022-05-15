@@ -71,7 +71,7 @@ class v2_19_0 {
         {
           type: "list",
           props: {
-            data: ["钥匙串", "UUID"]
+            data: ["钥匙串", "UUID", "Objective-C"]
           },
           layout: $layout.fill,
           events: {
@@ -82,6 +82,10 @@ class v2_19_0 {
                   break;
                 case 1:
                   this.uuid();
+                  break;
+                case 2:
+                  this.obc();
+                  break;
               }
             }
           }
@@ -216,6 +220,51 @@ class v2_19_0 {
       handler: text => {}
     });
   }
+  obc() {
+    $define({
+      type: "MyHelper",
+      classEvents: {
+        open: function (scheme) {
+          const url = $objc("NSURL").invoke("URLWithString", scheme);
+          $objc("UIApplication").invoke("sharedApplication.openURL", url);
+        }
+      }
+    });
+
+    $ui.render({
+      views: [
+        {
+          type: "button",
+          props: {
+            bgcolor: $objc("UIColor").invoke("blackColor").jsValue(),
+            titleColor: $color("#FFFFFF").ocValue().jsValue(),
+            title: "WeChat"
+          },
+          layout: function (make, view) {
+            make.center.equalTo(view.super);
+            make.size.equalTo($size(100, 32));
+          },
+          events: {
+            tapped: function (sender) {
+              $objc("MyHelper").invoke("open", "weixin://");
+            }
+          }
+        }
+      ]
+    });
+
+    const window = $ui.window.ocValue();
+    const label = $objc("UILabel").invoke("alloc.init");
+    label.invoke("setTextAlignment", 1);
+    label.invoke("setText", "Runtime");
+    label.invoke("setFrame", {
+      x: $device.info.screen.width * 0.5 - 50,
+      y: 240,
+      width: 100,
+      height: 32
+    });
+    window.invoke("addSubview", label);
+  }
 }
 const { Core } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
@@ -231,7 +280,6 @@ const { Core } = require("../../Core.js/core"),
       classObject: UiTest,
       index: "init"
     },
-
     {
       version: "api测试",
       classObject: ApiTest,
