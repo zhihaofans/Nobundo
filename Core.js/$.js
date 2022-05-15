@@ -7,15 +7,16 @@ function getUUID() {
 function info(message) {
   $console.info(message);
 }
+function isFunction(func) {
+  return func != undefined && typeof func == "function";
+}
 function toInt(data) {
   return Number.parseInt(data);
 }
 function warn(message) {
   $console.warn(message);
 }
-function isFunction(func) {
-  return func != undefined && typeof func == "function";
-}
+
 class Alert {
   constructor() {}
   show(title, message) {
@@ -170,6 +171,21 @@ class Http {
     });
   }
 }
+class Icon {
+  constructor() {
+    this.JSBOX_ICON_LIST = {
+      SHARE: "023"
+    };
+  }
+  getJsboxIcon(iconId, size, color) {
+    return $icon(
+      iconId,
+      $color(color || "white"),
+      $size(size || 20, size || 20)
+    );
+  }
+}
+
 class Share {
   constructor() {}
   isAction() {
@@ -207,8 +223,10 @@ module.exports = {
   dateTime: new Datetime(),
   error,
   getUUID,
+  icon: new Icon(),
   info,
   isFunction,
+  isString: new Str().isString,
   file: new File(),
   http: new Http(),
   share: new Share(),
