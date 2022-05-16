@@ -90,7 +90,7 @@ class BilibiliVideo extends CoreModule {
               {
                 title: videoInfo.owner.mid,
                 func: () => {
-                  this.Core.biliLuncher.space(videoInfo.owner.mid);
+                  this.Core.biliLauncher.space(videoInfo.owner.mid);
                 }
               },
               {

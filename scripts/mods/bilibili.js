@@ -1,7 +1,7 @@
 const { Core, ModuleLoader } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
-class BilibiliLuncher {
+class BilibiliLauncher {
   constructor(name) {
     this.NAME = name;
   }
@@ -134,7 +134,7 @@ class Bilibili extends Core {
       needCoreVersion: 4
     });
     this.ModuleLoader = new ModuleLoader(this);
-    this.biliLuncher = new BilibiliLuncher();
+    this.biliLauncher = new BilibiliLauncher();
   }
   run() {
     this.ModuleLoader.addModule("bilibili.video.js");
