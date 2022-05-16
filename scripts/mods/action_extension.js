@@ -10,7 +10,7 @@ class ActionExtension extends Core {
       modName: "分享内容解析",
       version: "1",
       author: "zhihaofans",
-      needCoreVersion: 4
+      coreVersion: 4
     });
     this.QUERY = $context.query;
     this.isSafari = app.isSafariEnv();
@@ -31,35 +31,38 @@ class ActionExtension extends Core {
   }
   runAction() {
     if (this.isSafari) {
-      const result = { url: [], text: [] },
-        safariItems = $context.safari.items;
-      result.url.push(
-        safariItems.source,
-        safariItems.baseURI,
-        safariItems.location,
-        safariItems.referer
-      );
-      result.text.push(safariItems.title, safariItems.cookie);
-      listKit.renderIdx(
-        "内容解析",
-        [
-          {
-            title: "链接",
-            rows: result.url
-          },
-          {
-            title: "文本",
-            rows: result.text
-          }
-        ],
-        (section, row) => {}
-      );
+      this.runSafari();
     } else if (this.isShare) {
+      this.run();
     } else {
       this.run();
     }
   }
-  runSafari() {}
+  runSafari() {
+    const result = { url: [], text: [] },
+      safariItems = $context.safari.items;
+    result.url.push(
+      safariItems.source,
+      safariItems.baseURI,
+      safariItems.location,
+      safariItems.referer
+    );
+    result.text.push(safariItems.title, safariItems.cookie);
+    listKit.renderIdx(
+      "内容解析",
+      [
+        {
+          title: "链接",
+          rows: result.url
+        },
+        {
+          title: "文本",
+          rows: result.text
+        }
+      ],
+      (section, row) => {}
+    );
+  }
   link(url) {}
 }
 module.exports = ActionExtension;

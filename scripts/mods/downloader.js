@@ -1,11 +1,21 @@
 const { Core } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
+class DownloaderCore {
+  constructor(core) {
+    this.Core = core;
+    this.Http = core.Http;
+  }
+  download({ url, header }) {}
+  saveFile() {}
+  saveImage() {}
+}
+
 class Main {
   constructor(core) {
     this.Core = core;
     this.$ = core.$;
-    this.Http = core.$.http;
+    this.Http = core.Http;
     this.isShare = this.$.share.isAction();
   }
   init() {
