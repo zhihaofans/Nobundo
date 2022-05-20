@@ -30,7 +30,6 @@ class UserLogin {
   isLogin() {
     return this.Data.cookie().length > 0;
   }
-  login() {}
   async getWebLoginKey() {
     const url = "https://passport.bilibili.com/qrcode/getLoginUrl",
       header = {},
@@ -330,6 +329,19 @@ class UserInfo {
         $ui.error("空白请求结果");
       }
     }
+  }
+  async getUserInfo() {
+    const cookie = this.Module.getCookie(),
+      header = { cookie },
+      url = "http://api.bilibili.com/x/web-interface/nav",
+      timeout = 5,
+      resp = await this.Core.$.http.get({
+        url,
+        header,
+        timeout
+      }),
+      response = resp.response;
+    $console.info({ resp, header });
   }
 }
 

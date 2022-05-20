@@ -12,7 +12,6 @@ const { AppKernel } = require("../Core.js/app"),
     "free-api.js",
     "example.js",
     "mefang.js",
-    "punches.js",
     "action_extension.js"
   ];
 
