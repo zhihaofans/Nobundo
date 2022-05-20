@@ -122,8 +122,8 @@ class DatabaseHelper extends Core {
   constructor(app) {
     super({
       app,
-      modId: "database_helper",
-      modName: "数据库助手",
+      modId: "datacenter",
+      modName: "数据中心",
       version: "1",
       author: "zhihaofans",
       coreVersion: 5
