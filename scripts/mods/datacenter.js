@@ -6,38 +6,93 @@ class KeychainCore {
   getAllValue() {
     const result = {},
       keys = this.getKeyList();
-    keys.map(k => (result[k] = this.getValue(k)));
+    keys.map(k => (result[k] = this.get(k)));
     return result;
   }
   getKeyList() {
     return $keychain.keys(this.DOMAIN);
   }
 
-  getValue(key) {
+  get(key) {
     return $keychain.get(key, this.DOMAIN);
   }
   remove(key) {
     return $keychain.remove(key, this.DOMAIN);
   }
-  setValue(key, value) {
+  set(key, value) {
     return $keychain.set(key, value, this.DOMAIN);
   }
 }
 class KeychainView {
   constructor(core) {
     this.Core = core;
+    this.Keychain = core.Keychain;
   }
   init() {
     $input.text({
       type: $kbType.text,
       placeholder: "域名",
-      text: "",
+      text: this.Keychain.get("lastdomain"),
       handler: domain => {
         if (domain != undefined && domain.length > 0) {
-          this.Core.Keychain;
-          $keychain.set("lastdomain", domain, "");
-          const keychainCore = new KeychainCore(domain);
-          keychainCore;
+          this.Keychain.set("lastdomain", domain);
+
+          const keychainCore = new KeychainCore(domain),
+            keys = keychainCore.getKeyList();
+          $console.info(keys);
+          $ui.push({
+            props: {
+              title: domain
+            },
+            views: [
+              {
+                type: "list",
+                props: {
+                  data: keys
+                },
+                layout: $layout.fill,
+                events: {
+                  didSelect: (_sender, indexPath, _data) => {
+                    const row = indexPath.row,
+                      thisKey = keys[row];
+                    $ui.alert({
+                      title: thisKey,
+                      message: keychainCore.get(thisKey),
+                      actions: [
+                        {
+                          title: "没事了",
+                          disabled: false, // Optional
+                          handler: () => {}
+                        },
+                        {
+                          title: "编辑",
+                          disabled: true, // Optional
+                          handler: () => {}
+                        },
+                        {
+                          title: "删除",
+                          disabled: false, // Optional
+                          handler: () => {
+                            const removeResult = keychainCore.remove(thisKey);
+                            if (removeResult) {
+                              $ui.success(removeResult);
+                            } else {
+                              $ui.error(removeResult);
+                            }
+                          }
+                        },
+                        {
+                          title: "分享",
+                          disabled: true, // Optional
+                          handler: () => {}
+                        }
+                      ]
+                    });
+                  }
+                }
+              }
+            ]
+          });
         }
       }
     });
@@ -130,7 +185,7 @@ class DatabaseHelper extends Core {
     });
   }
   run() {
-    const helperView = new HelperView();
+    const helperView = new HelperView(this);
     helperView.init();
   }
   runApi({ apiId, apiData, callback }) {

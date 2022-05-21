@@ -12,7 +12,8 @@ const { AppKernel } = require("../Core.js/app"),
     "free-api.js",
     "example.js",
     "mefang.js",
-    "action_extension.js"
+    "action_extension.js",
+    "datacenter.js"
   ];
 
 class App extends AppKernel {
