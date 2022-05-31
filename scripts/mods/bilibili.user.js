@@ -120,9 +120,24 @@ class UserInfo {
     this.Http = coreModule.Core.Http;
     this.Data = new UserData(coreModule.Core.Keychain);
   }
+  async AddToView(bvid) {
+    const cookie = this.Module.getCookie(),
+      postData = {},
+      header = { cookie },
+      url = "https://api.bilibili.com/x/v2/history/toview/add",
+      timeout = 5,
+      resp = await this.Core.$.http.post({
+        url,
+        header,
+        timeout,
+        body: postData
+      }),
+      response = resp.response;
+    $console.info({ resp, header });
+  }
   async getHistory() {
     $ui.loading(true);
-    const url = "http://api.bilibili.com/x/web-interface/history/cursor?ps=30",
+    const url = "https://api.bilibili.com/x/web-interface/history/cursor?ps=30",
       header = { cookie: this.Data.cookie() },
       timeout = 5,
       resp = await this.Http.get({
@@ -333,7 +348,7 @@ class UserInfo {
   async getUserInfo() {
     const cookie = this.Module.getCookie(),
       header = { cookie },
-      url = "http://api.bilibili.com/x/web-interface/nav",
+      url = "https://api.bilibili.com/x/web-interface/nav",
       timeout = 5,
       resp = await this.Core.$.http.get({
         url,

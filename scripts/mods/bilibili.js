@@ -104,6 +104,19 @@ class Main {
           case 0:
             this.UserModule.login(sender.cell(indexPath));
             break;
+          case 1:
+            $ui.alert({
+              title: "Cookie",
+              message: this.UserModule.getCookie(),
+              actions: [
+                {
+                  title: "OK",
+                  disabled: false, // Optional
+                  handler: () => {}
+                }
+              ]
+            });
+            break;
           case 3:
             try {
               this.Vip.getPrivilegeStatus(sender.cell(indexPath));
