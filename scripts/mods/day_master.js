@@ -41,7 +41,7 @@ class Main {
     listKit.pushString(this.Core.MOD_NAME, mainViewList, didSelect);
   }
   async getPastDate() {
-    const dateResult = await this.$.time.pickDate();
+    const dateResult = await this.$.dateTime.pickDate();
     if (dateResult) {
       const result = this.DSR.getIntervalDate(
         new Date().getTime(),
