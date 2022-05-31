@@ -54,10 +54,11 @@ class KeychainView {
                 events: {
                   didSelect: (_sender, indexPath, _data) => {
                     const row = indexPath.row,
-                      thisKey = keys[row];
+                      thisKey = keys[row],
+                      thisValue = keychainCore.get(thisKey);
                     $ui.alert({
                       title: thisKey,
-                      message: keychainCore.get(thisKey),
+                      message: thisValue,
                       actions: [
                         {
                           title: "没事了",
@@ -83,8 +84,10 @@ class KeychainView {
                         },
                         {
                           title: "分享",
-                          disabled: true, // Optional
-                          handler: () => {}
+                          disabled: false, // Optional
+                          handler: () => {
+                            $share.sheet([thisValue]);
+                          }
                         }
                       ]
                     });
