@@ -65,7 +65,7 @@ class UserData {
 
 class MefangApi {
   constructor(core) {
-    this.Http = $.http;
+    this.Http = core.$.http;
     this.UserData = new UserData(core);
   }
   checkLoginStatus() {
@@ -86,18 +86,40 @@ class MefangApi {
     });
     $console.info(result);
   }
+  async getCheckinQrcode(scene, width = 600) {
+    const result = await this.getCommon({
+      a: "wxapp/qrcode",
+      d: {
+        scene,
+        page: "pages/checkin/checkin",
+        width
+      }
+    });
+    if (result.errcode != 0) {
+      return undefined;
+    }
+    $console.info(result.result);
+    return result.result;
+  }
   async getCommon({ a, d }) {
     const url = "https://aifendou.net/common",
       header = this.UserData.getHeader(),
       body = { a, d },
       resp = await this.Http.post({ url, body, header }),
-      response = resp.response,
+      //response = resp.response,
       data = resp.data;
     $ui.loading(false);
     if (resp.error) {
       $console.error(resp.error);
       return undefined;
     } else {
+      $console.error({
+        message: data.meno,
+        url: "mefang.getCommon." + a,
+        data: {
+          d
+        }
+      });
       return data;
     }
   }
@@ -105,15 +127,22 @@ class MefangApi {
     const url = "https://aifendou.net/fightbox",
       header = this.UserData.getHeader(),
       body = { a, d },
-      resp = await this.Http.post({ url, body, header }),
-      response = resp.response,
+      resp = await this.Http.post({ url, body, header, timeout: 5 }),
+      //response = resp.response,
       data = resp.data;
-    $console.info({ data });
-    $ui.loading(false);
     if (resp.error) {
       $console.error(resp.error);
       return undefined;
     } else {
+      if (data.errcode != 0) {
+        $console.error({
+          message: data.meno,
+          url: "mefang.getFightBox." + a,
+          data: {
+            d
+          }
+        });
+      }
       return data;
     }
   }
@@ -178,7 +207,17 @@ class MefangUi {
               this.showUserData();
               break;
             case 5:
-              this.showCoachTimesheet();
+              $input.text({
+                type: $kbType.text,
+                placeholder: "教练id",
+                text: this.Core.Keychain.get("coash_timesheet_last_id"),
+                handler: coashId => {
+                  if (coashId.length > 0) {
+                    this.Core.Keychain.set("coash_timesheet_last_id", coashId);
+                  }
+                  this.showCoachTimesheet(coashId);
+                }
+              });
               break;
           }
         } catch (error) {
@@ -187,17 +226,111 @@ class MefangUi {
       }
     });
   }
-  async showCoachTimesheet() {
-    $ui.loading(true);
+  async showCoachTimesheet(coashId) {
     const pickedDate = await this.$.dateTime.pickDate(),
-      date = `${pickedDate.getFullYear()}-${pickedDate.getMonth()}-${pickedDate.getDay()}`,
-      resultData = await this.Api.getReservedTimesheet("251", date, date);
+      date = `${pickedDate.getFullYear()}-${
+        pickedDate.getMonth() + 1
+      }-${pickedDate.getDate()}`;
 
-    $ui.loading(false);
+    $ui.loading(true);
+    const resultData = await this.Api.getReservedTimesheet(
+      coashId || "251",
+      date,
+      date
+    );
     $console.info({
       date,
       resultData
     });
+    $ui.loading(false);
+    if (resultData.errcode == 0 && resultData.result.success == true) {
+      const timesheetList = resultData.result.list;
+      $console.warn({
+        timesheetList
+      });
+      if (timesheetList.length > 0) {
+        const timesheetData = resultData.result.list[0],
+          coashesList = timesheetData.coaches,
+          periods = coashesList[0].periods,
+          result = periods.map(item => {
+            const customerData = item.customer[0];
+            $console.warn(item);
+            return {
+              date: `${item.time_start}-${item.time_end}`,
+              list: [
+                {
+                  title: item.memo
+                },
+                {
+                  title: `${customerData.name}(${customerData.user_nickname})`,
+                  func: undefined
+                },
+                {
+                  title: customerData.user_avatar,
+                  func: () => {
+                    $ui.preview({
+                      title: "头像",
+                      url: customerData.user_avatar
+                    });
+                  }
+                },
+                {
+                  title: item.loc_name
+                }
+              ]
+            };
+          });
+        $console.info({
+          coashesList: coashesList.length,
+          periods: periods.length
+        });
+        if (coashesList.length > 0 && periods.length > 0) {
+          $ui.push({
+            props: {
+              title: timesheetData.date
+            },
+            views: [
+              {
+                type: "list",
+                props: {
+                  data: result.map(item => {
+                    return {
+                      title: item.date,
+                      rows: item.list.map(row => row.title)
+                    };
+                  })
+                },
+                layout: $layout.fill,
+                events: {
+                  didSelect: (_sender, indexPath, _data) => {
+                    const section = indexPath.section,
+                      row = indexPath.row,
+                      thisCoashes = result[section],
+                      thisTitle = thisCoashes.list[row];
+                    if (this.$.isFunction(thisTitle.func)) {
+                      try {
+                        thisTitle.func();
+                      } catch (error) {
+                        $console.error(error);
+                      }
+                    } else {
+                      $share.sheet([thisTitle.title]);
+                    }
+                  }
+                }
+              }
+            ]
+          });
+        } else {
+          $ui.warn("今天没有排班");
+        }
+        $console.warn(timesheetData);
+      } else {
+        $ui.error("0个结果");
+      }
+    } else {
+      $ui.error("(" + resultData.errcode + ")" + resultData.memo);
+    }
   }
   async showUserData() {
     $ui.loading(true);
@@ -271,9 +404,9 @@ class MefangUi {
             events: {
               didSelect: (sender, indexPath, data) => {
                 const section = indexPath.section,
-                  row = indexPath.row,
+                  //row = indexPath.row,
                   thisItem = userDataList[section];
-                if ($.isFunction(thisItem.onClick)) {
+                if (this.$.isFunction(thisItem.onClick)) {
                   try {
                     thisItem.onClick(data);
                   } catch (error) {
