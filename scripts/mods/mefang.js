@@ -146,6 +146,19 @@ class MefangApi {
       return data;
     }
   }
+  async getMyCoashes() {
+    const result = await this.getFightBox({
+      a: "book/list",
+      d: {
+        more: {
+          start_pos: 0,
+          pagesize: 20
+        }
+      }
+    });
+    $console.info(result);
+    return result;
+  }
   async getReservedTimesheet(coachId, dateStart, dateEnd) {
     const result = await this.getFightBox({
       a: "timesheet",
@@ -203,6 +216,9 @@ class MefangUi {
             case 2:
               this.getCurriculum();
               break;
+            case 3:
+              this.showMyCoashes();
+              break;
             case 4:
               this.showUserData();
               break;
@@ -225,6 +241,18 @@ class MefangUi {
         }
       }
     });
+  }
+  async showCheckinQrcode(id, book_id) {
+    $ui.loading(true);
+    const scene = `${id}_${book_id}`,
+      resultData = await this.Api.getCheckinQrcode(scene);
+
+    $console.info({
+      book_id,
+      id,
+      resultData
+    });
+    $ui.loading(false);
   }
   async showCoachTimesheet(coashId) {
     const pickedDate = await this.$.dateTime.pickDate(),
@@ -330,6 +358,124 @@ class MefangUi {
       }
     } else {
       $ui.error("(" + resultData.errcode + ")" + resultData.memo);
+    }
+  }
+  async showMyCoashes() {
+    $ui.loading(true);
+    const myCoashesData = await this.Api.getMyCoashes();
+    $ui.loading(false);
+    if (myCoashesData.errcode != 0) {
+      $ui.error(`[${myCoashesData.errcode}]${myCoashesData.memo}`);
+    } else {
+      const resultData = myCoashesData.result,
+        myCoashesList = resultData.list;
+      if (resultData.success == false) {
+        $ui.error(`result.success:${resultData.success}`);
+      } else if (myCoashesList == undefined || myCoashesList.length == 0) {
+        $ui.error("还没约课呢！");
+      } else {
+        const listData_myCoashes = [];
+        myCoashesList.map(coashes => {
+          //$console.warn(coashes);
+          const {
+              id,
+              date,
+              time_start,
+              time_end,
+              course_name,
+              course_id,
+              book_id,
+              coach_name,
+              coach_id,
+              status,
+              memo
+            } = coashes,
+            thisCourseData = {
+              id,
+              date,
+              time: time_start + "-" + time_end,
+              dateTime: `${date} ${time_start}-${time_end}`,
+              course: {
+                id: course_id,
+                title: course_name
+              },
+              coach: {
+                id: coach_id,
+                name: coach_name
+              },
+              status,
+              title: memo,
+              book_id
+            };
+          if (coashes.status == 1) {
+            $console.warn(thisCourseData);
+            listData_myCoashes.push(thisCourseData);
+          }
+        });
+
+        const listViewData = listData_myCoashes.map(item => {
+          return {
+            title: item.dateTime,
+            data: [
+              {
+                title: item.title,
+                func: undefined
+              },
+              {
+                title: item.course.title,
+                func: undefined
+              },
+              {
+                title: `教练:${item.coach.name}(${item.coach.id})`,
+                func: undefined
+              },
+              {
+                title: `查看签到二维码`,
+                func: () => {
+                  this.showCheckinQrcode(item.id, item.book_id);
+                }
+              }
+            ]
+          };
+        });
+        $ui.push({
+          props: {
+            title: "我的课程"
+          },
+          views: [
+            {
+              type: "list",
+              props: {
+                data: listViewData.map(item => {
+                  return {
+                    title: item.title,
+                    rows: item.data.map(data => data.title)
+                  };
+                })
+              },
+              layout: $layout.fill,
+              events: {
+                didSelect: (_sender, indexPath, _data) => {
+                  const section = indexPath.section,
+                    row = indexPath.row,
+                    thisCourse = listViewData[section],
+                    thisClicked = thisCourse.data[row];
+                  if (this.$.isFunction(thisClicked.func)) {
+                    try {
+                      thisClicked.func();
+                    } catch (error) {
+                      $ui.error(error.name);
+                      $console.error(error);
+                    }
+                  } else {
+                    $share.sheet([thisClicked.title]);
+                  }
+                }
+              }
+            }
+          ]
+        });
+      }
     }
   }
   async showUserData() {
