@@ -1,4 +1,6 @@
-const ModCore = require("../../Core.js/core").Core;
+const ModCore = require("../../Core.js/core").Core,
+  NextJs = require("../../Core.js/next"),
+  ListView = new NextJs.ListView();
 class UserData {
   constructor(core) {
     this.Core = core;
@@ -253,6 +255,14 @@ class MefangUi {
       resultData
     });
     $ui.loading(false);
+    if (resultData.success == true) {
+      $ui.preview({
+        title: "URL",
+        url: resultData.file
+      });
+    } else {
+      $ui.error("获取失败");
+    }
   }
   async showCoachTimesheet(coashId) {
     const pickedDate = await this.$.dateTime.pickDate(),
@@ -360,6 +370,7 @@ class MefangUi {
       $ui.error("(" + resultData.errcode + ")" + resultData.memo);
     }
   }
+
   async showMyCoashes() {
     $ui.loading(true);
     const myCoashesData = await this.Api.getMyCoashes();
@@ -413,10 +424,10 @@ class MefangUi {
           }
         });
 
-        const listViewData = listData_myCoashes.map(item => {
+        const listData = listData_myCoashes.map(item => {
           return {
             title: item.dateTime,
-            data: [
+            rows: [
               {
                 title: item.title,
                 func: undefined
@@ -438,43 +449,47 @@ class MefangUi {
             ]
           };
         });
-        $ui.push({
-          props: {
-            title: "我的课程"
-          },
-          views: [
-            {
-              type: "list",
-              props: {
-                data: listViewData.map(item => {
-                  return {
-                    title: item.title,
-                    rows: item.data.map(data => data.title)
-                  };
-                })
-              },
-              layout: $layout.fill,
-              events: {
-                didSelect: (_sender, indexPath, _data) => {
-                  const section = indexPath.section,
-                    row = indexPath.row,
-                    thisCourse = listViewData[section],
-                    thisClicked = thisCourse.data[row];
-                  if (this.$.isFunction(thisClicked.func)) {
-                    try {
-                      thisClicked.func();
-                    } catch (error) {
-                      $ui.error(error.name);
-                      $console.error(error);
-                    }
-                  } else {
-                    $share.sheet([thisClicked.title]);
-                  }
-                }
-              }
-            }
-          ]
+
+        ListView.pushSimpleList("我的课程", listData, data => {
+          $share.sheet([data]);
         });
+        //        $ui.push({
+        //          props: {
+        //            title: "我的课程"
+        //          },
+        //          views: [
+        //            {
+        //              type: "list",
+        //              props: {
+        //                data: listData.map(item => {
+        //                  return {
+        //                    title: item.title,
+        //                    rows: item.rows.map(data => data.title)
+        //                  };
+        //                })
+        //              },
+        //              layout: $layout.fill,
+        //              events: {
+        //                didSelect: (_sender, indexPath, _data) => {
+        //                  const section = indexPath.section,
+        //                    row = indexPath.row,
+        //                    thisCourse = listViewData[section],
+        //                    thisClicked = thisCourse.data[row];
+        //                  if (this.$.isFunction(thisClicked.func)) {
+        //                    try {
+        //                      thisClicked.func();
+        //                    } catch (error) {
+        //                      $ui.error(error.name);
+        //                      $console.error(error);
+        //                    }
+        //                  } else {
+        //                    $share.sheet([thisClicked.title]);
+        //                  }
+        //                }
+        //              }
+        //            }
+        //          ]
+        //        });
       }
     }
   }
