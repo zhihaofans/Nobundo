@@ -397,7 +397,12 @@ class Vip {
       const result = resp.data;
       if (result.code == 0) {
         const privilegeList = result.data.list,
-          privilegeStr = { 1: "B币", 2: "会员购优惠券", 3: "漫画福利券" };
+          privilegeStr = {
+            1: "B币",
+            2: "会员购优惠券",
+            3: "漫画福利券",
+            4: "会员购包邮券"
+          };
         $ui.push({
           props: {
             title: this.TITLE
@@ -425,7 +430,8 @@ class Vip {
                     clickItem.stopLoading();
                     $ui.alert({
                       title: "领取失败",
-                      message: privilegeStr[thisPrivilege.type] + "已领取",
+                      message:
+                        privilegeStr[thisPrivilege.type] || "未知" + "已领取",
                       actions: [
                         {
                           title: "OK",
