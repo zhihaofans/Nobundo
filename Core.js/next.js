@@ -78,7 +78,7 @@ class ListView {
                 typeof defaultFunc == "function"
               ) {
                 try {
-                  defaultFunc();
+                  defaultFunc(data);
                 } catch (error) {
                   $console.error(error);
                 }
