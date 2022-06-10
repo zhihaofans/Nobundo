@@ -25,6 +25,73 @@ class DateTime {
     return this.DATE_TIME.getTime();
   }
 }
+class ListView {
+  constructor(name) {
+    this.NAME = name;
+  }
+  pushSimpleList(title, listData, defaultFunc) {
+    //    const listData = [
+    //      {
+    //        title: "标题",
+    //        rows: [
+    //          {
+    //            title: "列表项",
+    //            func: data => {
+    //              // 会自动带入所选项的文本到data
+    //            }
+    //          }
+    //        ]
+    //      }
+    //    ];
+    $ui.push({
+      props: {
+        title
+      },
+      views: [
+        {
+          type: "list",
+          props: {
+            data: listData.map(group => {
+              return {
+                title: group.title,
+                rows: group.rows.map(row => row.title)
+              };
+            })
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (sender, indexPath, data) => {
+              const section = indexPath.section,
+                row = indexPath.row,
+                clickItem = listData[section].rows[row];
+              if (
+                clickItem.func != undefined &&
+                typeof clickItem.func == "function"
+              ) {
+                try {
+                  clickItem.func();
+                } catch (error) {
+                  $console.error(error);
+                }
+              } else if (
+                defaultFunc != undefined &&
+                typeof defaultFunc == "function"
+              ) {
+                try {
+                  defaultFunc();
+                } catch (error) {
+                  $console.error(error);
+                }
+              }
+            }
+          }
+        }
+      ]
+    });
+  }
+}
+
 module.exports = {
-  DateTime
+  DateTime,
+  ListView
 };
