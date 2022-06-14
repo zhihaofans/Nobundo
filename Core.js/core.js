@@ -92,7 +92,7 @@ class CoreLoader {
             $console.error(`modID(${modID})已存在`);
           }
         } else {
-          $console.error({ needUpdateCore });
+          $console.error({ modId: modCore.CORE_INFO.ID, needUpdateCore });
           const modID = modCore.CORE_INFO.ID;
           if (
             this.modList.id.indexOf(modID) < 0 &&
