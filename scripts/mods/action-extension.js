@@ -6,7 +6,7 @@ class ActionExtension extends Core {
   constructor(app) {
     super({
       app,
-      modId: "action_extension",
+      modId: "action-extension",
       modName: "分享内容解析",
       version: "1",
       author: "zhihaofans",

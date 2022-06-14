@@ -127,7 +127,7 @@ class FreeApi extends Core {
   constructor(app) {
     super({
       app,
-      modId: "free_api",
+      modId: "free-api",
       modName: "免费Api",
       version: "1",
       author: "zhihaofans",

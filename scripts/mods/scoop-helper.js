@@ -19,7 +19,7 @@ class AppGetter {
   }
 }
 
-class AppMod {
+class AppInfo {
   constructor({
     version,
     description,

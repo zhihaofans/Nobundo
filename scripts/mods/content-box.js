@@ -3,7 +3,7 @@ class Example extends Core {
   constructor(app) {
     super({
       app,
-      modId: "content_box",
+      modId: "content-box",
       modName: "内容盒子",
       version: "1",
       author: "zhihaofans",
