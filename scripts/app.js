@@ -8,11 +8,11 @@ const { AppKernel } = require("../Core.js/app"),
     "wallhaven.js",
     "downloader.js",
     "reminder.js",
-    "day_master.js",
+    "daymaster.js",
     "free-api.js",
     "example.js",
     "mefang.js",
-    "action_extension.js",
+    "action-extension.js",
     "datacenter.js"
   ];
 
@@ -50,7 +50,7 @@ class App extends AppKernel {
         );
         break;
       case this.isActionEnv() || this.isSafariEnv():
-        this.coreLoader.setActionCore("action_extension");
+        this.coreLoader.setActionCore("action-extension");
         this.coreLoader.runActionCore();
         break;
       default:
