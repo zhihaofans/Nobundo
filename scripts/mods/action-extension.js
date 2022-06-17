@@ -1,6 +1,71 @@
 const { Core } = require("../../Core.js/core"),
-  ui = require("../../Core.js/ui"),
-  listKit = new ui.ListKit();
+  Next = require("../../Core.js/next");
+
+class ShareAction {
+  constructor() {
+    this.hasData = this.getData() != undefined;
+    this.hasImage = this.getImage() != undefined;
+    this.hasLink = this.getLink() != undefined;
+    this.hasText = this.getText() != undefined;
+  }
+  init() {
+    if (this.hasImage) {
+      $ui.alert({
+        title: "发现图片",
+        message: "",
+        actions: [
+          {
+            title: "预览",
+            disabled: false, // Optional
+            handler: () => {
+              $quicklook.open({
+                image: this.getImage()
+              });
+            }
+          }
+        ]
+      });
+    } else if (this.hasLink) {
+      $ui.alert({
+        title: "发现链接",
+        message: this.getLink(),
+        actions: [
+          {
+            title: "OK",
+            disabled: false, // Optional
+            handler: () => {}
+          }
+        ]
+      });
+    } else {
+      $ui.alert({
+        title: "错误",
+        message: "不支持该内容",
+        actions: [
+          {
+            title: "OK",
+            disabled: false, // Optional
+            handler: () => {
+              $app.close();
+            }
+          }
+        ]
+      });
+    }
+  }
+  getData() {
+    return $context.data;
+  }
+  getImage() {
+    return $context.image;
+  }
+  getLink() {
+    return $context.link;
+  }
+  getText() {
+    return $context.text;
+  }
+}
 
 class ActionExtension extends Core {
   constructor(app) {
@@ -29,39 +94,19 @@ class ActionExtension extends Core {
       ]
     });
   }
-  runAction() {
+  runContext() {
     if (this.isSafari) {
       this.runSafari();
     } else if (this.isShare) {
-      this.run();
+      this.runShare();
     } else {
       this.run();
     }
   }
-  runSafari() {
-    const result = { url: [], text: [] },
-      safariItems = $context.safari.items;
-    result.url.push(
-      safariItems.source,
-      safariItems.baseURI,
-      safariItems.location,
-      safariItems.referer
-    );
-    result.text.push(safariItems.title, safariItems.cookie);
-    listKit.renderIdx(
-      "内容解析",
-      [
-        {
-          title: "链接",
-          rows: result.url
-        },
-        {
-          title: "文本",
-          rows: result.text
-        }
-      ],
-      (section, row) => {}
-    );
+  runSafari() {}
+  runShare() {
+    const shareAction = new ShareAction();
+    shareAction.init();
   }
   link(url) {}
 }
