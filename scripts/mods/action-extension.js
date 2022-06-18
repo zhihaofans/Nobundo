@@ -22,6 +22,13 @@ class ShareAction {
                 image: this.getImage()
               });
             }
+          },
+          {
+            title: "分享",
+            disabled: false, // Optional
+            handler: () => {
+              $share.sheet([this.getImage()]);
+            }
           }
         ]
       });
@@ -31,9 +38,11 @@ class ShareAction {
         message: this.getLink(),
         actions: [
           {
-            title: "OK",
+            title: "复制",
             disabled: false, // Optional
-            handler: () => {}
+            handler: () => {
+              $clipboard.text = this.getLink();
+            }
           }
         ]
       });
@@ -75,7 +84,7 @@ class ActionExtension extends Core {
       modName: "分享内容解析",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 4
+      coreVersion: 5
     });
     this.QUERY = $context.query;
     this.isSafari = app.isSafariEnv();
