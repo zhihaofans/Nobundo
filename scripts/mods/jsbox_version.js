@@ -311,7 +311,7 @@ class Version extends Core {
   constructor(app) {
     super({
       app,
-      modId: "jsbox-version",
+      modId: "jsbox_version",
       modName: "JSBox新功能测试",
       version: "3",
       author: "zhihaofans",

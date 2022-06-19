@@ -64,7 +64,7 @@ class Example extends Core {
   constructor(app) {
     super({
       app,
-      modId: "scoop-helper",
+      modId: "scoop_helper",
       modName: "Scoop小助手",
       version: "1",
       author: "zhihaofans",

@@ -41,7 +41,7 @@ class ContentBox extends Core {
   constructor(app) {
     super({
       app,
-      modId: "content-box",
+      modId: "content_box",
       modName: "内容盒子",
       version: "1",
       author: "zhihaofans",
