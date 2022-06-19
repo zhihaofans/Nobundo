@@ -45,12 +45,12 @@ class App extends AppKernel {
             }
           }),
           (section, row) => {
-            this.coreLoader.runCore(this.coreLoader.modList.id[row]);
+            this.coreLoader.runMod(this.coreLoader.modList.id[row]);
           }
         );
         break;
       case this.isActionEnv() || this.isSafariEnv():
-        this.coreLoader.setActionCore("action-extension");
+        this.coreLoader.setActionCore("action_extension");
         this.coreLoader.runActionCore();
         break;
       default:
@@ -82,7 +82,7 @@ function run() {
     $console.error(error);
     $ui.alert({
       title: "app.js throw",
-      message: error.message + "\n" + error.name,
+      message: error.name + "\n" + error.message,
       actions: [
         {
           title: "OK",
