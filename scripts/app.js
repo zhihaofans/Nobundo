@@ -4,15 +4,15 @@ const { AppKernel } = require("../Core.js/app"),
   listKit = new ui.ListKit(),
   coreModList = [
     "bilibili.js",
-    "jsbox-version.js",
+    "jsbox_version.js",
     "wallhaven.js",
     "downloader.js",
     "reminder.js",
     "daymaster.js",
-    "free-api.js",
+    "free_api.js",
     "example.js",
     "mefang.js",
-    "action-extension.js",
+    "action_extension.js",
     "datacenter.js"
   ];
 
