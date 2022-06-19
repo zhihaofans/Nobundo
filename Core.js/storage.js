@@ -191,6 +191,15 @@ class SQLite {
     });
     db.close();
   }
+  query(sql, args = undefined) {
+    const db = this.init(),
+      queryResult = db.query({
+        sql,
+        args
+      });
+    db.close();
+    return queryResult;
+  }
   createSimpleTable(table_id) {
     if (table_id) {
       try {
@@ -198,8 +207,8 @@ class SQLite {
           sql = `CREATE TABLE IF NOT EXISTS ${table_id}(id TEXT PRIMARY KEY NOT NULL, value TEXT)`;
         db.update({ sql: sql, args: undefined });
         db.close();
-      } catch (_ERROR) {
-        $console.error(_ERROR);
+      } catch (error) {
+        $console.error(error);
       }
     } else {
       $console.error("createSimpleTable:table_id = undefined");
@@ -225,8 +234,30 @@ class SQLite {
       } else {
         return undefined;
       }
-    } catch (_ERROR) {
-      $console.error(`parseSimpleQuery:${_ERROR.message}`);
+    } catch (error) {
+      $console.error(`parseSimpleQuery:${error.message}`);
+      return undefined;
+    }
+  }
+  parseQueryResult(result) {
+    try {
+      if (result) {
+        if (result.error !== null) {
+          $console.error(result.error);
+          return undefined;
+        }
+        const sqlResult = result.result,
+          data = [];
+        while (sqlResult.next()) {
+          data.push(sqlResult.values);
+        }
+        sqlResult.close();
+        return data;
+      } else {
+        return undefined;
+      }
+    } catch (error) {
+      $console.error(`parseQueryResult:${error.message}`);
       return undefined;
     }
   }
@@ -250,8 +281,8 @@ class SQLite {
       } else {
         return undefined;
       }
-    } catch (_ERROR) {
-      $console.error(`getSimpleData:${_ERROR.message}`);
+    } catch (error) {
+      $console.error(`getSimpleData:${error.message}`);
       return undefined;
     }
   }
@@ -273,8 +304,8 @@ class SQLite {
       } else {
         return false;
       }
-    } catch (_ERROR) {
-      $console.error(`setSimpleData:${_ERROR.message}`);
+    } catch (error) {
+      $console.error(`setSimpleData:${error.message}`);
       return false;
     }
   }
@@ -288,8 +319,8 @@ class SQLite {
         this.setSimpleData(table, sql_key, value.toString());
       }
       return this.getSimpleData(table, sql_key) || undefined;
-    } catch (_ERROR) {
-      $console.error(`SQLite.auto:${_ERROR.message}`);
+    } catch (error) {
+      $console.error(`SQLite.auto:${error.message}`);
       return undefined;
     }
   }
