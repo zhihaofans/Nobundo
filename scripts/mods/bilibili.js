@@ -132,7 +132,7 @@ class Main {
             break;
         }
       };
-    listKit.pushString(this.Core.CORE_INFO.NAME, mainViewList, didSelect);
+    listKit.pushString(this.Core.MOD_INFO.NAME, mainViewList, didSelect);
   }
 }
 
@@ -144,7 +144,7 @@ class Bilibili extends Core {
       modName: "哔哩哔哩",
       version: "5b",
       author: "zhihaofans",
-      needCoreVersion: 4
+      coreVersion: 5
     });
     this.ModuleLoader = new ModuleLoader(this);
     this.biliLauncher = new BilibiliLauncher();

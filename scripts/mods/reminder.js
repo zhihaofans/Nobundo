@@ -301,7 +301,7 @@ class Reminder extends Core {
       modName: "提醒事项",
       version: "1",
       author: "zhihaofans",
-      needCoreVersion: 4
+      coreVersion: 6
     });
   }
   run() {

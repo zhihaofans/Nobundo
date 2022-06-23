@@ -119,7 +119,7 @@ class BilibiliVideo extends CoreModule {
                         case 1:
                           try {
                             $console.warn("try downloading");
-                            this.Core.App.coreLoader.runCoreApi(
+                            this.Core.App.coreLoader.runModApi(
                               "downloader",
                               "start_downloading",
                               { url: videoInfo.pic }

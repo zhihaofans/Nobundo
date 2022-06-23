@@ -1,5 +1,5 @@
-const { AppKernel } = require("../Core.js/app"),
-  { CoreLoader } = require("../Core.js/core"),
+const AppKernel = require("../Core.js/app"),
+  { ModLoader } = require("../Core.js/core"),
   ui = require("../Core.js/ui"),
   listKit = new ui.ListKit(),
   coreModList = [
@@ -19,39 +19,39 @@ const { AppKernel } = require("../Core.js/app"),
 class App extends AppKernel {
   constructor({ appId, modDir, l10nPath }) {
     super({ appId, modDir, l10nPath });
-    this.coreLoader = new CoreLoader({ modDir, app: this });
+    this.modLoader = new ModLoader({ modDir, app: this });
   }
   init() {
     this.initModList();
-    this.info(`启动耗时${new Date().getTime() - this.START_TIME}ms`);
+    this.$.info(`启动耗时${new Date().getTime() - this.START_TIME}ms`);
   }
   initModList() {
-    this.coreLoader.addCoreByList(coreModList);
+    this.modLoader.addCoreByList(coreModList);
 
     switch (true) {
       case this.isWidgetEnv():
-        this.coreLoader.setWidgetCore("example");
-        this.coreLoader.runWidgetCore();
+        this.modLoader.setWidgetMod("example");
+        this.modLoader.runWidgetMod();
         break;
       case this.isAppEnv():
         listKit.renderIdx(
           this.AppInfo.name,
-          this.coreLoader.modList.id.map(modId => {
-            const thisCore = this.coreLoader.modList.mods[modId];
-            if (thisCore.checkCoreVersion() == 0) {
-              return thisCore.CORE_INFO.NAME;
+          this.modLoader.getModList().id.map(modId => {
+            const thisMod = this.modLoader.getModList().mods[modId];
+            if (thisMod.checkCoreVersion() == 0) {
+              return thisMod.MOD_INFO.NAME;
             } else {
-              return thisCore.CORE_INFO.NAME + "(待更新)";
+              return thisMod.MOD_INFO.NAME + "(待更新)";
             }
           }),
           (section, row) => {
-            this.coreLoader.runMod(this.coreLoader.modList.id[row]);
+            this.modLoader.runMod(this.modLoader.getModList().id[row]);
           }
         );
         break;
       case this.isActionEnv() || this.isSafariEnv():
-        this.coreLoader.setActionCore("action_extension");
-        this.coreLoader.runActionCore();
+        this.modLoader.setContextMod("action_extension");
+        this.modLoader.runContextMod();
         break;
       default:
         $ui.alert({
