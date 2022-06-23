@@ -1,5 +1,4 @@
-const CORE_VERSION = 6,
-  $ = require("./$");
+const CORE_VERSION = 6;
 class ModCore {
   constructor({
     app,
@@ -7,25 +6,14 @@ class ModCore {
     modName,
     version,
     author,
-    needCoreVersion,
     ignoreCoreVersion,
     coreVersion,
     useSqlite
   }) {
     this.App = app;
     this.Storage = require("./storage");
-    this.Http = $.http;
-    this.$ = $;
-    this.CORE_INFO = {
-      ID: modId,
-      NAME: modName,
-      VERSION: version,
-      AUTHOR: author,
-      CORE_VERSION: coreVersion || needCoreVersion,
-      DATABASE_ID: modId,
-      KEYCHAIN_DOMAIN: `nobundo.mods.${author}.${modId}`,
-      USE_SQLITE: useSqlite == true
-    };
+    this.$ = app.$;
+    this.Http = this.$.http;
     this.MOD_INFO = {
       ID: modId,
       NAME: modName,
@@ -71,8 +59,9 @@ class ModCore {
 class ModLoader {
   constructor({ app, modDir }) {
     this.App = app;
+    this.$ = this.App.$;
     this.MOD_DIR = modDir;
-    this.modList = { id: [], mods: {} };
+    this.MOD_LIST = { id: [], mods: {} };
     this.WIDGET_MOD_ID = undefined;
     this.ACTION_MOD_ID = undefined;
     this.CONFIG = {
@@ -80,11 +69,11 @@ class ModLoader {
       CONTEXT_MOD_ID: undefined
     };
   }
-  addCore(modCore) {
+  addMod(modCore) {
     if (
-      typeof modCore.run == "function" ||
-      typeof modCore.runWidget == "function" ||
-      typeof modCore.runContext == "function"
+      this.$.isFunction(modCore.run) ||
+      this.$.isFunction(modCore.runWidget) ||
+      this.$.isFunction(modCore.runContext)
     ) {
       if (
         modCore.MOD_INFO.ID.length > 0 &&
@@ -98,11 +87,11 @@ class ModLoader {
         ) {
           const modId = modCore.MOD_INFO.ID;
           if (
-            this.modList.id.indexOf(modId) < 0 &&
-            this.modList.mods[modId] == undefined
+            this.MOD_LIST.id.indexOf(modId) < 0 &&
+            this.MOD_LIST.mods[modId] == undefined
           ) {
-            this.modList.id.push(modId);
-            this.modList.mods[modId] = modCore;
+            this.MOD_LIST.id.push(modId);
+            this.MOD_LIST.mods[modId] = modCore;
           } else {
             $console.error(`modId(${modId})已存在`);
           }
@@ -110,11 +99,11 @@ class ModLoader {
           $console.error({ modId: modCore.MOD_INFO.ID, needUpdateCore });
           const modId = modCore.MOD_INFO.ID;
           if (
-            this.modList.id.indexOf(modId) < 0 &&
-            this.modList.mods[modId] == undefined
+            this.MOD_LIST.id.indexOf(modId) < 0 &&
+            this.MOD_LIST.mods[modId] == undefined
           ) {
-            this.modList.id.push(modId);
-            this.modList.mods[modId] = modCore;
+            this.MOD_LIST.id.push(modId);
+            this.MOD_LIST.mods[modId] = modCore;
           } else {
             $console.error(`modId(${modId})已存在`);
           }
@@ -130,7 +119,7 @@ class ModLoader {
     fileNameList.map(fileName => {
       try {
         const thisMod = require(this.MOD_DIR + fileName);
-        this.addCore(new thisMod(this.App));
+        this.addMod(new thisMod(this.App));
       } catch (error) {
         $console.error({
           message: error.message,
@@ -140,11 +129,14 @@ class ModLoader {
       }
     });
   }
+  getModList() {
+    return this.MOD_LIST;
+  }
   getMod(modId) {
-    return this.modList.mods[modId];
+    return this.MOD_LIST.mods[modId];
   }
   runMod(modId) {
-    const thisMod = this.modList.mods[modId];
+    const thisMod = this.MOD_LIST.mods[modId];
     try {
       thisMod.run();
     } catch (error) {
@@ -162,18 +154,17 @@ class ModLoader {
       });
     }
   }
-  setWidgetCore(modId) {
+  setWidgetMod(modId) {
     if (
-      this.modList.id.indexOf(modId) >= 0 &&
-      typeof this.modList.mods[modId].runWidget == "function"
+      this.MOD_LIST.id.indexOf(modId) >= 0 &&
+      this.$.isFunction(this.MOD_LIST.mods[modId].runWidget)
     ) {
       this.WIDGET_MOD_ID = modId;
       this.CONFIG.WIDGET_MOD_ID = modId;
     }
   }
-  runWidgetCore() {
-    const modId = this.WIDGET_MOD_ID,
-      thisMod = this.modList.mods[modId];
+  runWidgetMod() {
+    const thisMod = this.MOD_LIST.mods[this.WIDGET_MOD_ID];
     try {
       thisMod.runWidget();
     } catch (error) {
@@ -190,19 +181,19 @@ class ModLoader {
       });
     }
   }
-  setActionCore(modId) {
+  setContextMod(modId) {
     if (
-      this.modList.id.indexOf(modId) >= 0 &&
-      typeof this.modList.mods[modId].runContext == "function"
+      this.MOD_LIST.id.indexOf(modId) >= 0 &&
+      this.$.isFunction(this.MOD_LIST.mods[modId].runContext)
     ) {
       this.ACTION_MOD_ID = modId;
       this.CONFIG.CONTEXT_MOD_ID = modId;
     }
   }
-  runActionCore() {
+  runContextMod() {
     const modId = this.CONFIG.CONTEXT_MOD_ID;
     if (modId && modId.length >= 0) {
-      const thisMod = this.modList.mods[modId];
+      const thisMod = this.MOD_LIST.mods[modId];
       try {
         thisMod.runContext();
       } catch (error) {
@@ -212,17 +203,17 @@ class ModLoader {
       $app.close();
     }
   }
-  isCoreSupportApi(modId) {
+  isModSupportApi(modId) {
     if (modId && modId.length >= 0) {
-      const thisMod = this.modList.mods[modId];
-      return thisMod != undefined && $.isFunction(thisMod.runApi);
+      const thisMod = this.MOD_LIST.mods[modId];
+      return thisMod != undefined && this.$.isFunction(thisMod.runApi);
     }
     return false;
   }
-  runCoreApi(modId, apiId, data) {
+  runModApi(modId, apiId, data) {
     if (modId && modId.length >= 0) {
-      const thisMod = this.modList.mods[modId];
-      if (thisMod != undefined && $.isFunction(thisMod.runApi)) {
+      const thisMod = this.MOD_LIST.mods[modId];
+      if (thisMod != undefined && this.$.isFunction(thisMod.runApi)) {
         try {
           return thisMod.runApi(apiId, data);
         } catch (error) {
@@ -258,7 +249,8 @@ class ModModule {
 class ModModuleLoader {
   constructor(core) {
     this.Core = core;
-    this.App = core.App;
+    this.Mod = core;
+    this.App = this.Mod.App;
     this.MOD_DIR = this.App.MOD_DIR;
     this.ModuleList = {};
   }
@@ -266,7 +258,7 @@ class ModModuleLoader {
     if (fileName.length <= 0) {
       $console.error({
         name: "core.module.ModuleLoader.addModule",
-        MOD_NAME: this.Core.CORE_INFO.NAME,
+        MOD_NAME: this.Mod.MOD_INFO.NAME,
         message: "需要module fileName",
         fileName,
         length: fileName.length
@@ -274,11 +266,11 @@ class ModModuleLoader {
       return false;
     }
     const modulePath = this.MOD_DIR + fileName;
-    if (this.Core.CORE_INFO.ID.length <= 0) {
+    if (this.Mod.MOD_INFO.ID.length <= 0) {
       $console.error({
         name: "core.module.ModuleLoader.addModule",
-        message: "需要Core.MOD_ID",
-        MOD_NAME: this.Core.CORE_INFO.NAME
+        message: "需要Mod.MOD_INFO.ID",
+        MOD_NAME: this.Mod.MOD_INFO.NAME
       });
       return false;
     }
@@ -286,42 +278,42 @@ class ModModuleLoader {
       $console.error({
         name: "core.module.ModuleLoader.addModule",
         message: "module文件不存在",
-        MOD_NAME: this.Core.CORE_INFO.NAME,
+        MOD_NAME: this.Mod.MOD_INFO.NAME,
         fileName
       });
       return false;
     }
     try {
       const moduleFile = require(modulePath),
-        thisModule = new moduleFile(this.Core);
-      if (this.Core.CORE_INFO.ID != thisModule.CORE_ID) {
+        thisModule = new moduleFile(this.Mod);
+      if (this.Mod.MOD_INFO.ID != thisModule.MOD_ID) {
         $console.error({
           name: "core.module.ModuleLoader.addModule",
           message: "CORE_ID错误",
-          MOD_NAME: this.Core.CORE_INFO.NAME,
-          CORE_ID: thisModule.CORE_ID,
-          MOD_ID: this.Core.CORE_INFO.ID,
+          MOD_NAME: this.Mod.MOD_INFO.NAME,
+          CORE_ID: thisModule.MOD_ID,
+          MOD_ID: this.Mod.MOD_INFO.ID,
           MODULE_ID: thisModule.MODULE_ID,
           MODULE_NAME: thisModule.MODULE_NAME
         });
         return false;
       }
       if (thisModule.AUTHOR == undefined || thisModule.AUTHOR.length <= 0) {
-        thisModule.AUTHOR = this.Core.CORE_INFO.AUTHOR;
+        thisModule.AUTHOR = this.Mod.MOD_INFO.AUTHOR;
         $console.info(
-          `自动为模块${thisModule.CORE_ID}添加mod的作者(${this.Core.MOD_INFO.AUTHOR})`
+          `自动为模块${thisModule.MOD_ID}添加mod的作者(${this.Mod.MOD_INFO.AUTHOR})`
         );
       }
       this.ModuleList[thisModule.MODULE_ID] = thisModule;
       $console.info(
-        `Mod[${this.Core.MOD_INFO.NAME}]加载module[${thisModule.MODULE_NAME}]`
+        `Mod[${this.Mod.MOD_INFO.NAME}]加载module[${thisModule.MODULE_NAME}]`
       );
       return true;
     } catch (error) {
       $console.error({
         id: "core.module.ModuleLoader.addModule.try",
         fileName,
-        MOD_NAME: this.Core.MOD_INFO.NAME,
+        MOD_NAME: this.Mod.MOD_INFO.NAME,
         error: error.message
       });
       return false;

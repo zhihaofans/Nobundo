@@ -6,6 +6,7 @@ const START_TIME = new Date().getTime(),
   $ = require("./$");
 class AppKernel {
   constructor({ appId, modDir, l10nPath }) {
+    this.$ = $;
     this.START_TIME = START_TIME;
     this.MOD_DIR = modDir;
     this.DEBUG = $app.isDebugging;
@@ -24,9 +25,9 @@ class AppKernel {
     this.l10n(require(l10nPath));
     this.UUID = new UserUUID(this);
     if (this.DEBUG) {
-      this.kernelDebug(`appName:${this.AppInfo.name}`);
-      this.kernelDebug(`appId:${this.AppInfo.id}`);
-      this.kernelDebug(`debug:${this.DEBUG}`);
+      $.info(`appName:${this.AppInfo.name}`);
+      $.info(`appId:${this.AppInfo.id}`);
+      $.info(`debug:${this.DEBUG}`);
     }
     this.checkJsboxVersion();
   }
@@ -76,26 +77,6 @@ class AppKernel {
       $.file.mkdirs(this.DATA_DIR.LOCAL);
     }
   }
-  info(id, msg) {
-    if (this.DEBUG) {
-      $console.info(msg ? `${id}:${msg}` : id);
-    }
-  }
-  warn(id, msg) {
-    if (this.DEBUG) {
-      $console.warn(msg ? `${id}:${msg}` : id);
-    }
-  }
-  error(id, msg) {
-    if (this.DEBUG) {
-      $console.error(msg ? `${id}:${msg}` : id);
-    }
-  }
-  kernelDebug(message) {
-    if (this.DEBUG) {
-      $console.info(`Kernel:${message}`);
-    }
-  }
   checkJsboxVersion() {
     if (NOW_JSBOX_VERSION < NEED_JSBOX_VERSION) {
       throw new VersionException({
@@ -111,6 +92,9 @@ class AppKernel {
   isActionEnv() {
     return $app.env == $env.action;
   }
+  isContextEnv() {
+    return $app.env == $env.action;
+  }
   isSafariEnv() {
     return $app.env == $env.safari;
   }
@@ -122,4 +106,4 @@ class AppKernel {
   }
 }
 
-module.exports = { AppKernel, version: 1 };
+module.exports = AppKernel;
