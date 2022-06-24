@@ -61,8 +61,6 @@ class ModLoader {
     this.$ = this.App.$;
     this.MOD_DIR = modDir;
     this.MOD_LIST = { id: [], mods: {} };
-    this.WIDGET_MOD_ID = undefined;
-    this.ACTION_MOD_ID = undefined;
     this.CONFIG = {
       WIDGET_MOD_ID: undefined,
       CONTEXT_MOD_ID: undefined
@@ -155,12 +153,11 @@ class ModLoader {
       this.MOD_LIST.id.indexOf(modId) >= 0 &&
       this.$.isFunction(this.MOD_LIST.mods[modId].runWidget)
     ) {
-      this.WIDGET_MOD_ID = modId;
       this.CONFIG.WIDGET_MOD_ID = modId;
     }
   }
   runWidgetMod() {
-    const thisMod = this.MOD_LIST.mods[this.WIDGET_MOD_ID];
+    const thisMod = this.MOD_LIST.mods[this.CONFIG.WIDGET_MOD_ID];
     try {
       thisMod.runWidget();
     } catch (error) {
