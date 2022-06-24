@@ -6,7 +6,6 @@ class ModCore {
     modName,
     version,
     author,
-    ignoreCoreVersion,
     coreVersion,
     useSqlite
   }) {
@@ -81,10 +80,7 @@ class ModLoader {
         modCore.MOD_INFO.AUTHOR.length > 0
       ) {
         const needUpdateCore = modCore.checkCoreVersion();
-        if (
-          modCore.MOD_INFO.IGNORE_CORE_VERSION == true ||
-          needUpdateCore == 0
-        ) {
+        if (needUpdateCore == 0) {
           const modId = modCore.MOD_INFO.ID;
           if (
             this.MOD_LIST.id.indexOf(modId) < 0 &&
