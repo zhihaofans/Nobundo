@@ -13,7 +13,8 @@ const AppKernel = require("../Core.js/app"),
     "example.js",
     "mefang.js",
     "action_extension.js",
-    "datacenter.js"
+    "datacenter.js",
+    "content_box.js"
   ];
 
 class App extends AppKernel {
