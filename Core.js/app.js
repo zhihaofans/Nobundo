@@ -3,10 +3,12 @@ const START_TIME = new Date().getTime(),
   NOW_JSBOX_VERSION = Number.parseInt($app.info.build),
   { UserUUID } = require("./uuid"),
   { VersionException } = require("./object"),
-  $ = require("./$");
+  $ = require("./$"),
+  Storage = require("./storage");
 class AppKernel {
   constructor({ appId, modDir, l10nPath }) {
     this.$ = $;
+    this.Storage = Storage;
     this.START_TIME = START_TIME;
     this.MOD_DIR = modDir;
     this.DEBUG = $app.isDebugging;

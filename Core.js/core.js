@@ -11,8 +11,8 @@ class ModCore {
     useSqlite
   }) {
     this.App = app;
-    this.Storage = require("./storage");
-    this.$ = app.$;
+    this.Storage = this.App.Storage;
+    this.$ = this.App.$;
     this.Http = this.$.http;
     this.MOD_INFO = {
       ID: modId,
@@ -247,9 +247,8 @@ class ModModule {
   }
 }
 class ModModuleLoader {
-  constructor(core) {
-    this.Core = core;
-    this.Mod = core;
+  constructor(mod) {
+    this.Mod = mod;
     this.App = this.Mod.App;
     this.MOD_DIR = this.App.MOD_DIR;
     this.ModuleList = {};
