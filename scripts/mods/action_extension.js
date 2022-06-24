@@ -84,7 +84,7 @@ class ActionExtension extends ModCore {
       modName: "分享内容解析",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 5
+      coreVersion: 6
     });
     this.QUERY = $context.query;
     this.isSafari = app.isSafariEnv();
