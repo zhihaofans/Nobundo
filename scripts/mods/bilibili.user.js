@@ -492,7 +492,7 @@ class Vip {
 class BilibiliUser extends CoreModule {
   constructor(core) {
     super({
-      coreId: "bilibili",
+      modId: "bilibili",
       moduleId: "bilibili.user",
       moduleName: "哔哩哔哩用户模块",
       version: "1"

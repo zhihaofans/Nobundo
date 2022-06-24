@@ -45,7 +45,7 @@ class VideoInfo {
 class BilibiliVideo extends CoreModule {
   constructor(core) {
     super({
-      coreId: "bilibili",
+      modId: "bilibili",
       moduleId: "bilibili.video",
       moduleName: "哔哩哔哩视频",
       version: "1"
