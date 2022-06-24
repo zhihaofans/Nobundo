@@ -1,4 +1,4 @@
-const ModCore = require("../../Core.js/core").Core,
+const { ModCore } = require("../../Core.js/core"),
   NextJs = require("../../Core.js/next"),
   ListView = new NextJs.ListView();
 class UserData {
@@ -595,7 +595,7 @@ class Mefang extends ModCore {
       modName: "么方运动",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 5
+      coreVersion: 6
     });
     this.ui = new MefangUi(this);
   }

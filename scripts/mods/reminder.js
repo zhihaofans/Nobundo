@@ -1,4 +1,4 @@
-const { Core } = require("../../Core.js/core"),
+const { ModCore } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 class ReminderLib {
@@ -293,7 +293,7 @@ class Main {
   }
 }
 
-class Reminder extends Core {
+class Reminder extends ModCore {
   constructor(app) {
     super({
       app,

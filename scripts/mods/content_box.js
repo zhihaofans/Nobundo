@@ -1,7 +1,20 @@
-const { Core } = require("../../Core.js/core");
+const { ModCore } = require("../../Core.js/core");
+class ContentData {
+  constructor({ id, timestamp, title, type, tag, data, otherData }) {
+    this.id = id;
+    this.timestamp = timestamp;
+    this.title = title;
+    this.type = type;
+    this.tag = tag;
+    this.data = data;
+    this.otherData = otherData;
+  }
+}
 class Database {
-  constructor(sqlite) {
-    this.SQLite = sqlite;
+  constructor(mod) {
+    this.SQLITE_FILE =
+      mod.App.DATA_DIR.LOCAL + mod.MOD_INFO.KEYCHAIN_DOMAIN + ".db";
+    this.SQLite = new mod.Storage.SQLite(this.SQLITE_FILE);
     this.SQL_TABLE_ID = {
       CONTENT_LIST: "ContentList"
     };
@@ -30,32 +43,21 @@ class Database {
   }
 }
 
-class ContentData {
-  constructor({ id, timestamp, title, type, tag, data, otherData }) {
-    this.id = id;
-    this.timestamp = timestamp;
-    this.title = title;
-    this.type = type;
-    this.tag = tag;
-    this.data = data;
-    this.otherData = otherData;
-  }
-}
 class ContentBoxApi {
-  constructor(core) {
-    this.DB = new Database(core.SQLITE);
+  constructor(mod) {
+    this.DB = new Database(mod);
   }
   getContent(id) {}
 }
 
 class ContentBoxView {
-  constructor(core) {
-    this.Core = core;
+  constructor(mod) {
+    this.Mod = mod;
   }
   init() {}
 }
 
-class ContentBox extends Core {
+class ContentBox extends ModCore {
   constructor(app) {
     super({
       app,
@@ -63,7 +65,7 @@ class ContentBox extends Core {
       modName: "内容盒子",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 5
+      coreVersion: 6
     });
   }
   run() {}

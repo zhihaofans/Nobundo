@@ -266,7 +266,7 @@ class v2_19_0 {
     window.invoke("addSubview", label);
   }
 }
-const { Core } = require("../../Core.js/core"),
+const { ModCore } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit(),
   versionList = [
@@ -307,7 +307,7 @@ class Main {
   }
 }
 
-class Version extends Core {
+class Version extends ModCore {
   constructor(app) {
     super({
       app,

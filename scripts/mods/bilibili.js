@@ -1,4 +1,4 @@
-const { Core, ModuleLoader } = require("../../Core.js/core"),
+const { ModCore, ModuleLoader } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 class BilibiliLauncher {
@@ -136,7 +136,7 @@ class Main {
   }
 }
 
-class Bilibili extends Core {
+class Bilibili extends ModCore {
   constructor(app) {
     super({
       app,

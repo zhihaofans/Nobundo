@@ -1,4 +1,4 @@
-const { Core } = require("../../Core.js/core");
+const { ModCore } = require("../../Core.js/core");
 class AppGetter {
   constructor(core) {
     this._Core = core;
@@ -60,7 +60,7 @@ class NodeLts extends AppGetter {
   }
 }
 
-class Example extends Core {
+class Example extends ModCore {
   constructor(app) {
     super({
       app,
@@ -68,7 +68,7 @@ class Example extends Core {
       modName: "Scoop小助手",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 5
+      coreVersion: 6
     });
   }
   run() {}

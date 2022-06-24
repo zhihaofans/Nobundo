@@ -1,4 +1,4 @@
-const { Core } = require("../../Core.js/core");
+const { ModCore } = require("../../Core.js/core");
 class KeychainCore {
   constructor(domain) {
     this.DOMAIN = domain;
@@ -176,7 +176,7 @@ class HelperView {
   }
 }
 
-class DatabaseHelper extends Core {
+class DatabaseHelper extends ModCore {
   constructor(app) {
     super({
       app,
@@ -184,7 +184,7 @@ class DatabaseHelper extends Core {
       modName: "数据中心",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 5
+      coreVersion: 6
     });
   }
   run() {

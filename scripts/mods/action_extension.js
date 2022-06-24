@@ -1,4 +1,4 @@
-const { Core } = require("../../Core.js/core"),
+const { ModCore } = require("../../Core.js/core"),
   Next = require("../../Core.js/next");
 
 class ShareAction {
@@ -76,7 +76,7 @@ class ShareAction {
   }
 }
 
-class ActionExtension extends Core {
+class ActionExtension extends ModCore {
   constructor(app) {
     super({
       app,

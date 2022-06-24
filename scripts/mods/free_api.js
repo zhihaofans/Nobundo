@@ -1,4 +1,4 @@
-const { Core } = require("../../Core.js/core"),
+const { ModCore } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 class Douyin {
@@ -123,7 +123,7 @@ class Main {
   }
 }
 
-class FreeApi extends Core {
+class FreeApi extends ModCore {
   constructor(app) {
     super({
       app,

@@ -1,4 +1,4 @@
-const { Core } = require("../../Core.js/core"),
+const { ModCore } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 class DownloaderCore {
@@ -251,7 +251,7 @@ class Main {
   }
 }
 
-class Downloader extends Core {
+class Downloader extends ModCore {
   constructor(app) {
     super({
       app,
@@ -259,7 +259,7 @@ class Downloader extends Core {
       modName: "下载器",
       version: "1a",
       author: "zhihaofans",
-      coreVersion: 5
+      coreVersion: 6
     });
     this.main = new Main(this);
   }

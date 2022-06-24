@@ -1,4 +1,4 @@
-const { Core } = require("../../Core.js/core"),
+const { ModCore } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 class DaoshuriKit {
@@ -70,7 +70,7 @@ class Main {
   }
 }
 
-class Daoshuri extends Core {
+class Daoshuri extends ModCore {
   constructor(app) {
     super({
       app,
@@ -78,7 +78,7 @@ class Daoshuri extends Core {
       modName: "倒数日",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 5
+      coreVersion: 6
     });
   }
   run() {

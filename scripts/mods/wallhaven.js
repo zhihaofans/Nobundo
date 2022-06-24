@@ -1,4 +1,4 @@
-const { Core } = require("../../Core.js/core"),
+const { ModCore } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 class Main {
@@ -92,7 +92,7 @@ class Main {
   }
 }
 
-class Wallhaven extends Core {
+class Wallhaven extends ModCore {
   constructor(app) {
     super({
       app,
@@ -100,7 +100,7 @@ class Wallhaven extends Core {
       modName: "Wallhaven",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 4
+      coreVersion: 6
     });
   }
   run() {
