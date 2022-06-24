@@ -1,13 +1,13 @@
-const { Core, ModuleLoader } = require("../../Core.js/core");
-class Example extends Core {
+const { ModCore, ModuleLoader } = require("../../Core.js/core");
+class Example extends ModCore {
   constructor(app) {
     super({
       app,
       modId: "example",
       modName: "例子",
-      version: "6a",
+      version: "6b",
       author: "zhihaofans",
-      coreVersion: 5
+      coreVersion: 6
     });
     this.ModuleLoader = new ModuleLoader(this);
   }

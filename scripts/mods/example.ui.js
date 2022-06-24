@@ -2,9 +2,9 @@ const { CoreModule } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 class Main {
-  constructor(core) {
-    this.Core = core;
-    this.$ = this.Core.$;
+  constructor(mod) {
+    this.Mod = mod;
+    this.$ = this.Mod.$;
   }
   init() {
     const mainViewList = ["example 1"],
@@ -24,24 +24,24 @@ class Main {
             });
         }
       };
-    listKit.pushString(this.Core.MOD_NAME, mainViewList, didSelect);
+    listKit.pushString(this.Mod.MOD_INFO.NAME, mainViewList, didSelect);
   }
 }
 
 class ExampleModule extends CoreModule {
-  constructor(core) {
+  constructor(mod) {
     super({
-      coreId: "example",
+      modId: "example",
       moduleId: "example.ui",
       moduleName: "例子ui",
       version: "1a"
       //author: "zhihaofans"
     });
-    this.Core = core;
+    this.Mod = mod;
   }
   initUi() {
     $ui.success("run");
-    const main = new Main(this.Core);
+    const main = new Main(this.Mod);
     main.init();
   }
 }
