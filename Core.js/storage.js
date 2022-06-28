@@ -184,12 +184,13 @@ class SQLite {
     return $sqlite.open(this.DATABASEFILE);
   }
   update(sql, args = undefined) {
-    const db = this.init();
-    db.update({
-      sql: sql,
-      args: args
-    });
+    const db = this.init(),
+      result = db.update({
+        sql: sql,
+        args: args
+      });
     db.close();
+    return result;
   }
   query(sql, args = undefined) {
     const db = this.init(),

@@ -220,6 +220,8 @@ class Str {
 
 module.exports = {
   alert: new Alert(),
+  base64Encode: $text.base64Encode,
+  base64Decode: $text.base64Decode,
   dateTime: new Datetime(),
   error,
   getUUID,
@@ -232,5 +234,7 @@ module.exports = {
   share: new Share(),
   string: new Str(),
   toInt,
+  urlEncode: $text.URLEncode,
+  urlDecode: $text.URLDecode,
   warn
 };
