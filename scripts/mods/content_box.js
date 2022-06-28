@@ -42,13 +42,36 @@ class Database {
     return result;
   }
   getContentList() {
-    const sql = `SELECT * FROM ${this.SQL_TABLE_ID.CONTENT_LIST}`,
-      sqlResult = this.SQLite.query(sql);
-    $console.info(sqlResult);
+    const sql = `SELECT * FROM ${this.SQL_TABLE_ID.CONTENT_LIST} WHERE id IS NOT NULL`,     sqlResult = this.SQLite.query(sql),
+      rs = sqlResult.result;
+    $console.info(rs);
+
     if (sqlResult.error) {
       $console.error(sqlResult.error);
+      sqlResult.close();
       return [];
+    } else if (rs.isNull() || rs.columnCount == 0) {
+      $ui.alert({
+        title: "查询结果空白",
+        message: `columnCount:${rs.columnCount}`,
+        actions: [
+          {
+            title: "OK",
+            disabled: false, // Optional
+            handler: () => {}
+          }
+        ]
+      });
     } else {
+      while (sqlResult.next()) {
+        const values = sqlResult.values;
+        const name = sqlResult.get("id"); // Or rs.get(0);
+        $console.info({
+          values,
+          name
+        });
+      }
+      rs.close();
       const queryResult = this.SQLite.parseQueryResult(sqlResult);
       const resultData = queryResult.map(item => {
         const data = item.type == "text" ? item.text_data : item.blob_data;
