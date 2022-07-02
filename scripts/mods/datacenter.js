@@ -1,4 +1,5 @@
-const { ModCore } = require("../../Core.js/core");
+const { ModCore } = require("../../Core.js/core"),
+  Next = require("../../Core.js/next");
 class KeychainCore {
   constructor(domain) {
     this.DOMAIN = domain;
@@ -103,65 +104,143 @@ class KeychainView {
 }
 
 class SQLiteCore {
-  constructor(sql_file_path) {
-    this.SQL_FILE_PATH = sql_file_path;
-    this.DB = $sqlite.open(sql_file_path);
+  constructor(sqlite) {
+    this.DB = sqlite;
   }
   createTable(
     tableId,
-    columnList = {
-      uuid: "TEXT",
-      title: "TEXT",
-      timestamp: "INTEGER"
-    }
+    columnList = [`uuid TEXT NOT NULL`, `title TEXT`, `timestamp INTEGER`]
   ) {
-    const sql = `CREATE TABLE ${tableId}(name text, age integer)`;
+    const sql = `CREATE TABLE ${tableId}(${columnList.toString()})`;
     return this.update(sql);
   }
   query(
     sql,
     handler = (rs, err) => {
+      $console.info(rs.columnCount);
       while (rs.next()) {
         const values = rs.values;
         const name = rs.get("name"); // Or rs.get(0);
+        $console.info(values);
       }
       rs.close();
     }
   ) {
-    this.DB.query(sql, handler);
+    this.DB.queryHandler(sql, handler);
   }
-  update(sql) {
-    return this.DB.update(sql);
+  queryAll(tableId) {
+    const queryResultList = [],
+      sql = `SELECT * FROM ${tableId}`,
+      handler = (rs, err) => {
+        $console.info(rs.columnCount);
+        while (rs.next()) {
+          queryResultList.push(rs.values);
+        }
+        rs.close();
+      };
+    this.DB.queryHandler(sql, handler);
+    return queryResultList;
+  }
+  update(sql, args) {
+    return this.DB.update(sql, args);
   }
 }
 class SQLiteView {
-  constructor(name) {
-    this.NAME = name;
+  constructor(mod) {
+    this.Mod = mod;
+    this.uiKit = new Next.UiKit();
   }
   init() {
+    const menuList = ["输入数据库文件路径", "查看目录下的数据库文件"];
+    this.uiKit.showMenu(menuList, idx => {
+      switch (idx) {
+        case 0:
+          this.inputFilePath();
+          break;
+        default:
+      }
+    });
+  }
+  inputFilePath() {
     $input.text({
       type: $kbType.text,
       placeholder: "数据库文件",
       text: "/assets/.files/mods.db",
       handler: path => {
-        try {
-          const sqliteCore = new SQLiteCore(path);
-        } catch (error) {
-          $console.error(error);
+        if (path.length > 0) {
+          try {
+            const sqliteCore = new SQLiteCore(
+              new this.Mod.Storage.SQLite(path)
+            );
+            this.initView(sqliteCore);
+          } catch (error) {
+            $console.error(error);
+          }
+        } else {
+          $ui.error("请输入数据库文件路径");
         }
       }
+    });
+  }
+  initView(sqliteCore) {
+    const menuList = ["查询所有"];
+    this.uiKit.showMenu(menuList, idx => {
+      switch (idx) {
+        case 0:
+          $input.text({
+            type: $kbType.text,
+            placeholder: "table id",
+            text: "bilibili",
+            handler: tableId => {
+              if (tableId.length > 0) {
+                this.queryAll(sqliteCore, tableId);
+              }
+            }
+          });
+          break;
+        default:
+      }
+    });
+  }
+  queryAll(sqliteCore, tableId) {
+    const queryResult = sqliteCore.queryAll(tableId);
+    $ui.push({
+      props: {
+        title: ""
+      },
+      views: [
+        {
+          type: "list",
+          props: {
+            data: queryResult.map(item => {
+              const keys = Object.keys(item);
+              return {
+                title: "",
+                rows: keys.map(key => `${key}:${item[key]}`)
+              };
+            })
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (_sender, indexPath, _data) => {
+              const section = indexPath.section,
+                row = indexPath.row;
+            }
+          }
+        }
+      ]
     });
   }
 }
 
 class HelperView {
-  constructor(core) {
-    this.sqliteView = new SQLiteView();
-    this.keychainView = new KeychainView(core);
+  constructor(mod) {
+    this.sqliteView = new SQLiteView(mod);
+    this.keychainView = new KeychainView(mod);
   }
   init() {
     $ui.menu({
-      items: ["SQLite", "Keychain"],
+      items: ["SQLite", "Keychain", "文件选择"],
       handler: (title, idx) => {
         switch (idx) {
           case 0:
@@ -170,13 +249,21 @@ class HelperView {
           case 1:
             this.keychainView.init();
             break;
+          case 2:
+            $drive.open({
+              types: ["sqlite.db"],
+              handler: data => {
+                $console.info(data);
+              }
+            });
+            break;
         }
       }
     });
   }
 }
 
-class DatabaseHelper extends ModCore {
+class DataCenter extends ModCore {
   constructor(app) {
     super({
       app,
@@ -196,4 +283,4 @@ class DatabaseHelper extends ModCore {
     return false;
   }
 }
-module.exports = DatabaseHelper;
+module.exports = DataCenter;
