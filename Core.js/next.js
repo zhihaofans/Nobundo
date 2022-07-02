@@ -90,8 +90,20 @@ class ListView {
     });
   }
 }
+class UiKit {
+  constructor() {}
+  showMenu(menuList, handler = idx => {}) {
+    $ui.menu({
+      items: menuList,
+      handler: (title, idx) => {
+        handler(idx);
+      }
+    });
+  }
+}
 
 module.exports = {
   DateTime,
-  ListView
+  ListView,
+  UiKit
 };

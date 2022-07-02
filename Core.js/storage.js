@@ -180,6 +180,9 @@ class SQLite {
   constructor(_dataBaseFile) {
     this.DATABASEFILE = _dataBaseFile;
   }
+  hasTable(tableId) {
+    return this.query(`SELECT * FROM ${tableId}`).error == undefined;
+  }
   init() {
     return $sqlite.open(this.DATABASEFILE);
   }
@@ -200,6 +203,9 @@ class SQLite {
       });
     db.close();
     return queryResult;
+  }
+  queryHandler(sql, handler = undefined) {
+    this.init().query(sql, handler);
   }
   createSimpleTable(table_id) {
     if (table_id) {
