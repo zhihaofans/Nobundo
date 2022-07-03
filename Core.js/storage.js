@@ -204,6 +204,28 @@ class SQLite {
     db.close();
     return queryResult;
   }
+  queryAll(tableId) {
+    const result = {
+        result: undefined,
+        error: undefined
+      },
+      sql = `SELECT * FROM ${tableId}`,
+      handler = (rs, err) => {
+        if (err == undefined) {
+          const queryResultList = [];
+          while (rs.next()) {
+            queryResultList.push(rs.values);
+          }
+          result.result = queryResultList;
+        } else {
+          result.error = err;
+          $console.error(err);
+        }
+        rs.close();
+      };
+    this.queryHandler(sql, handler);
+    return result;
+  }
   queryHandler(sql, handler = undefined) {
     this.init().query(sql, handler);
   }

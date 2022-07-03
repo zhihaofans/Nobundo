@@ -333,9 +333,7 @@ class ImageKit extends ViewKit {
   }
 }
 class InputKit {
-  constructor() {
-    this.name = "name";
-  }
+  constructor() {}
   text({ placeholder, text, handler }) {
     $input.text({
       type: $kbType.text,
