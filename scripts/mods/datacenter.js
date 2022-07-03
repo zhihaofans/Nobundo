@@ -129,17 +129,24 @@ class SQLiteCore {
     this.DB.queryHandler(sql, handler);
   }
   queryAll(tableId) {
-    const queryResultList = [],
-      sql = `SELECT * FROM ${tableId}`,
-      handler = (rs, err) => {
-        $console.info(rs.columnCount);
-        while (rs.next()) {
-          queryResultList.push(rs.values);
-        }
-        rs.close();
-      };
-    this.DB.queryHandler(sql, handler);
-    return queryResultList;
+    if (!this.DB.hasTable(tableId)) {
+      return undefined;
+    } else {
+      const queryResultList = [],
+        sql = `SELECT * FROM ${tableId}`,
+        handler = (rs, err) => {
+          if (err) {
+            $console.error(err);
+          }
+          $console.info(rs.columnCount);
+          while (rs.next()) {
+            queryResultList.push(rs.values);
+          }
+          rs.close();
+        };
+      this.DB.queryHandler(sql, handler);
+      return queryResultList;
+    }
   }
   update(sql, args) {
     return this.DB.update(sql, args);
@@ -204,32 +211,36 @@ class SQLiteView {
   }
   queryAll(sqliteCore, tableId) {
     const queryResult = sqliteCore.queryAll(tableId);
-    $ui.push({
-      props: {
-        title: ""
-      },
-      views: [
-        {
-          type: "list",
-          props: {
-            data: queryResult.map(item => {
-              const keys = Object.keys(item);
-              return {
-                title: "",
-                rows: keys.map(key => `${key}:${item[key]}`)
-              };
-            })
-          },
-          layout: $layout.fill,
-          events: {
-            didSelect: (_sender, indexPath, _data) => {
-              const section = indexPath.section,
-                row = indexPath.row;
+    if (queryResult != undefined) {
+      $ui.push({
+        props: {
+          title: ""
+        },
+        views: [
+          {
+            type: "list",
+            props: {
+              data: queryResult.map(item => {
+                const keys = Object.keys(item);
+                return {
+                  title: "",
+                  rows: keys.map(key => `${key}:${item[key]}`)
+                };
+              })
+            },
+            layout: $layout.fill,
+            events: {
+              didSelect: (_sender, indexPath, _data) => {
+                const section = indexPath.section,
+                  row = indexPath.row;
+              }
             }
           }
-        }
-      ]
-    });
+        ]
+      });
+    } else {
+      $ui.error("我觉得不存在该表");
+    }
   }
 }
 
