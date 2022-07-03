@@ -12,12 +12,7 @@ class ContentData {
 }
 class Database {
   constructor(mod) {
-    this.SQLITE_FILE =
-      mod.App.DATA_DIR.LOCAL +
-      mod.MOD_INFO.AUTHOR +
-      ".mods." +
-      mod.MOD_INFO.ID +
-      ".db";
+    this.SQLITE_FILE = `${mod.App.DATA_DIR.LOCAL}${mod.MOD_INFO.AUTHOR}.mods.${mod.MOD_INFO.ID}.db`;
     this.SQLite = new mod.Storage.SQLite(this.SQLITE_FILE);
     this.SQL_TABLE_ID = {
       CONTENT_LIST: "ContentList"
@@ -30,10 +25,6 @@ class Database {
           : `INSERT INTO ${this.SQL_TABLE_ID.CONTENT_LIST} (id, timestamp, title, type, tag, blob_data, other_data) values(?, ?, ?, ?, ?, ?, ?)`,
       args = [id, timestamp, title, type, tag, data, otherData],
       sqlResult = this.SQLite.update(sql, args);
-    $console.warn({
-      sql,
-      args
-    });
     return sqlResult;
   }
   createContentListTable() {
@@ -42,52 +33,8 @@ class Database {
     return result;
   }
   getContentList() {
-    const sql = `SELECT * FROM ${this.SQL_TABLE_ID.CONTENT_LIST} WHERE id IS NOT NULL`,     sqlResult = this.SQLite.query(sql),
-      rs = sqlResult.result;
-    $console.info(rs);
-
-    if (sqlResult.error) {
-      $console.error(sqlResult.error);
-      sqlResult.close();
-      return [];
-    } else if (rs.isNull() || rs.columnCount == 0) {
-      $ui.alert({
-        title: "查询结果空白",
-        message: `columnCount:${rs.columnCount}`,
-        actions: [
-          {
-            title: "OK",
-            disabled: false, // Optional
-            handler: () => {}
-          }
-        ]
-      });
-    } else {
-      while (sqlResult.next()) {
-        const values = sqlResult.values;
-        const name = sqlResult.get("id"); // Or rs.get(0);
-        $console.info({
-          values,
-          name
-        });
-      }
-      rs.close();
-      const queryResult = this.SQLite.parseQueryResult(sqlResult);
-      const resultData = queryResult.map(item => {
-        const data = item.type == "text" ? item.text_data : item.blob_data;
-        return new ContentData({
-          id: item.id,
-          timestamp: item.timestamp,
-          title: item.title,
-          type: item.type,
-          tag: item.tag,
-          data,
-          otherData: item.otherData
-        });
-      });
-      $console.warn(resultData);
-      return resultData || [];
-    }
+    const queryResult = this.SQLite.queryAll(this.SQL_TABLE_ID.CONTENT_LIST);
+    return queryResult;
   }
 }
 
@@ -113,12 +60,11 @@ class ContentBoxApi {
         data,
         otherData
       });
-    $console.info(sqlResult);
     if (sqlResult.result == true && sqlResult.error == undefined) {
       $ui.success("添加成功");
     } else {
       $ui.alert({
-        title: "",
+        title: "SQLITE.ERROR",
         message: "",
         actions: [
           {
@@ -132,10 +78,31 @@ class ContentBoxApi {
   }
   getContent(id) {}
   getContentList() {
-    const contentList = this.DB.getContentList();
-    if (contentList.length > 0) {
+    const queryResult = this.DB.getContentList(),
+      result = queryResult.result;
+    if (queryResult.error == undefined) {
+      const resultData = queryResult.result.map(item => {
+        const data = item.type == "text" ? item.text_data : item.blob_data;
+        return new ContentData({
+          id: item.id,
+          timestamp: item.timestamp,
+          title: item.title,
+          type: item.type,
+          tag: item.tag,
+          data,
+          otherData: item.otherData
+        });
+      });
+      return {
+        success: true,
+        result: resultData || [],
+        error: undefined
+      };
     } else {
-      $ui.error("空白内容");
+      return {
+        success: false,
+        error: queryResult.error
+      };
     }
   }
 }
@@ -153,7 +120,7 @@ class ContentBoxView {
         this.askToAddContent();
         break;
       case 1:
-        this.Api.getContentList();
+        this.showContentList();
         break;
       default:
     }
@@ -181,6 +148,14 @@ class ContentBoxView {
         }
       }
     });
+  }
+  showContentList() {
+    const contentList = this.Api.getContentList();
+    if (contentList.length > 0) {
+      $console.info(contentList);
+    } else {
+      $ui.error("空白内容");
+    }
   }
 }
 
