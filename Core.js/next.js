@@ -24,6 +24,12 @@ class DateTime {
       this.DATE_TIME.getMonth() + 1
     }-${this.DATE_TIME.getDate()}`;
   }
+  getFullDateTimeStr() {
+    //返回2022-1-1 00:11:22格式的日期
+    return `${this.DATE_TIME.getFullYear()}-${
+      this.DATE_TIME.getMonth() + 1
+    }-${this.DATE_TIME.getDate()} ${this.DATE_TIME.getHours()}:${this.DATE_TIME.getMinutes()}:${this.DATE_TIME.getSeconds()}`;
+  }
   getUnixTime() {
     return this.DATE_TIME.getTime();
   }
@@ -75,7 +81,7 @@ class ListView {
                 typeof clickItem.func == "function"
               ) {
                 try {
-                  clickItem.func();
+                  clickItem.func(data);
                 } catch (error) {
                   $console.error(error);
                 }
