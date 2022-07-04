@@ -1,4 +1,5 @@
-const { ModCore } = require("../../Core.js/core");
+const { ModCore } = require("../../Core.js/core"),
+  next = require("../../Core.js/next");
 class ContentData {
   constructor({ id, timestamp, title, type, tag, data, otherData }) {
     this.id = id;
@@ -111,6 +112,7 @@ class ContentBoxView {
   constructor(mod) {
     this.Mod = mod;
     this.Api = new ContentBoxApi(this.Mod);
+    this.ListView = new next.ListView();
   }
   async init() {
     const menuResult = await $ui.menu(["添加", "查看"]);
@@ -150,9 +152,32 @@ class ContentBoxView {
     });
   }
   showContentList() {
-    const contentList = this.Api.getContentList();
-    if (contentList.length > 0) {
-      $console.info(contentList);
+    const contentListResult = this.Api.getContentList();
+    if (contentListResult.success) {
+      $console.info(contentListResult);
+      const contentListData = contentListResult.result.map(item => {
+        return {
+          title: `${item.title}(${item.type})`,
+          rows: [
+            {
+              title: item.data,
+              func: data => {
+                // 会自动带入所选项的文本到data
+              }
+            },
+            {
+              title: item.timestamp
+            }
+          ]
+        };
+      });
+      this.ListView.pushSimpleList(
+        this.Mod.MOD_INFO.NAME,
+        contentListData,
+        data => {
+          $console.info(data);
+        }
+      );
     } else {
       $ui.error("空白内容");
     }
