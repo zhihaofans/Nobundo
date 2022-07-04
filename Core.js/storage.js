@@ -181,7 +181,11 @@ class SQLite {
     this.DATABASEFILE = _dataBaseFile;
   }
   hasTable(tableId) {
-    return this.query(`SELECT * FROM ${tableId}`).error == undefined;
+    const result = this.query(`SELECT * FROM ${tableId}`);
+    if (result.error) {
+      $console.error(result.error);
+    }
+    return result.error == undefined;
   }
   init() {
     return $sqlite.open(this.DATABASEFILE);

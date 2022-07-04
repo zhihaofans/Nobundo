@@ -3,6 +3,9 @@ class DateTime {
     this.DATE_TIME = new Date(); //pickDateTime后可修改
     this.MODE = mode || 2; //0:时间,1:日期,2:日期时间
   }
+  setDateTime(newDateTime) {
+    this.DATE_TIME = new Date(newDateTime);
+  }
   setMode(newMode) {
     switch (newMode) {
       case 0:
@@ -26,8 +29,9 @@ class DateTime {
   }
 }
 class ListView {
-  constructor(name) {
-    this.NAME = name;
+  constructor() {
+    this.AUTO_ROW_HEIGHT = false;
+    this.ESTIMATED_ROW_HEIGHT = undefined;
   }
   pushSimpleList(title, listData, defaultFunc) {
     //    const listData = [
@@ -51,10 +55,12 @@ class ListView {
         {
           type: "list",
           props: {
+            autoRowHeight: this.AUTO_ROW_HEIGHT,
+            estimatedRowHeight: this.ESTIMATED_ROW_HEIGHT,
             data: listData.map(group => {
               return {
                 title: group.title,
-                rows: group.rows.map(row => row.title)
+                rows: group.rows.map(row => row.title.toString())
               };
             })
           },
@@ -88,6 +94,12 @@ class ListView {
         }
       ]
     });
+  }
+  setAutoRowHeight(autoRowHeight) {
+    this.AUTO_ROW_HEIGHT = autoRowHeight == true;
+  }
+  setEstimatedRowHeight(estimatedRowHeight) {
+    this.ESTIMATED_ROW_HEIGHT = estimatedRowHeight || 10;
   }
 }
 class UiKit {
