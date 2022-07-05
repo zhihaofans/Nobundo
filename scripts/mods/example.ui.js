@@ -6,10 +6,90 @@ class Main {
     this.Mod = mod;
     this.$ = this.Mod.$;
   }
+  test() {
+    $ui.push({
+      props: {
+        title: ""
+      },
+      views: [
+        {
+          type: "list",
+          props: {
+            template: {
+              props: {
+                bgcolor: $color("clear"),
+                autoRowHeight: true,
+                estimatedRowHeight: 50
+              },
+              views: [
+                {
+                  type: "label",
+                  props: {
+                    id: "labelTitle",
+                    bgcolor: $color("white"),
+                    textColor: $color("black"),
+                    align: $align.left,
+                    font: $font(24)
+                  },
+                  layout: function (make) {
+                    make.height.equalTo(40);
+                    make.left.top.right.inset(2);
+                  }
+                },
+                {
+                  type: "label",
+                  props: {
+                    id: "labelData",
+                    bgcolor: $color("white"),
+                    textColor: $color("black"),
+                    align: $align.left,
+                    font: $font(16)
+                  },
+                  layout: function (make) {
+                    make.height.equalTo(40);
+                    //                    make.left.right.inset(2);
+                    make.top.equalTo($("labelTitle").bottom);
+                  }
+                }
+              ]
+            },
+            data: [
+              {
+                labelTitle: {
+                  text: "标题1"
+                },
+                labelData: {
+                  text: "内容1"
+                }
+              },
+              {
+                labelTitle: {
+                  text: "标题2"
+                },
+                labelData: {
+                  text: "内容2"
+                }
+              }
+            ]
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (_sender, indexPath, _data) => {
+              const section = indexPath.section,
+                row = indexPath.row;
+            }
+          }
+        }
+      ]
+    });
+  }
   init() {
     const mainViewList = ["example 1"],
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
+          case 0:
+            this.test();
+            break;
           default:
             $ui.alert({
               title: indexPath.row,
@@ -18,7 +98,9 @@ class Main {
                 {
                   title: "OK",
                   disabled: false, // Optional
-                  handler: () => {}
+                  handler: () => {
+                    this.test();
+                  }
                 }
               ]
             });
@@ -40,7 +122,7 @@ class ExampleModule extends CoreModule {
     this.Mod = mod;
   }
   initUi() {
-    $ui.success("run");
+    //    $ui.success("run");
     const main = new Main(this.Mod);
     main.init();
   }

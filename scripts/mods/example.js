@@ -19,7 +19,7 @@ class Example extends ModCore {
     } catch (error) {
       $console.error(error);
     }
-    $ui.success("run");
+    //    $ui.success("run");
   }
   runWidget() {
     const inputValue = $widget.inputValue ? `[${$widget.inputValue}]` : "";
