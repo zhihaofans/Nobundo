@@ -29,9 +29,12 @@ class Database {
     return sqlResult;
   }
   createContentListTable() {
-    const sql = `CREATE TABLE IF NOT EXISTS ${this.SQL_TABLE_ID.CONTENT_LIST}(id TEXT PRIMARY KEY NOT NULL, timestamp INTEGER NOT NULL,title TEXT NOT NULL,type TEXT NOT NULL,tag TEXT,text_data TEXT,blob_data BLOB,other_data TEXT)`,
-      result = this.SQLite.update(sql);
-    return result;
+    if (!this.SQLite.hasTable(this.SQL_TABLE_ID.CONTENT_LIST)) {
+      const sql = `CREATE TABLE IF NOT EXISTS ${this.SQL_TABLE_ID.CONTENT_LIST}(id TEXT PRIMARY KEY NOT NULL, timestamp INTEGER NOT NULL,title TEXT NOT NULL,type TEXT NOT NULL,tag TEXT,text_data TEXT,blob_data BLOB,other_data TEXT)`,
+        result = this.SQLite.update(sql);
+      return result;
+    }
+    return undefined;
   }
   getContentList() {
     const queryResult = this.SQLite.queryAll(this.SQL_TABLE_ID.CONTENT_LIST);
@@ -89,7 +92,7 @@ class ContentBoxApi {
           timestamp: item.timestamp,
           title: item.title,
           type: item.type,
-          tag: item.tag,
+          tag: JSON.parse(item.tag),
           data,
           otherData: item.otherData
         });
@@ -156,17 +159,37 @@ class ContentBoxView {
     if (contentListResult.success) {
       $console.info(contentListResult);
       const contentListData = contentListResult.result.map(item => {
+        const dateTime = new next.DateTime();
+        dateTime.setDateTime(item.timestamp);
         return {
           title: `${item.title}(${item.type})`,
           rows: [
             {
-              title: item.data,
-              func: data => {
-                // 会自动带入所选项的文本到data
-              }
+              title: `TYPE:${item.type}`
             },
             {
-              title: item.timestamp
+              title: dateTime.getFullDateTimeStr()
+            },
+            {
+              title: `TAG:${item.tag.toString()}`
+            },
+            {
+              title: item.data,
+              func: data => {
+                $console.warn(data);
+                // 会自动带入所选项的文本到data
+                $ui.alert({
+                  title: item.title,
+                  message: data,
+                  actions: [
+                    {
+                      title: "OK",
+                      disabled: false, // Optional
+                      handler: () => {}
+                    }
+                  ]
+                });
+              }
             }
           ]
         };
