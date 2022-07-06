@@ -48,6 +48,7 @@ class ContentBoxApi {
     this.$ = mod.$;
     this.DB = new Database(mod);
     this.DB.createContentListTable();
+    this.LASTEST_SORT = false;
   }
   addContent({ title, data }) {
     const type = "text",
@@ -97,6 +98,9 @@ class ContentBoxApi {
           otherData: item.otherData
         });
       });
+      if (this.LASTEST_SORT) {
+        resultData.reverse();
+      }
       return {
         success: true,
         result: resultData || [],
@@ -109,6 +113,9 @@ class ContentBoxApi {
       };
     }
   }
+  setLatestSortMode(isLatest) {
+    this.LASTEST_SORT = isLatest == true;
+  }
 }
 
 class ContentBoxView {
@@ -118,6 +125,7 @@ class ContentBoxView {
     this.ListView = new next.ListView();
   }
   async init() {
+    this.Api.setLatestSortMode(true);
     const menuResult = await $ui.menu(["添加", "查看"]);
     //menuResult.index , menuResult.title
     switch (menuResult.index) {
@@ -209,26 +217,24 @@ class ContentBoxView {
   showContentListView(contentListData) {
     $ui.push({
       props: {
-        title: "showContentListView"
+        title: this.Api.LASTEST_SORT ? "新▶旧" : "旧▶新"
       },
       views: [
         {
           type: "list",
           props: {
             autoRowHeight: true,
-            estimatedRowHeight: 50,
+            estimatedRowHeight: 20,
             template: {
               props: {
-                bgcolor: $color("clear"),
-                autoRowHeight: true,
-                estimatedRowHeight: 50
+                bgcolor: $color("clear")
               },
               views: [
                 {
                   type: "stack",
                   props: {
                     axis: $stackViewAxis.vertical,
-                    spacing: 5,
+                    spacing: 3,
                     distribution: $stackViewDistribution.fillEqually,
                     stack: {
                       views: [
@@ -238,11 +244,28 @@ class ContentBoxView {
                             id: "labelTitle",
 
                             align: $align.left,
-                            font: $font(20)
+                            font: $font(20),
+                            lines: 1
                           },
-                          layout: function (make) {
-                            make.height.equalTo(40);
+                          layout: make => {
+                            make.height.equalTo(20);
                             make.left.top.right.inset(2);
+                          }
+                        },
+                        {
+                          type: "label",
+                          props: {
+                            id: "labelDatetime",
+
+                            align: $align.left,
+                            font: $font(16),
+                            lines: 1,
+                            textColor: $color("gray")
+                          },
+                          layout: make => {
+                            make.height.equalTo(20);
+                            make.left.right.inset(2);
+                            //                            make.top.equalTo($("labelTitle").bottom);
                           }
                         },
                         {
@@ -251,12 +274,11 @@ class ContentBoxView {
                             id: "labelData",
 
                             align: $align.left,
-                            font: $font(16),
-                            lines: 0
+                            font: $font(16)
                           },
-                          layout: function (make) {
-                            make.height.equalTo(40);
-                            make.top.left.right.bottom.inset(2);
+                          layout: make => {
+                            //                            make.height.equalTo(40);
+                            make.left.right.inset(2);
                             //                            make.top.equalTo($("labelTitle").bottom);
                           }
                         }
@@ -268,9 +290,14 @@ class ContentBoxView {
               ]
             },
             data: contentListData.map(contentItem => {
+              const dateTime = new next.DateTime();
+              dateTime.setDateTime(contentItem.timestamp);
               return {
                 labelTitle: {
                   text: contentItem.title
+                },
+                labelDatetime: {
+                  text: dateTime.getFullDateTimeStr()
                 },
                 labelData: {
                   text: contentItem.data
