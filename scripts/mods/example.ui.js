@@ -23,33 +23,44 @@ class Main {
               },
               views: [
                 {
-                  type: "label",
+                  type: "stack",
                   props: {
-                    id: "labelTitle",
-                    bgcolor: $color("white"),
-                    textColor: $color("black"),
-                    align: $align.left,
-                    font: $font(24)
+                    axis: $stackViewAxis.vertical,
+                    spacing: 5,
+                    distribution: $stackViewDistribution.fillEqually,
+                    stack: {
+                      views: [
+                        {
+                          type: "label",
+                          props: {
+                            id: "labelTitle",
+
+                            align: $align.left,
+                            font: $font(24)
+                          },
+                          layout: function (make) {
+                            make.height.equalTo(40);
+                            make.left.top.right.inset(2);
+                          }
+                        },
+                        {
+                          type: "label",
+                          props: {
+                            id: "labelData",
+
+                            align: $align.left,
+                            font: $font(16)
+                          },
+                          layout: function (make) {
+                            make.height.equalTo(40);
+                            make.top.left.right.bottom.inset(2);
+                            //                            make.top.equalTo($("labelTitle").bottom);
+                          }
+                        }
+                      ]
+                    }
                   },
-                  layout: function (make) {
-                    make.height.equalTo(40);
-                    make.left.top.right.inset(2);
-                  }
-                },
-                {
-                  type: "label",
-                  props: {
-                    id: "labelData",
-                    bgcolor: $color("white"),
-                    textColor: $color("black"),
-                    align: $align.left,
-                    font: $font(16)
-                  },
-                  layout: function (make) {
-                    make.height.equalTo(40);
-                    //                    make.left.right.inset(2);
-                    make.top.equalTo($("labelTitle").bottom);
-                  }
+                  layout: $layout.fill
                 }
               ]
             },
