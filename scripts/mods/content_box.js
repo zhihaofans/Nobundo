@@ -194,16 +194,112 @@ class ContentBoxView {
           ]
         };
       });
-      this.ListView.pushSimpleList(
-        this.Mod.MOD_INFO.NAME,
-        contentListData,
-        data => {
-          $console.info(data);
-        }
-      );
+      //      this.ListView.pushSimpleList(
+      //        this.Mod.MOD_INFO.NAME,
+      //        contentListData,
+      //        data => {
+      //          $console.info(data);
+      //        }
+      //      );
+      this.showContentListView(contentListResult.result);
     } else {
       $ui.error("空白内容");
     }
+  }
+  showContentListView(contentListData) {
+    $ui.push({
+      props: {
+        title: "showContentListView"
+      },
+      views: [
+        {
+          type: "list",
+          props: {
+            autoRowHeight: true,
+            estimatedRowHeight: 50,
+            template: {
+              props: {
+                bgcolor: $color("clear"),
+                autoRowHeight: true,
+                estimatedRowHeight: 50
+              },
+              views: [
+                {
+                  type: "stack",
+                  props: {
+                    axis: $stackViewAxis.vertical,
+                    spacing: 5,
+                    distribution: $stackViewDistribution.fillEqually,
+                    stack: {
+                      views: [
+                        {
+                          type: "label",
+                          props: {
+                            id: "labelTitle",
+
+                            align: $align.left,
+                            font: $font(20)
+                          },
+                          layout: function (make) {
+                            make.height.equalTo(40);
+                            make.left.top.right.inset(2);
+                          }
+                        },
+                        {
+                          type: "label",
+                          props: {
+                            id: "labelData",
+
+                            align: $align.left,
+                            font: $font(16),
+                            lines: 0
+                          },
+                          layout: function (make) {
+                            make.height.equalTo(40);
+                            make.top.left.right.bottom.inset(2);
+                            //                            make.top.equalTo($("labelTitle").bottom);
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  layout: $layout.fill
+                }
+              ]
+            },
+            data: contentListData.map(contentItem => {
+              return {
+                labelTitle: {
+                  text: contentItem.title
+                },
+                labelData: {
+                  text: contentItem.data
+                }
+              };
+            })
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (_sender, indexPath, _data) => {
+              const section = indexPath.section,
+                row = indexPath.row,
+                selectedContent = contentListData[row];
+              $ui.alert({
+                title: selectedContent.title,
+                message: selectedContent.data,
+                actions: [
+                  {
+                    title: "OK",
+                    disabled: false, // Optional
+                    handler: () => {}
+                  }
+                ]
+              });
+            }
+          }
+        }
+      ]
+    });
   }
 }
 
