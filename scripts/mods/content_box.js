@@ -13,7 +13,7 @@ class ContentData {
 }
 class Database {
   constructor(mod) {
-    this.SQLITE_FILE = `${mod.App.DATA_DIR.LOCAL}${mod.MOD_INFO.AUTHOR}.mods.${mod.MOD_INFO.ID}.db`;
+    this.SQLITE_FILE = `${mod.App.DATA_DIR.LOCAL}${mod.MOD_INFO.AUTHOR}.${mod.MOD_INFO.ID}.db`;
     this.SQLite = new mod.Storage.SQLite(this.SQLITE_FILE);
     this.SQL_TABLE_ID = {
       CONTENT_LIST: "ContentList"
