@@ -20,15 +20,51 @@ class DateTime {
   }
   getFullDateStr() {
     //返回2022-01-01格式的日期
-    return `${this.DATE_TIME.getFullYear()}-${
-      this.DATE_TIME.getMonth() + 1
-    }-${this.DATE_TIME.getDate()}`;
+    const dateTime = this.DATE_TIME,
+      year = dateTime.getFullYear(),
+      month = dateTime.getMonth() + 1,
+      date = dateTime.getDate(),
+      result = `${year}-${month >= 10 ? month : "0" + month}-${
+        date >= 10 ? date : "0" + date
+      }`;
+    return result;
   }
   getFullDateTimeStr() {
-    //返回2022-1-1 00:11:22格式的日期
-    return `${this.DATE_TIME.getFullYear()}-${
-      this.DATE_TIME.getMonth() + 1
-    }-${this.DATE_TIME.getDate()} ${this.DATE_TIME.getHours()}:${this.DATE_TIME.getMinutes()}:${this.DATE_TIME.getSeconds()}`;
+    //返回2022-01-01 00:11:22格式的日期
+    const dateTime = this.DATE_TIME,
+      year = dateTime.getFullYear(),
+      month = dateTime.getMonth() + 1,
+      date = dateTime.getDate(),
+      hours = dateTime.getHours(),
+      minutes = dateTime.getMinutes(),
+      seconds = dateTime.getSeconds(),
+      result = `${year}-${month >= 10 ? month : "0" + month}-${
+        date >= 10 ? date : "0" + date
+      } ${hours >= 10 ? hours : "0" + hours}:${
+        minutes >= 10 ? minutes : "0" + minutes
+      }:${seconds >= 10 ? seconds : "0" + seconds}`;
+    return result;
+  }
+  getShortDateStr() {
+    //返回2022-1-1 0:1:22格式的日期
+    const dateTime = this.DATE_TIME,
+      year = dateTime.getFullYear(),
+      month = dateTime.getMonth() + 1,
+      date = dateTime.getDate(),
+      result = `${year}-${month}-${date}`;
+    return result;
+  }
+  getShortDateTimeStr() {
+    //返回2022-1-1 0:1:22格式的日期
+    const dateTime = this.DATE_TIME,
+      year = dateTime.getFullYear(),
+      month = dateTime.getMonth() + 1,
+      date = dateTime.getDate(),
+      hours = dateTime.getHours(),
+      minutes = dateTime.getMinutes(),
+      seconds = dateTime.getSeconds(),
+      result = `${year}-${month}-${date} ${hours}:${minutes}:${seconds}`;
+    return result;
   }
   getUnixTime() {
     return this.DATE_TIME.getTime();
