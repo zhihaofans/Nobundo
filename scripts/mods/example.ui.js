@@ -19,7 +19,7 @@ class Main {
               props: {
                 bgcolor: $color("clear"),
                 autoRowHeight: true,
-                estimatedRowHeight: 50
+                estimatedRowHeight: 100
               },
               views: [
                 {
@@ -27,7 +27,7 @@ class Main {
                   props: {
                     axis: $stackViewAxis.vertical,
                     spacing: 5,
-                    distribution: $stackViewDistribution.fillEqually,
+                    distribution: $stackViewDistribution.fillProportionally,
                     stack: {
                       views: [
                         {
@@ -38,9 +38,9 @@ class Main {
                             align: $align.left,
                             font: $font(24)
                           },
-                          layout: function (make) {
-                            make.height.equalTo(40);
-                            make.left.top.right.inset(2);
+                          layout: make => {
+                            make.height.equalTo(24);
+                            make.left.top.right.inset(5);
                           }
                         },
                         {
@@ -49,9 +49,10 @@ class Main {
                             id: "labelData",
 
                             align: $align.left,
-                            font: $font(16)
+                            font: $font(12),
+                            textColor: $color("gray")
                           },
-                          layout: function (make) {
+                          layout: make => {
                             make.height.equalTo(40);
                             make.top.left.right.bottom.inset(2);
                             //                            make.top.equalTo($("labelTitle").bottom);
@@ -70,7 +71,7 @@ class Main {
                   text: "标题1"
                 },
                 labelData: {
-                  text: "内容1"
+                  text: "2022/07/22 内容1"
                 }
               },
               {
@@ -85,9 +86,10 @@ class Main {
           },
           layout: $layout.fill,
           events: {
-            didSelect: (_sender, indexPath, _data) => {
+            didSelect: (_sender, indexPath, data) => {
               const section = indexPath.section,
                 row = indexPath.row;
+              $console.info(row);
             }
           }
         }
