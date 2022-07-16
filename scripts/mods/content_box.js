@@ -166,49 +166,6 @@ class ContentBoxView {
     const contentListResult = this.Api.getContentList();
     if (contentListResult.success) {
       $console.info(contentListResult);
-      const contentListData = contentListResult.result.map(item => {
-        const dateTime = new next.DateTime();
-        dateTime.setDateTime(item.timestamp);
-        return {
-          title: `${item.title}(${item.type})`,
-          rows: [
-            {
-              title: `TYPE:${item.type}`
-            },
-            {
-              title: dateTime.getFullDateTimeStr()
-            },
-            {
-              title: `TAG:${item.tag.toString()}`
-            },
-            {
-              title: item.data,
-              func: data => {
-                $console.warn(data);
-                // 会自动带入所选项的文本到data
-                $ui.alert({
-                  title: item.title,
-                  message: data,
-                  actions: [
-                    {
-                      title: "OK",
-                      disabled: false, // Optional
-                      handler: () => {}
-                    }
-                  ]
-                });
-              }
-            }
-          ]
-        };
-      });
-      //      this.ListView.pushSimpleList(
-      //        this.Mod.MOD_INFO.NAME,
-      //        contentListData,
-      //        data => {
-      //          $console.info(data);
-      //        }
-      //      );
       this.showContentListView(contentListResult.result);
     } else {
       $ui.error("空白内容");
@@ -234,8 +191,8 @@ class ContentBoxView {
                   type: "stack",
                   props: {
                     axis: $stackViewAxis.vertical,
-                    spacing: 3,
-                    distribution: $stackViewDistribution.fillEqually,
+                    spacing: 5,
+                    distribution: $stackViewDistribution.fillProportionally,
                     stack: {
                       views: [
                         {
@@ -244,28 +201,11 @@ class ContentBoxView {
                             id: "labelTitle",
 
                             align: $align.left,
-                            font: $font(20),
-                            lines: 1
+                            font: $font(24)
                           },
                           layout: make => {
-                            make.height.equalTo(20);
-                            make.left.top.right.inset(2);
-                          }
-                        },
-                        {
-                          type: "label",
-                          props: {
-                            id: "labelDatetime",
-
-                            align: $align.left,
-                            font: $font(16),
-                            lines: 1,
-                            textColor: $color("gray")
-                          },
-                          layout: make => {
-                            make.height.equalTo(20);
-                            make.left.right.inset(2);
-                            //                            make.top.equalTo($("labelTitle").bottom);
+                            make.height.equalTo(24);
+                            make.left.top.right.inset(5);
                           }
                         },
                         {
@@ -274,11 +214,12 @@ class ContentBoxView {
                             id: "labelData",
 
                             align: $align.left,
-                            font: $font(16)
+                            font: $font(12),
+                            textColor: $color("gray")
                           },
                           layout: make => {
-                            //                            make.height.equalTo(40);
-                            make.left.right.inset(2);
+                            make.height.equalTo(40);
+                            make.top.left.right.bottom.inset(2);
                             //                            make.top.equalTo($("labelTitle").bottom);
                           }
                         }
@@ -296,11 +237,9 @@ class ContentBoxView {
                 labelTitle: {
                   text: contentItem.title
                 },
-                labelDatetime: {
-                  text: dateTime.getFullDateTimeStr()
-                },
+
                 labelData: {
-                  text: contentItem.data
+                  text: `${dateTime.getShortDateStr()}  ${contentItem.data}`
                 }
               };
             })
