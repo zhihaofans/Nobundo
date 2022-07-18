@@ -300,8 +300,10 @@ class SQLiteView {
                         );
                         if (deleteResult.result) {
                           $console.info(deleteResult);
+                          $ui.success("已删除");
                         } else {
                           $console.error(deleteResult.error);
+                          $ui.error("删除失败");
                         }
                       }
                     }
@@ -317,7 +319,7 @@ class SQLiteView {
     }
   }
   initTableView(sqliteCore, tableId) {
-    const menuList = ["查询所有", "插入", "删除"];
+    const menuList = ["查询所有", "插入"];
     this.uiKit.showMenu(menuList, idx => {
       switch (idx) {
         case 0:
@@ -325,8 +327,6 @@ class SQLiteView {
           break;
         case 1:
           this.insertItem(sqliteCore, tableId);
-          break;
-        case 2:
           break;
         default:
       }
