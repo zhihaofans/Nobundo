@@ -114,13 +114,37 @@ class SQLiteCore {
     const sql = `CREATE TABLE ${tableId}(${columnList.toString()})`;
     return this.update(sql);
   }
+  insert(table, columnObject) {
+    const columnKeys = Object.keys(columnObject);
+
+    if (columnKeys.length == 0) {
+      return undefined;
+    } else {
+      const columnValueList = [];
+
+      var a = "";
+      columnKeys.map(key => {
+        columnValueList.push(columnObject[key]);
+        if (a.length > 0) {
+          a += ",";
+        }
+        a += "?";
+      });
+      const sql = `INSERT INTO ${table} (${columnKeys.toString()}) VALUES(${a})`,
+        updateResult = this.update(sql, columnValueList);
+      $console.info({
+        sql,
+        updateResult
+      });
+      return updateResult;
+    }
+  }
   query(
     sql,
     handler = (rs, err) => {
       $console.info(rs.columnCount);
       while (rs.next()) {
         const values = rs.values;
-        const name = rs.get("name"); // Or rs.get(0);
         $console.info(values);
       }
       rs.close();
@@ -150,6 +174,25 @@ class SQLiteCore {
   }
   update(sql, args) {
     return this.DB.update(sql, args);
+  }
+  delete(table, columnObject) {
+    const columnKeys = Object.keys(columnObject),
+      columnStrList = [];
+    if (columnKeys.length == 0) {
+      return undefined;
+    } else {
+      columnKeys.map(key => {
+        columnStrList.push(key + "=" + columnObject[key]);
+      });
+      const columnStr = columnStrList.toString(),
+        sql = `DELETE FROM ${table} WHERE ${columnStr}`,
+        updateResult = this.update(sql);
+      $console.info({
+        sql,
+        updateResult
+      });
+      return updateResult;
+    }
   }
 }
 class SQLiteView {
@@ -190,22 +233,14 @@ class SQLiteView {
     });
   }
   initView(sqliteCore) {
-    const menuList = ["查询所有"];
-    this.uiKit.showMenu(menuList, idx => {
-      switch (idx) {
-        case 0:
-          $input.text({
-            type: $kbType.text,
-            placeholder: "table id",
-            text: "bilibili",
-            handler: tableId => {
-              if (tableId.length > 0) {
-                this.queryAll(sqliteCore, tableId);
-              }
-            }
-          });
-          break;
-        default:
+    $input.text({
+      type: $kbType.text,
+      placeholder: "table id",
+      text: "bilibili",
+      handler: tableId => {
+        if (tableId.length > 0) {
+          this.initTableView(sqliteCore, tableId);
+        }
       }
     });
   }
@@ -233,6 +268,10 @@ class SQLiteView {
               didSelect: (_sender, indexPath, _data) => {
                 const section = indexPath.section,
                   row = indexPath.row;
+                $console.info({
+                  section,
+                  row
+                });
               }
             }
           }
@@ -241,6 +280,50 @@ class SQLiteView {
     } else {
       $ui.error("我觉得不存在该表");
     }
+  }
+  initTableView(sqliteCore, tableId) {
+    const menuList = ["查询所有", "插入"];
+    this.uiKit.showMenu(menuList, idx => {
+      switch (idx) {
+        case 0:
+          this.queryAll(sqliteCore, tableId);
+          break;
+        case 1:
+          this.insertItem(sqliteCore, tableId);
+          break;
+        default:
+      }
+    });
+  }
+  insertItem(sqliteCore, tableId) {
+    const columnObject = {};
+    $input.text({
+      type: $kbType.text,
+      placeholder: "key",
+      text: "",
+      handler: key => {
+        if (key.length > 0) {
+          $input.text({
+            type: $kbType.text,
+            placeholder: "value",
+            text: "",
+            handler: value => {
+              if (value.length > 0) {
+                columnObject.id = key;
+                columnObject.value = value;
+                const insertResult = sqliteCore.insert(tableId, columnObject);
+
+                if (insertResult.result) {
+                  $console.info(insertResult);
+                } else {
+                  $console.error(insertResult.error);
+                }
+              }
+            }
+          });
+        }
+      }
+    });
   }
 }
 
