@@ -181,14 +181,21 @@ class SQLiteCore {
     if (columnKeys.length == 0) {
       return undefined;
     } else {
+      const args = [];
+      var whereStr = "";
       columnKeys.map(key => {
-        columnStrList.push(key + "=" + columnObject[key]);
+        columnStrList.push();
+        if (whereStr.length > 0) {
+          whereStr += " AND ";
+        }
+        whereStr += key + "=? ";
+        args.push(columnObject[key]);
       });
-      const columnStr = columnStrList.toString(),
-        sql = `DELETE FROM ${table} WHERE ${columnStr}`,
-        updateResult = this.update(sql);
+      const sql = `DELETE FROM ${table} WHERE ${whereStr}`,
+        updateResult = this.update(sql, args);
       $console.info({
         sql,
+        args,
         updateResult
       });
       return updateResult;
@@ -265,12 +272,40 @@ class SQLiteView {
             },
             layout: $layout.fill,
             events: {
-              didSelect: (_sender, indexPath, _data) => {
+              didSelect: (_sender, indexPath, data) => {
                 const section = indexPath.section,
-                  row = indexPath.row;
+                  row = indexPath.row,
+                  selectItem = queryResult[section];
                 $console.info({
                   section,
-                  row
+                  row,
+                  selectItem
+                });
+                $ui.alert({
+                  title: "菜单",
+                  message: JSON.stringify(selectItem),
+                  actions: [
+                    {
+                      title: "OK",
+                      disabled: false, // Optional
+                      handler: () => {}
+                    },
+                    {
+                      title: "删除",
+                      disabled: false, // Optional
+                      handler: () => {
+                        const deleteResult = sqliteCore.delete(
+                          tableId,
+                          selectItem
+                        );
+                        if (deleteResult.result) {
+                          $console.info(deleteResult);
+                        } else {
+                          $console.error(deleteResult.error);
+                        }
+                      }
+                    }
+                  ]
                 });
               }
             }
@@ -282,7 +317,7 @@ class SQLiteView {
     }
   }
   initTableView(sqliteCore, tableId) {
-    const menuList = ["查询所有", "插入"];
+    const menuList = ["查询所有", "插入", "删除"];
     this.uiKit.showMenu(menuList, idx => {
       switch (idx) {
         case 0:
@@ -290,6 +325,8 @@ class SQLiteView {
           break;
         case 1:
           this.insertItem(sqliteCore, tableId);
+          break;
+        case 2:
           break;
         default:
       }
