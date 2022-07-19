@@ -40,6 +40,12 @@ class Database {
     const queryResult = this.SQLite.queryAll(this.SQL_TABLE_ID.CONTENT_LIST);
     return queryResult;
   }
+  deleteContent(contentId) {
+    const sql = `DELETE FROM ${this.SQL_TABLE_ID.CONTENT_LIST} WHERE id=?`,
+      args = [contentId],
+      sqlResult = this.SQLite.update(sql, args);
+    return sqlResult;
+  }
 }
 
 class ContentBoxApi {
@@ -81,10 +87,36 @@ class ContentBoxApi {
       });
     }
   }
+  deleteContent(contentItem) {
+    $ui.alert({
+      title: "确定删除吗？",
+      message: `《${contentItem.title}》`,
+      actions: [
+        {
+          title: "OK",
+          disabled: false, // Optional
+          handler: () => {
+            const deleteResult = this.DB.deleteContent(contentItem.id);
+            if (deleteResult.result) {
+              $console.info(deleteResult);
+              $ui.success("删除成功");
+            } else {
+              $console.error(deleteResult.error);
+              $ui.error("删除失败");
+            }
+          }
+        },
+        {
+          title: "NO",
+          disabled: false, // Optional
+          handler: () => {}
+        }
+      ]
+    });
+  }
   getContent(id) {}
   getContentList() {
-    const queryResult = this.DB.getContentList(),
-      result = queryResult.result;
+    const queryResult = this.DB.getContentList();
     if (queryResult.error == undefined) {
       const resultData = queryResult.result.map(item => {
         const data = item.type == "text" ? item.text_data : item.blob_data;
@@ -104,6 +136,7 @@ class ContentBoxApi {
       return {
         success: true,
         result: resultData || [],
+        count: resultData.length || 0,
         error: undefined
       };
     } else {
@@ -172,9 +205,31 @@ class ContentBoxView {
     }
   }
   showContentListView(contentListData) {
+    const navButtons = [
+      {
+        title: "新增",
+        symbol: "text.badge.plus", // SF symbols are supported
+        handler: sender => {
+          this.askToAddContent();
+        },
+        menu: {
+          title: "更多",
+          items: [
+            {
+              title: "设置",
+              handler: sender => {
+                $ui.warning("未完善");
+              }
+            }
+          ]
+        }
+      }
+    ];
     $ui.push({
       props: {
-        title: this.Api.LASTEST_SORT ? "新▶旧" : "旧▶新"
+        id: "listview_contentlist",
+        title: this.Api.LASTEST_SORT ? "新▶旧" : "旧▶新",
+        navButtons
       },
       views: [
         {
@@ -247,8 +302,7 @@ class ContentBoxView {
           layout: $layout.fill,
           events: {
             didSelect: (_sender, indexPath, _data) => {
-              const section = indexPath.section,
-                row = indexPath.row,
+              const row = indexPath.row,
                 selectedContent = contentListData[row];
               $ui.alert({
                 title: selectedContent.title,
@@ -258,6 +312,13 @@ class ContentBoxView {
                     title: "OK",
                     disabled: false, // Optional
                     handler: () => {}
+                  },
+                  {
+                    title: "删除",
+                    disabled: false, // Optional
+                    handler: () => {
+                      this.Api.deleteContent(selectedContent);
+                    }
                   }
                 ]
               });
