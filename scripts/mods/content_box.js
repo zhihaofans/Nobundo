@@ -286,7 +286,13 @@ class ContentBoxView {
               ]
             },
             data: contentListData.map(contentItem => {
-              const dateTime = new next.DateTime();
+              const dateTime = new next.DateTime(),
+                contentType = contentItem.type,
+                dataShowStrList = {
+                  image: "[图片]",
+                  text: contentItem.data
+                },
+                dataShowStr = dataShowStrList[contentType];
               dateTime.setDateTime(contentItem.timestamp);
               return {
                 labelTitle: {
@@ -294,14 +300,14 @@ class ContentBoxView {
                 },
 
                 labelData: {
-                  text: `${dateTime.getShortDateStr()}  ${contentItem.data}`
+                  text: `${dateTime.getShortDateStr()}  ${dataShowStr}`
                 }
               };
             })
           },
           layout: $layout.fill,
           events: {
-            didSelect: (_sender, indexPath, _data) => {
+            didSelect: (sender, indexPath, data) => {
               const row = indexPath.row,
                 selectedContent = contentListData[row];
               $ui.alert({
