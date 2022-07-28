@@ -1,18 +1,4 @@
 {
-  "widget": {
-    "staticSize": false,
-    "tintColor": "",
-    "height": 0,
-    "iconColor": ""
-  },
-  "info": {
-    "url": "",
-    "author": "zhihaofans",
-    "types": 5,
-    "website": "https:\/\/github.com\/zhihaofans\/Nobundo",
-    "name": "Nobundo",
-    "version": "1.0.1-alpha"
-  },
   "settings": {
     "autoKeyboardEnabled": false,
     "minOSVer": "13.0.0",
@@ -21,5 +7,19 @@
     "theme": "auto",
     "keyboardToolbarEnabled": false,
     "minSDKVer": "2.20.1"
+  },
+  "info": {
+    "version": "1.0.1-alpha",
+    "author": "zhihaofans",
+    "types": 13,
+    "name": "Nobundo",
+    "url": "",
+    "website": "https:\/\/github.com\/zhihaofans\/Nobundo"
+  },
+  "widget": {
+    "staticSize": false,
+    "tintColor": "",
+    "height": 0,
+    "iconColor": ""
   }
 }

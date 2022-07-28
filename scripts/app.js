@@ -55,6 +55,32 @@ class App extends AppKernel {
         this.modLoader.setContextMod("action_extension");
         this.modLoader.runContextMod();
         break;
+      case this.isKeyboardEnv():
+        $ui.render({
+          props: {
+            title: ""
+          },
+          views: [
+            {
+              type: "list",
+              props: {
+                data: [
+                  {
+                    title: "title",
+                    rows: ["test"]
+                  }
+                ]
+              },
+              layout: $layout.fill,
+              events: {
+                didSelect: (_sender, indexPath, _data) => {
+                  const row = indexPath.row;
+                }
+              }
+            }
+          ]
+        });
+        break;
       default:
         $ui.alert({
           title: "启动失败",
