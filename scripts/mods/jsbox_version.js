@@ -4,13 +4,22 @@ class ApiTest {
     this.$ = core.$;
   }
   init() {
-    this.httpHead();
+    this.pickImage();
   }
   async httpHead() {
     const result = await this.$.http.head({
       url: "https://www.httpbin.org/get"
     });
     $console.warn(result.response);
+  }
+  pickImage() {
+    $photo.pick({
+      format: "data",
+      handler: resp => {
+        const image = resp.image;
+        $console.info(resp);
+      }
+    });
   }
 }
 
