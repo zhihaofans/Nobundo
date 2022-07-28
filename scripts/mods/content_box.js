@@ -56,9 +56,8 @@ class ContentBoxApi {
     this.DB.createContentListTable();
     this.LASTEST_SORT = false;
   }
-  addContent({ title, data }) {
-    const type = "text",
-      timestamp = this.$.dateTime.getUnixTime(),
+  addContent({ title, data, type = "text" }) {
+    const timestamp = this.$.dateTime.getUnixTime(),
       id = `${$text.uuid}-${timestamp}`,
       tag = "[]",
       otherData = "{}",
@@ -74,6 +73,7 @@ class ContentBoxApi {
     if (sqlResult.result == true && sqlResult.error == undefined) {
       $ui.success("添加成功");
     } else {
+      $console.error(sqlResult.error);
       $ui.alert({
         title: "SQLITE.ERROR",
         message: "",
@@ -154,6 +154,7 @@ class ContentBoxApi {
 class ContentBoxView {
   constructor(mod) {
     this.Mod = mod;
+    this.$ = this.Mod.$;
     this.Api = new ContentBoxApi(this.Mod);
     this.ListView = new next.ListView();
   }
@@ -163,7 +164,7 @@ class ContentBoxView {
     //menuResult.index , menuResult.title
     switch (menuResult.index) {
       case 0:
-        this.askToAddContent();
+        this.askToImportClipboard();
         break;
       case 1:
         this.showContentList();
@@ -195,6 +196,67 @@ class ContentBoxView {
       }
     });
   }
+  askToImportClipboard() {
+    const clipText = $clipboard.text;
+    if (this.$.string.hasString(clipText)) {
+      $ui.alert({
+        title: "是否导入剪贴板内容",
+        message: clipText,
+        actions: [
+          {
+            title: "导入",
+            disabled: false, // Optional
+            handler: () => {
+              $input.text({
+                type: $kbType.text,
+                placeholder: "标题",
+                text: "这是你要输入的标题",
+                handler: title => {
+                  if (title.length > 0) {
+                    this.Api.addContent({
+                      title,
+                      data: clipText
+                    });
+                  }
+                }
+              });
+            }
+          },
+          {
+            title: "No",
+            disabled: false, // Optional
+            handler: () => {
+              this.askToAddContent();
+            }
+          }
+        ]
+      });
+    } else {
+      this.askToAddContent();
+    }
+  }
+  pickImage() {
+    $photo.pick({
+      format: "data",
+      handler: resp => {
+        $console.info(resp);
+        if (resp.status) {
+          const { filename, data } = resp;
+          this.Api.addContent({
+            title: filename,
+            data,
+            type: "image"
+          });
+        } else {
+          if (resp.error.description == "canceled") {
+            $ui.error("你取消了导入");
+          } else {
+            $ui.error(resp.error.description);
+          }
+        }
+      }
+    });
+  }
   showContentList() {
     const contentListResult = this.Api.getContentList();
     if (contentListResult.success) {
@@ -219,6 +281,12 @@ class ContentBoxView {
               title: "设置",
               handler: sender => {
                 $ui.warning("未完善");
+              }
+            },
+            {
+              title: "导入图片",
+              handler: sender => {
+                this.pickImage();
               }
             }
           ]
@@ -292,7 +360,7 @@ class ContentBoxView {
                   image: "[图片]",
                   text: contentItem.data
                 },
-                dataShowStr = dataShowStrList[contentType];
+                dataShowStr = dataShowStrList[contentType] || "未知内容";
               dateTime.setDateTime(contentItem.timestamp);
               return {
                 labelTitle: {
@@ -309,11 +377,8 @@ class ContentBoxView {
           events: {
             didSelect: (sender, indexPath, data) => {
               const row = indexPath.row,
-                selectedContent = contentListData[row];
-              $ui.alert({
-                title: selectedContent.title,
-                message: selectedContent.data,
-                actions: [
+                selectedContent = contentListData[row],
+                actions = [
                   {
                     title: "OK",
                     disabled: false, // Optional
@@ -326,7 +391,23 @@ class ContentBoxView {
                       this.Api.deleteContent(selectedContent);
                     }
                   }
-                ]
+                ];
+              if (selectedContent.type == "image") {
+                actions.push({
+                  title: "预览图片",
+                  disabled: false, // Optional
+                  handler: () => {
+                    $quicklook.open({
+                      type: "jpg",
+                      data: selectedContent.data
+                    });
+                  }
+                });
+              }
+              $ui.alert({
+                title: selectedContent.title,
+                message: selectedContent.data,
+                actions
               });
             }
           }
