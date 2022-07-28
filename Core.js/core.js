@@ -46,14 +46,6 @@ class ModCore {
     SQLite.createSimpleTable(this.MOD_INFO.DATABASE_ID);
     return SQLite;
   }
-  getSql(key) {
-    return this.SQLITE
-      ? this.SQLITE.auto(this.MOD_INFO.DATABASE_ID, key)
-      : undefined;
-  }
-  setSql(key, value) {
-    return this.SQLITE.setSimpleData(this.MOD_INFO.DATABASE_ID, key, value);
-  }
 }
 class ModLoader {
   constructor({ app, modDir }) {
@@ -62,15 +54,17 @@ class ModLoader {
     this.MOD_DIR = modDir;
     this.MOD_LIST = { id: [], mods: {} };
     this.CONFIG = {
-      WIDGET_MOD_ID: undefined,
-      CONTEXT_MOD_ID: undefined
+      CONTEXT_MOD_ID: undefined,
+      KEYBOARD_MOD_ID: undefined,
+      WIDGET_MOD_ID: undefined
     };
   }
   addMod(modCore) {
     if (
       this.$.isFunction(modCore.run) ||
       this.$.isFunction(modCore.runWidget) ||
-      this.$.isFunction(modCore.runContext)
+      this.$.isFunction(modCore.runContext) ||
+      this.$.isFunction(modCore.runKeyboard)
     ) {
       if (
         modCore.MOD_INFO.ID.length > 0 &&
@@ -226,6 +220,38 @@ class ModLoader {
         message: "need coreId"
       });
       return false;
+    }
+  }
+  setKeyboardMod(modId) {
+    if (
+      this.MOD_LIST.id.indexOf(modId) >= 0 &&
+      this.$.isFunction(this.MOD_LIST.mods[modId].runKeyboard)
+    ) {
+      this.CONFIG.KEYBOARD_MOD_ID = modId;
+    }
+  }
+  runKeyboardMod() {
+    const modId = this.CONFIG.CONTEXT_MOD_ID;
+    if (modId && modId.length >= 0) {
+      const thisMod = this.MOD_LIST.mods[modId];
+      try {
+        thisMod.runKeyboard();
+      } catch (error) {
+        $console.error(error);
+        $ui.alert({
+          title: "runKeyboardMod.error",
+          message: error.message,
+          actions: [
+            {
+              title: "OK",
+              disabled: false, // Optional
+              handler: () => {}
+            }
+          ]
+        });
+      }
+    } else {
+      $app.close();
     }
   }
 }
