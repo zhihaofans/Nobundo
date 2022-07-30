@@ -15,7 +15,8 @@ const AppKernel = require("../Core.js/app"),
     "action_extension.js",
     "datacenter.js",
     "content_box.js",
-    "keyboard.js"
+    "keyboard.js",
+    "chinese_zodiac.js"
   ];
 
 class App extends AppKernel {
@@ -24,37 +25,17 @@ class App extends AppKernel {
     this.modLoader = new ModLoader({ modDir, app: this });
   }
   init() {
-    this.initModList();
-    this.$.info(`启动耗时${new Date().getTime() - this.START_TIME}ms`);
+    try {
+      this.initModList();
+    } catch (error) {
+      $console.error(error);
+    } finally {
+      this.$.info(`启动耗时${new Date().getTime() - this.START_TIME}ms`);
+    }
   }
   initModList() {
     this.modLoader.addCoreByList(coreModList);
-
     switch (true) {
-      case this.isWidgetEnv():
-        this.modLoader.setWidgetMod("example");
-        this.modLoader.runWidgetMod();
-        break;
-      case this.isAppEnv():
-        listKit.renderIdx(
-          this.AppInfo.name,
-          this.modLoader.getModList().id.map(modId => {
-            const thisMod = this.modLoader.getModList().mods[modId];
-            if (thisMod.checkCoreVersion() == 0) {
-              return thisMod.MOD_INFO.NAME;
-            } else {
-              return thisMod.MOD_INFO.NAME + "(待更新)";
-            }
-          }),
-          (section, row) => {
-            this.modLoader.runMod(this.modLoader.getModList().id[row]);
-          }
-        );
-        break;
-      case this.isActionEnv() || this.isSafariEnv():
-        this.modLoader.setContextMod("action_extension");
-        this.modLoader.runContextMod();
-        break;
       case this.isKeyboardEnv():
         $ui.render({
           props: {
@@ -66,7 +47,7 @@ class App extends AppKernel {
               props: {
                 data: [
                   {
-                    title: "title",
+                    title: "键盘模式待完善",
                     rows: ["test"]
                   }
                 ]
@@ -82,19 +63,9 @@ class App extends AppKernel {
         });
         break;
       default:
-        $ui.alert({
-          title: "启动失败",
-          message: "不支持该启动方式",
-          actions: [
-            {
-              title: "OK",
-              disabled: false, // Optional
-              handler: () => {
-                $app.close();
-              }
-            }
-          ]
-        });
+        this.modLoader.setWidgetMod("example");
+        this.modLoader.setContextMod("action_extension");
+        this.modLoader.autoRunMod();
     }
   }
 }
