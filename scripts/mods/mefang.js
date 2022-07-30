@@ -1,6 +1,56 @@
 const { ModCore } = require("../../Core.js/core"),
   NextJs = require("../../Core.js/next"),
   ListView = new NextJs.ListView();
+class CourseData {
+  // 课程
+  constructor({
+    id,
+    coach_name,
+    coach_id,
+    coach_avatar,
+    book_id,
+    course_id,
+    course_name,
+    course_img,
+    course_content,
+    memo,
+    start_timestamp,
+    end_timestamp,
+    date,
+    time_start,
+    time_end,
+    user_id,
+    loc_name
+  }) {
+    this.coach_info = {
+      id: coach_id,
+      name: coach_name,
+      avatar: coach_avatar
+    };
+    this.course_info = {
+      class_id: id,
+      book_id,
+      memo,
+      timestamp: {
+        start: start_timestamp,
+        end: end_timestamp
+      },
+      datetime: {
+        date,
+        start_time: time_start,
+        end_time: time_end
+      },
+      location: loc_name,
+      course_id,
+      name: course_name,
+      img: course_img,
+      content: course_content
+    };
+    this.user_info = {
+      id: user_id
+    };
+  }
+}
 class UserData {
   constructor(core) {
     this.Core = core;
@@ -69,6 +119,20 @@ class MefangApi {
   constructor(core) {
     this.Http = core.$.http;
     this.UserData = new UserData(core);
+  }
+  addToSystemCalendar(courseData) {
+    const coachName = courseData.coach_info.name,
+      timestamp = courseData.course_info;
+    $calendar.create({
+      title: "健身💪",
+      startDate: new Date(timestamp.start),
+      endDate: new Date(timestamp.end),
+      hours: 1,
+      notes: `教练：${coachName}\n${coachName}`,
+      handler: resp => {
+        $console.info();
+      }
+    });
   }
   checkLoginStatus() {
     const tkid = this.UserData.getTkid(),
@@ -214,9 +278,6 @@ class MefangUi {
               break;
             case 1:
               this.Api.UserData.inputTkid();
-              break;
-            case 2:
-              this.getCurriculum();
               break;
             case 3:
               this.showMyCoashes();
@@ -442,6 +503,12 @@ class MefangUi {
               },
               {
                 title: `查看签到二维码`,
+                func: () => {
+                  this.showCheckinQrcode(item.id, item.book_id);
+                }
+              },
+              {
+                title: `写入日历`,
                 func: () => {
                   this.showCheckinQrcode(item.id, item.book_id);
                 }

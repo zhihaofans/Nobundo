@@ -7,7 +7,8 @@ class Example extends ModCore {
       modName: "例子",
       version: "6b",
       author: "zhihaofans",
-      coreVersion: 6
+      coreVersion: 6,
+      useSqlite: false
     });
     this.ModuleLoader = new ModuleLoader(this);
   }
