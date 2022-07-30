@@ -254,6 +254,49 @@ class ModLoader {
       $app.close();
     }
   }
+  autoRunMod() {
+    switch (true) {
+      case this.App.isWidgetEnv():
+        this.runWidgetMod();
+        break;
+      case this.App.isAppEnv():
+        $ui.render({
+          props: {
+            title: this.App.AppInfo.name
+          },
+          views: [
+            {
+              type: "list",
+              props: {
+                data: this.getModList().id.map(modId => {
+                  const thisMod = this.getModList().mods[modId];
+                  if (thisMod.checkCoreVersion() == 0) {
+                    return thisMod.MOD_INFO.NAME;
+                  } else {
+                    return thisMod.MOD_INFO.NAME + "(待更新)";
+                  }
+                })
+              },
+              layout: $layout.fill,
+              events: {
+                didSelect: (sender, indexPath, data) => {
+                  this.runMod(this.getModList().id[indexPath.row]);
+                }
+              }
+            }
+          ]
+        });
+        break;
+      case this.App.isActionEnv() || this.App.isSafariEnv():
+        this.runContextMod();
+        break;
+      case this.App.isKeyboardEnv():
+        this.runKeyboardMod();
+        break;
+      default:
+        $app.close();
+    }
+  }
 }
 class ModModule {
   constructor({ modId, coreId, moduleId, moduleName, author, version }) {
