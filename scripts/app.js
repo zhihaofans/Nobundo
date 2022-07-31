@@ -15,8 +15,7 @@ const AppKernel = require("../Core.js/app"),
     "action_extension.js",
     "datacenter.js",
     "content_box.js",
-    "keyboard.js",
-    "chinese_zodiac.js"
+    "keyboard.js"
   ];
 
 class App extends AppKernel {
