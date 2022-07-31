@@ -20,7 +20,11 @@ class CourseData {
     time_start,
     time_end,
     user_id,
-    loc_name
+    loc_name,
+    status,
+    created_at,
+    end_time,
+    updated_at
   }) {
     this.coach_info = {
       id: coach_id,
@@ -28,8 +32,12 @@ class CourseData {
       avatar: coach_avatar
     };
     this.course_info = {
+      id: course_id,
+      name: course_name,
+      img: course_img,
       class_id: id,
       book_id,
+      content: course_content,
       memo,
       timestamp: {
         start: start_timestamp,
@@ -38,17 +46,20 @@ class CourseData {
       datetime: {
         date,
         start_time: time_start,
-        end_time: time_end
+        end_time: time_end,
+        text: `${date} ${time_start}-${time_end}`
       },
       location: loc_name,
-      course_id,
-      name: course_name,
-      img: course_img,
-      content: course_content
+      order_time: created_at,
+      update_time: updated_at,
+      finish_time: end_time,
+      status
     };
     this.user_info = {
       id: user_id
     };
+    this.isFinish = status == 3;
+    this.isAvailable = status == 1;
   }
 }
 class UserData {
@@ -224,6 +235,102 @@ class MefangApi {
     });
     $console.info(result);
     return result;
+  }
+  async getMyCoashesList() {
+    const resultData = await this.getFightBox({
+        a: "book/list",
+        d: {
+          more: {
+            start_pos: 0,
+            pagesize: 20
+          }
+        }
+      }),
+      result = resultData.result,
+      resultList = result.list;
+    $console.info(resultData);
+    if (resultData.errcode != 0) {
+      return {
+        success: false,
+        code: resultData.errcode,
+        message: resultData.memo
+      };
+    } else if (result.success == false) {
+      return {
+        success: false,
+        message: `result.success:${result.success}`
+      };
+    } else if (resultList == undefined || resultList.length == 0) {
+      return {
+        success: true,
+        count: 0,
+        data: []
+      };
+    } else {
+      resultList.map(coashes => {
+        //$console.warn(coashes);
+        const {
+            id,
+            date,
+            time_start,
+            time_end,
+            start_timestamp,
+            end_timestamp,
+            course_name,
+            course_id,
+            course_img,
+            course_content,
+            book_id,
+            coach_name,
+            coach_id,
+            coach_avatar,
+            status,
+            memo,
+            loc_name,
+            user_id
+          } = coashes,
+          thisCourseData = {
+            id,
+            date,
+            time: time_start + "-" + time_end,
+            dateTime: `${date} ${time_start}-${time_end}`,
+            course: {
+              id: course_id,
+              title: course_name
+            },
+            coach: {
+              id: coach_id,
+              name: coach_name
+            },
+            status,
+            title: memo,
+            book_id
+          },
+          courseData = new CourseData({
+            id,
+            coach_name,
+            coach_id,
+            coach_avatar,
+            book_id,
+            course_id,
+            course_name,
+            course_img,
+            course_content,
+            memo,
+            start_timestamp,
+            end_timestamp,
+            date,
+            time_start,
+            time_end,
+            user_id,
+            loc_name
+          });
+        if (coashes.status == 1) {
+          $console.warn(thisCourseData);
+          //          listData_myCoashes.push(thisCourseData);
+        }
+      });
+    }
   }
   async getReservedTimesheet(coachId, dateStart, dateEnd) {
     const result = await this.getFightBox({
@@ -479,7 +586,7 @@ class MefangUi {
               title: memo,
               book_id
             };
-          if (coashes.status == 1) {
+          if (coashes.status != 9999) {
             $console.warn(thisCourseData);
             listData_myCoashes.push(thisCourseData);
           }
@@ -510,7 +617,7 @@ class MefangUi {
               {
                 title: `写入日历`,
                 func: () => {
-                  this.showCheckinQrcode(item.id, item.book_id);
+                  this.Api.addToSystemCalendar();
                 }
               }
             ]
