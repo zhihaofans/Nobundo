@@ -1,4 +1,4 @@
-const { CoreModule } = require("../../Core.js/core"),
+const { ModModule } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 class UserData {
@@ -23,9 +23,9 @@ class UserData {
 }
 
 class UserLogin {
-  constructor(core) {
-    this.Http = core.Http;
-    this.Data = new UserData(core.Keychain);
+  constructor(mod) {
+    this.Http = mod.Http;
+    this.Data = new UserData(mod.Keychain);
   }
   isLogin() {
     return this.Data.cookie().length > 0;
@@ -115,10 +115,10 @@ class UserLogin {
   }
 }
 class UserInfo {
-  constructor(coreModule) {
-    this.Module = coreModule;
-    this.Http = coreModule.Core.Http;
-    this.Data = new UserData(coreModule.Core.Keychain);
+  constructor(modModule) {
+    this.Module = modModule;
+    this.Http = modModule.Mod.Http;
+    this.Data = new UserData(modModule.Mod.Keychain);
   }
   async AddToView(bvid) {
     const cookie = this.Module.getCookie(),
@@ -126,7 +126,7 @@ class UserInfo {
       header = { cookie },
       url = "https://api.bilibili.com/x/v2/history/toview/add",
       timeout = 5,
-      resp = await this.Core.$.http.post({
+      resp = await this.http.post({
         url,
         header,
         timeout,
@@ -198,7 +198,7 @@ class UserInfo {
                           switch (idx) {
                             case 0:
                               try {
-                                this.Module.Core.ModuleLoader.getModule(
+                                this.Module.Mod.ModuleLoader.getModule(
                                   "bilibili.video"
                                 ).showVideoInfo(selectHistory.history.bvid);
                               } catch (error) {
@@ -303,7 +303,7 @@ class UserInfo {
                           switch (idx) {
                             case 0:
                               try {
-                                this.Module.Core.ModuleLoader.getModule(
+                                this.Module.Mod.ModuleLoader.getModule(
                                   "bilibili.video"
                                 ).showVideoInfo(selectVideo.bvid);
                               } catch (error) {
@@ -350,7 +350,7 @@ class UserInfo {
       header = { cookie },
       url = "https://api.bilibili.com/x/web-interface/nav",
       timeout = 5,
-      resp = await this.Core.$.http.get({
+      resp = await this.http.get({
         url,
         header,
         timeout
@@ -361,9 +361,9 @@ class UserInfo {
 }
 
 class Vip {
-  constructor(coreModule) {
-    this.Module = coreModule;
-    this.Core = coreModule.Core;
+  constructor(modModule) {
+    this.Module = modModule;
+    this.Mod = modModule.Mod;
   }
   async getPrivilegeStatus(listItem) {
     listItem.startLoading({
@@ -373,7 +373,7 @@ class Vip {
       header = { cookie },
       url = "https://api.bilibili.com/x/vip/privilege/my",
       timeout = 5,
-      resp = await this.Core.$.http.get({
+      resp = await this.Mod.Http.get({
         url,
         header,
         timeout
@@ -469,7 +469,7 @@ class Vip {
       bili_jct = cookie.bili_jct,
       url = `https://api.bilibili.com/x/vip/privilege/receive?type=${typeId}&csrf=${bili_jct}`,
       timeout = 5,
-      resp = await this.Core.$.http.post({
+      resp = await this.Mod.Http.post({
         url,
         header,
         timeout
@@ -489,8 +489,8 @@ class Vip {
   }
 }
 
-class BilibiliUser extends CoreModule {
-  constructor(core) {
+class BilibiliUser extends ModModule {
+  constructor(mod) {
     super({
       modId: "bilibili",
       moduleId: "bilibili.user",
@@ -498,8 +498,8 @@ class BilibiliUser extends CoreModule {
       version: "1"
       //author: "zhihaofans"
     });
-    this.Core = core;
-    this.Login = new UserLogin(core);
+    this.Mod = mod;
+    this.Login = new UserLogin(mod);
     this.Info = new UserInfo(this);
     this.Vip = new Vip(this);
   }

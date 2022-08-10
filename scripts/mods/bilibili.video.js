@@ -1,12 +1,12 @@
-const { CoreModule } = require("../../Core.js/core");
+const { ModModule } = require("../../Core.js/core");
 
 class VideoInfo {
-  constructor(coreModule) {
-    this.Module = coreModule;
-    this.Http = coreModule.Core.Http;
+  constructor(modModule) {
+    this.Module = modModule;
+    this.Http = modModule.Mod.Http;
   }
   async getVideoInfo(bvid = "BV17x411w7KC") {
-    const cookie = this.Module.Core.ModuleLoader.getModule(
+    const cookie = this.Module.Mod.ModuleLoader.getModule(
         "bilibili.user"
       ).getCookie(),
       url = `https://api.bilibili.com/x/web-interface/view?bvid=${bvid}`,
@@ -42,16 +42,16 @@ class VideoInfo {
   }
 }
 
-class BilibiliVideo extends CoreModule {
-  constructor(core) {
+class BilibiliVideo extends ModModule {
+  constructor(mod) {
     super({
       modId: "bilibili",
       moduleId: "bilibili.video",
       moduleName: "哔哩哔哩视频",
       version: "1"
     });
-    this.Core = core;
-    this.$ = core.$;
+    this.Mod = mod;
+    this.$ = mod.$;
     this.Info = new VideoInfo(this);
   }
   async showVideoInfo(bvid) {
@@ -90,7 +90,7 @@ class BilibiliVideo extends CoreModule {
               {
                 title: videoInfo.owner.mid,
                 func: () => {
-                  this.Core.biliLauncher.space(videoInfo.owner.mid);
+                  this.Mod.biliLauncher.space(videoInfo.owner.mid);
                 }
               },
               {
@@ -119,7 +119,7 @@ class BilibiliVideo extends CoreModule {
                         case 1:
                           try {
                             $console.warn("try downloading");
-                            this.Core.App.coreLoader.runModApi(
+                            this.Mod.App.ModLoader.runModApi(
                               "downloader",
                               "start_downloading",
                               { url: videoInfo.pic }

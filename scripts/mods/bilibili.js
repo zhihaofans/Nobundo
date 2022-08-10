@@ -29,10 +29,10 @@ class BilibiliLauncher {
 }
 
 class BilibiliApi {
-  constructor(core) {
-    this.Core = core;
-    this.$ = core.$;
-    this.Http = core.http;
+  constructor(mod) {
+    this.Mod = mod;
+    this.$ = mod.$;
+    this.Http = mod.Http;
   }
   getAppsecByAppkey(appkey) {
     const keyAndSec = {
@@ -83,10 +83,10 @@ class BilibiliApi {
 }
 
 class Main {
-  constructor(core) {
-    this.Core = core;
-    this.Video = this.Core.ModuleLoader.getModule("bilibili.video");
-    this.UserModule = this.Core.ModuleLoader.getModule("bilibili.user");
+  constructor(mod) {
+    this.Mod = mod;
+    this.Video = this.Mod.ModuleLoader.getModule("bilibili.video");
+    this.UserModule = this.Mod.ModuleLoader.getModule("bilibili.user");
     this.Vip = this.UserModule.Vip;
     this.isLoading = false;
   }
@@ -132,7 +132,7 @@ class Main {
             break;
         }
       };
-    listKit.pushString(this.Core.MOD_INFO.NAME, mainViewList, didSelect);
+    listKit.pushString(this.Mod.MOD_INFO.NAME, mainViewList, didSelect);
   }
 }
 
