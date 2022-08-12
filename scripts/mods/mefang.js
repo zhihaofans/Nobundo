@@ -237,7 +237,8 @@ class MefangApi {
     return result;
   }
   async getMyCoashesList() {
-    const resultData = await this.getFightBox({
+    const listData_myCoashes = [],
+      resultData = await this.getFightBox({
         a: "book/list",
         d: {
           more: {
@@ -271,41 +272,27 @@ class MefangApi {
         //$console.warn(coashes);
         const {
             id,
-            date,
-            time_start,
-            time_end,
-            start_timestamp,
-            end_timestamp,
-            course_name,
-            course_id,
-            course_img,
-            course_content,
-            book_id,
             coach_name,
             coach_id,
             coach_avatar,
-            status,
+            book_id,
+            course_id,
+            course_name,
+            course_img,
+            course_content,
             memo,
-            loc_name,
-            user_id
-          } = coashes,
-          thisCourseData = {
-            id,
+            start_timestamp,
+            end_timestamp,
             date,
-            time: time_start + "-" + time_end,
-            dateTime: `${date} ${time_start}-${time_end}`,
-            course: {
-              id: course_id,
-              title: course_name
-            },
-            coach: {
-              id: coach_id,
-              name: coach_name
-            },
+            time_start,
+            time_end,
+            user_id,
+            loc_name,
             status,
-            title: memo,
-            book_id
-          },
+            created_at,
+            end_time,
+            updated_at
+          } = coashes,
           courseData = new CourseData({
             id,
             coach_name,
@@ -323,13 +310,22 @@ class MefangApi {
             time_start,
             time_end,
             user_id,
-            loc_name
+            loc_name,
+            status,
+            created_at,
+            end_time,
+            updated_at
           });
         if (coashes.status == 1) {
-          $console.warn(thisCourseData);
-          //          listData_myCoashes.push(thisCourseData);
+          $console.warn(courseData);
+          listData_myCoashes.push(courseData);
         }
       });
+      return {
+        success: true,
+        count: listData_myCoashes.length || 0,
+        data: listData_myCoashes
+      };
     }
   }
   async getReservedTimesheet(coachId, dateStart, dateEnd) {
