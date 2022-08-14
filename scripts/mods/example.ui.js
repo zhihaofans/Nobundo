@@ -1,4 +1,4 @@
-const { CoreModule } = require("../../Core.js/core"),
+const { ModModule } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 class Main {
@@ -6,10 +6,10 @@ class Main {
     this.Mod = mod;
     this.$ = this.Mod.$;
   }
-  test() {
+  multListTest() {
     $ui.push({
       props: {
-        title: ""
+        title: "example 1"
       },
       views: [
         {
@@ -97,11 +97,11 @@ class Main {
     });
   }
   init() {
-    const mainViewList = ["example 1"],
+    const mainViewList = ["example 1", "example 2"],
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
           case 0:
-            this.test();
+            this.multListTest();
             break;
           default:
             $ui.alert({
@@ -111,9 +111,7 @@ class Main {
                 {
                   title: "OK",
                   disabled: false, // Optional
-                  handler: () => {
-                    this.test();
-                  }
+                  handler: () => {}
                 }
               ]
             });
@@ -123,7 +121,7 @@ class Main {
   }
 }
 
-class ExampleModule extends CoreModule {
+class ExampleModule extends ModModule {
   constructor(mod) {
     super({
       modId: "example",
