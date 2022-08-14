@@ -143,6 +143,104 @@ class ListView {
   setEstimatedRowHeight(estimatedRowHeight) {
     this.ESTIMATED_ROW_HEIGHT = estimatedRowHeight || 10;
   }
+  pushTwoLineList({
+    id,
+    title,
+    navButtons,
+    items = [
+      {
+        title: "title",
+        subTitle: "subTitle"
+      }
+    ],
+    handler = (section, row,data) => {
+      $console.info({
+        section,
+        row,data
+      });
+    }
+  }) {
+    $ui.push({
+      props: {
+        id,
+        title,
+        navButtons
+      },
+      views: [
+        {
+          type: "list",
+          props: {
+            autoRowHeight: this.AUTO_ROW_HEIGHT,
+            estimatedRowHeight: this.ESTIMATED_ROW_HEIGHT,
+            template: {
+              props: {
+                bgcolor: $color("clear")
+              },
+              views: [
+                {
+                  type: "stack",
+                  props: {
+                    axis: $stackViewAxis.vertical,
+                    spacing: 5,
+                    distribution: $stackViewDistribution.fillProportionally,
+                    stack: {
+                      views: [
+                        {
+                          type: "label",
+                          props: {
+                            id: "title",
+
+                            align: $align.left,
+                            font: $font(24)
+                          },
+                          layout: make => {
+                            make.height.equalTo(24);
+                            make.left.top.right.inset(5);
+                          }
+                        },
+                        {
+                          type: "label",
+                          props: {
+                            id: "subTitle",
+
+                            align: $align.left,
+                            font: $font(12),
+                            textColor: $color("gray")
+                          },
+                          layout: make => {
+                            make.height.equalTo(40);
+                            make.top.left.right.bottom.inset(2);
+                            //                            make.top.equalTo($("labelTitle").bottom);
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  layout: $layout.fill
+                }
+              ]
+            },
+            data: items.map(item => {
+              return {
+                title: {
+                  text: item.title
+                },
+                subTitle: {
+                  text: item.subTitle
+                }
+              };
+            })
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (sender, indexPath, data) => {
+              handler(indexPath.section, indexPath.row,data);
+            }
+          }
+        }
+      ]
+    });
+  }
 }
 class UiKit {
   constructor() {}
