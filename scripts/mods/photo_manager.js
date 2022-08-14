@@ -81,23 +81,52 @@ class PhotoManagerView {
         $ui.loading(false);
         $ui.push({
           props: {
-            title: ""
+            title: "最新10张照片"
           },
           views: [
             {
-              type: "list",
+              type: "matrix",
               props: {
-                data: imageStrList
+                columns: 3,
+                itemHeight: 50,
+                spacing: 5,
+                template: {
+                  props: {},
+                  views: [
+                    {
+                      type: "stack",
+                      props: {
+                        axis: $stackViewAxis.vertical,
+                        spacing: 5,
+                        distribution: $stackViewDistribution.fillProportionally,
+                        stack: {
+                          views: [
+                            {
+                              type: "image",
+                              props: {
+                                id: "image"
+                              },
+                              layout: (make, view) => {
+                                make.center.equalTo(view.super);
+                                make.size.equalTo($size(50, 50));
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      layout: $layout.fill
+                    }
+                  ]
+                },
+                data: images.map(img => {
+                  return {
+                    image: {
+                      data: img.png
+                    }
+                  };
+                })
               },
-              layout: $layout.fill,
-              events: {
-                didSelect: (sender, indexPath, data) => {
-                  const section = indexPath.section,
-                    row = indexPath.row,
-                    thisImage = images[row];
-                  $console.info(thisImage);
-                }
-              }
+              layout: $layout.fill
             }
           ]
         });
