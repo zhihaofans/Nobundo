@@ -1,26 +1,43 @@
 const { ModModule } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
+  next = require("../../Core.js/next"),
   listKit = new uiKit.ListKit();
 class Main {
   constructor(mod) {
     this.Mod = mod;
     this.$ = this.Mod.$;
+    this.listViewKit = new next.ListView();
   }
   multListTest() {
+    const listData = [
+      {
+        title: "标题1",
+        subTitle: "2022/07/22 内容1"
+      },
+      {
+        title: "标题2",
+        subTitle: "内容2"
+      }
+    ];
+    this.listViewKit.pushTwoLineList({
+      title: "example 1",
+      items: listData
+    });
+  }
+  gridViewTest() {
     $ui.push({
       props: {
-        title: "example 1"
+        title: ""
       },
       views: [
         {
-          type: "list",
+          type: "matrix",
           props: {
+            columns: 3,
+            itemHeight: 100,
+            spacing: 5,
             template: {
-              props: {
-                bgcolor: $color("clear"),
-                autoRowHeight: true,
-                estimatedRowHeight: 100
-              },
+              props: {},
               views: [
                 {
                   type: "stack",
@@ -31,31 +48,26 @@ class Main {
                     stack: {
                       views: [
                         {
-                          type: "label",
+                          type: "image",
                           props: {
-                            id: "labelTitle",
-
-                            align: $align.left,
-                            font: $font(24)
+                            id: "icon"
                           },
-                          layout: make => {
-                            make.height.equalTo(24);
-                            make.left.top.right.inset(5);
+                          layout: function (make, view) {
+                            make.center.equalTo(view.super);
+                            make.size.equalTo($size(50, 50));
                           }
                         },
                         {
                           type: "label",
                           props: {
-                            id: "labelData",
+                            id: "label",
 
                             align: $align.left,
-                            font: $font(12),
-                            textColor: $color("gray")
+                            font: $font(24)
                           },
                           layout: make => {
-                            make.height.equalTo(40);
-                            make.top.left.right.bottom.inset(2);
-                            //                            make.top.equalTo($("labelTitle").bottom);
+                            make.height.equalTo(20);
+                            make.left.top.right.inset(0);
                           }
                         }
                       ]
@@ -67,31 +79,41 @@ class Main {
             },
             data: [
               {
-                labelTitle: {
-                  text: "标题1"
+                label: {
+                  text: "example 1"
                 },
-                labelData: {
-                  text: "2022/07/22 内容1"
+                icon: {
+                  src:
+                    "https://images.apple.com/v/ios/what-is/b/images/performance_large.jpg"
                 }
               },
               {
-                labelTitle: {
-                  text: "标题2"
+                label: {
+                  text: "example 1"
                 },
-                labelData: {
-                  text: "内容2"
+                icon: {
+                  src:
+                    "https://images.apple.com/v/ios/what-is/b/images/performance_large.jpg"
+                }
+              },
+              {
+                icon: {
+                  icon: $icon("005", $color("red"), $size(12, 12))
+                }
+              },
+              {
+                label: {
+                  text: "example 1"
+                }
+              },
+              {
+                label: {
+                  text: "example 1"
                 }
               }
             ]
           },
-          layout: $layout.fill,
-          events: {
-            didSelect: (_sender, indexPath, data) => {
-              const section = indexPath.section,
-                row = indexPath.row;
-              $console.info(row);
-            }
-          }
+          layout: $layout.fill
         }
       ]
     });
@@ -102,6 +124,9 @@ class Main {
         switch (indexPath.row) {
           case 0:
             this.multListTest();
+            break;
+          case 1:
+            this.gridViewTest();
             break;
           default:
             $ui.alert({
