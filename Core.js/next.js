@@ -153,10 +153,11 @@ class ListView {
         subTitle: "subTitle"
       }
     ],
-    handler = (section, row,data) => {
+    handler = (section, row, data) => {
       $console.info({
         section,
-        row,data
+        row,
+        data
       });
     }
   }) {
@@ -234,7 +235,7 @@ class ListView {
           layout: $layout.fill,
           events: {
             didSelect: (sender, indexPath, data) => {
-              handler(indexPath.section, indexPath.row,data);
+              handler(indexPath.section, indexPath.row, data);
             }
           }
         }

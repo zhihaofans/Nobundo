@@ -4,6 +4,8 @@ class ModCore {
     app,
     modId,
     modName,
+    icon,
+    image,
     version,
     author,
     coreVersion,
@@ -21,7 +23,10 @@ class ModCore {
       CORE_VERSION: coreVersion,
       DATABASE_ID: modId,
       KEYCHAIN_DOMAIN: `nobundo.mods.${author}.${modId}`,
-      USE_SQLITE: useSqlite == true
+      USE_SQLITE: useSqlite == true,
+      ICON: icon,
+      IMAGE: image,
+      NEED_UPDATE: coreVersion != CORE_VERSION
     };
     this.SQLITE_FILE = this.App.DEFAULE_SQLITE_FILE;
     this.SQLITE =
@@ -48,7 +53,7 @@ class ModCore {
   }
 }
 class ModLoader {
-  constructor({ app, modDir }) {
+  constructor({ app, modDir, gridListMode = false }) {
     this.App = app;
     this.$ = this.App.$;
     this.MOD_DIR = modDir;
@@ -56,7 +61,8 @@ class ModLoader {
     this.CONFIG = {
       CONTEXT_MOD_ID: undefined,
       KEYBOARD_MOD_ID: undefined,
-      WIDGET_MOD_ID: undefined
+      WIDGET_MOD_ID: undefined,
+      GRID_LIST_MODE: gridListMode == true
     };
   }
   addMod(modCore) {
@@ -260,32 +266,37 @@ class ModLoader {
         this.runWidgetMod();
         break;
       case this.App.isAppEnv():
-        $ui.render({
-          props: {
-            title: this.App.AppInfo.name
-          },
-          views: [
-            {
-              type: "list",
-              props: {
-                data: this.getModList().id.map(modId => {
-                  const thisMod = this.getModList().mods[modId];
-                  if (thisMod.checkCoreVersion() == 0) {
-                    return thisMod.MOD_INFO.NAME;
-                  } else {
-                    return thisMod.MOD_INFO.NAME + "(待更新)";
+        if (this.CONFIG.GRID_LIST_MODE) {
+          this.showGridModList();
+        } else {
+          $ui.render({
+            props: {
+              title: this.App.AppInfo.name
+            },
+            views: [
+              {
+                type: "list",
+                props: {
+                  data: this.getModList().id.map(modId => {
+                    const thisMod = this.getModList().mods[modId];
+                    $console.info(thisMod.MOD_INFO.NEED_UPDATE);
+                    if (thisMod.MOD_INFO.NEED_UPDATE) {
+                      return thisMod.MOD_INFO.NAME + "(待更新)";
+                    } else {
+                      return thisMod.MOD_INFO.NAME;
+                    }
+                  })
+                },
+                layout: $layout.fill,
+                events: {
+                  didSelect: (sender, indexPath, data) => {
+                    this.runMod(this.getModList().id[indexPath.row]);
                   }
-                })
-              },
-              layout: $layout.fill,
-              events: {
-                didSelect: (sender, indexPath, data) => {
-                  this.runMod(this.getModList().id[indexPath.row]);
                 }
               }
-            }
-          ]
-        });
+            ]
+          });
+        }
         break;
       case this.App.isActionEnv() || this.App.isSafariEnv():
         this.runContextMod();
@@ -296,6 +307,84 @@ class ModLoader {
       default:
         $app.close();
     }
+  }
+  showGridModList() {
+    const modList = this.getModList();
+    $ui.render({
+      props: {
+        title: this.App.AppInfo.name
+      },
+      views: [
+        {
+          type: "matrix",
+          props: {
+            columns: 3,
+            waterfall: true,
+            itemHeight: 50,
+            spacing: 2,
+            template: {
+              props: {},
+              views: [
+                {
+                  type: "stack",
+                  props: {
+                    axis: $stackViewAxis.vertical,
+                    spacing: 5,
+                    distribution: $stackViewDistribution.fillProportionally,
+                    stack: {
+                      views: [
+                        {
+                          type: "image",
+                          props: {
+                            id: "image"
+                          },
+                          layout: (make, view) => {
+                            make.center.equalTo(view.super);
+                            make.size.equalTo($size(50, 50));
+                          }
+                        },
+                        {
+                          type: "label",
+                          props: {
+                            id: "name",
+
+                            align: $align.left,
+                            font: $font(12)
+                          },
+                          layout: make => {
+                            make.height.equalTo(20);
+                            make.left.top.right.inset(0);
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  layout: $layout.fill
+                }
+              ]
+            },
+            data: modList.id.map(modId => {
+              const mod = modList.mods[modId];
+              return {
+                image: {
+                  icon: mod.MOD_INFO.ICON,
+                  image: mod.MOD_INFO.IMAGE
+                },
+                name: {
+                  text: mod.MOD_INFO.NAME
+                }
+              };
+            })
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (sender, indexPath, data) => {
+              this.runMod(modList.id[indexPath.row]);
+            }
+          }
+        }
+      ]
+    });
   }
 }
 class ModModule {
