@@ -160,17 +160,17 @@ class ContentBoxView {
   }
   async init() {
     this.Api.setLatestSortMode(true);
-    const menuResult = await $ui.menu(["添加", "查看"]);
-    //menuResult.index , menuResult.title
-    switch (menuResult.index) {
-      case 0:
-        this.askToImportClipboard();
-        break;
-      case 1:
-        this.showContentList();
-        break;
-      default:
-    }
+    //    const menuResult = await $ui.menu(["添加", "查看"]);
+    //    switch (menuResult.index) {
+    //      case 0:
+    //        this.askToImportClipboard();
+    //        break;
+    //      case 1:
+    //        this.showContentList();
+    //        break;
+    //      default:
+    //    }
+    this.showContentList();
   }
   askToAddContent() {
     $input.text({
@@ -431,7 +431,22 @@ class ContentBox extends ModCore {
     this.View = new ContentBoxView(this);
   }
   run() {
-    this.View.init();
+    try {
+      this.View.init();
+    } catch (error) {
+      $console.error(error);
+      $ui.alert({
+        title: this.MOD_INFO.NAME + "初始化错误",
+        message: error.message,
+        actions: [
+          {
+            title: "OK",
+            disabled: false, // Optional
+            handler: () => {}
+          }
+        ]
+      });
+    }
   }
 
   runApi({ url, data, callback }) {
