@@ -25,9 +25,8 @@ class KeychainCore {
   }
 }
 class KeychainView {
-  constructor(core) {
-    this.Core = core;
-    this.Keychain = core.Keychain;
+  constructor(mod) {
+    this.Keychain = mod.Keychain;
   }
   init() {
     $input.text({

@@ -63,9 +63,9 @@ class CourseData {
   }
 }
 class UserData {
-  constructor(core) {
-    this.Core = core;
-    this.Keychain = core.Keychain;
+  constructor(mod) {
+    this.Mod = mod;
+    this.Keychain = mod.Keychain;
   }
   getHeader() {
     return {
@@ -127,9 +127,9 @@ class UserData {
 }
 
 class MefangApi {
-  constructor(core) {
-    this.Http = core.$.http;
-    this.UserData = new UserData(core);
+  constructor(mod) {
+    this.Http = mod.Http;
+    this.UserData = new UserData(mod);
   }
   addToSystemCalendar(courseData) {
     const coachName = courseData.coach_info.name,
@@ -357,10 +357,10 @@ class MefangApi {
 }
 
 class MefangUi {
-  constructor(core) {
-    this.Core = core;
-    this.$ = core.$;
-    this.Api = new MefangApi(core);
+  constructor(mod) {
+    this.Mod = mod;
+    this.$ = mod.$;
+    this.Api = new MefangApi(mod);
   }
   init() {
     const menuList = [
@@ -392,10 +392,10 @@ class MefangUi {
               $input.text({
                 type: $kbType.text,
                 placeholder: "教练id",
-                text: this.Core.Keychain.get("coash_timesheet_last_id"),
+                text: this.Mod.Keychain.get("coash_timesheet_last_id"),
                 handler: coashId => {
                   if (coashId.length > 0) {
-                    this.Core.Keychain.set("coash_timesheet_last_id", coashId);
+                    this.Mod.Keychain.set("coash_timesheet_last_id", coashId);
                   }
                   this.showCoachTimesheet(coashId);
                 }
