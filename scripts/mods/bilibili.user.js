@@ -1,5 +1,6 @@
 const { ModModule } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
+  next = require("../../Core.js/next"),
   listKit = new uiKit.ListKit();
 class UserData {
   constructor(keychain) {

@@ -2,9 +2,9 @@ const { ModCore } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 class DownloaderCore {
-  constructor(core) {
-    this.Core = core;
-    this.Http = core.Http;
+  constructor(mod) {
+    this.Mod = mod;
+    this.Http = mod.Http;
   }
   download({ url, header }) {}
   saveFile() {}
@@ -12,10 +12,11 @@ class DownloaderCore {
 }
 
 class Main {
-  constructor(core) {
-    this.Core = core;
-    this.$ = core.$;
-    this.Http = core.Http;
+  constructor(mod) {
+    this.Core = mod;
+    this.Mod = mod;
+    this.$ = mod.$;
+    this.Http = mod.Http;
     this.isShare = this.$.share.isAction();
   }
   init() {

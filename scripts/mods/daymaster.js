@@ -23,9 +23,9 @@ class DaoshuriKit {
   }
 }
 class Main {
-  constructor(core) {
-    this.Core = core;
-    this.$ = core.$;
+  constructor(mod) {
+    this.Mod = mod;
+    this.$ = mod.$;
     this.DSR = new DaoshuriKit();
   }
   init() {
@@ -38,7 +38,7 @@ class Main {
             break;
         }
       };
-    listKit.pushString(this.Core.MOD_NAME, mainViewList, didSelect);
+    listKit.pushString(this.Mod.MOD_NAME, mainViewList, didSelect);
   }
   async getPastDate() {
     const dateResult = await this.$.dateTime.pickDate();
@@ -82,7 +82,6 @@ class Daoshuri extends ModCore {
     });
   }
   run() {
-    $ui.success("run");
     const main = new Main(this);
     main.init();
   }

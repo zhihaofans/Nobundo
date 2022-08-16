@@ -1,7 +1,7 @@
 class ApiTest {
-  constructor(core) {
-    this.Core = core;
-    this.$ = core.$;
+  constructor(mod) {
+    this.Mod = mod;
+    this.$ = mod.$;
   }
   init() {
     this.pickImage();
@@ -55,7 +55,7 @@ class UiTest {
           },
           layout: $layout.fill,
           events: {
-            didSelect: (_sender, indexPath, _data) => {
+            didSelect: (sender, indexPath, data) => {
               const section = indexPath.section;
               const row = indexPath.row;
             }
@@ -84,7 +84,7 @@ class v2_19_0 {
           },
           layout: $layout.fill,
           events: {
-            didSelect: (_sender, indexPath, _data) => {
+            didSelect: (sender, indexPath, data) => {
               switch (indexPath.row) {
                 case 0:
                   this.keychain();
@@ -116,7 +116,7 @@ class v2_19_0 {
           },
           layout: $layout.fill,
           events: {
-            didSelect: (_sender, indexPath, _data) => {
+            didSelect: (sender, indexPath, data) => {
               switch (indexPath.row) {
                 case 0:
                   $input.text({
@@ -192,7 +192,7 @@ class v2_19_0 {
                           },
                           layout: $layout.fill,
                           events: {
-                            didSelect: (_sender, indexPath, _data) => {
+                            didSelect: (sender, indexPath, data) => {
                               const thisKey = keys[indexPath.row];
                               $input.text({
                                 type: $kbType.text,
@@ -233,13 +233,12 @@ class v2_19_0 {
     $define({
       type: "MyHelper",
       classEvents: {
-        open: function (scheme) {
+        open: scheme => {
           const url = $objc("NSURL").invoke("URLWithString", scheme);
           $objc("UIApplication").invoke("sharedApplication.openURL", url);
         }
       }
     });
-
     $ui.render({
       views: [
         {
@@ -249,12 +248,12 @@ class v2_19_0 {
             titleColor: $color("#FFFFFF").ocValue().jsValue(),
             title: "WeChat"
           },
-          layout: function (make, view) {
+          layout: (make, view) => {
             make.center.equalTo(view.super);
             make.size.equalTo($size(100, 32));
           },
           events: {
-            tapped: function (sender) {
+            tapped: sender => {
               $objc("MyHelper").invoke("open", "weixin://");
             }
           }
@@ -298,8 +297,8 @@ const { ModCore } = require("../../Core.js/core"),
   ];
 
 class Main {
-  constructor(core) {
-    this.Core = core;
+  constructor(mod) {
+    this.Mod = mod;
   }
   init() {
     const main_view_list = versionList.map(v =>
@@ -308,11 +307,11 @@ class Main {
       didSelect = (sender, indexPath, data) => {
         const thisVer = versionList[indexPath.row],
           versionClass = new thisVer.classObject(
-            thisVer.needCore == true ? this.Core : undefined
+            thisVer.needCore == true ? this.Mod : undefined
           );
         versionClass[thisVer.index]();
       };
-    listKit.pushString(this.Core.MOD_NAME, main_view_list, didSelect);
+    listKit.pushString(this.Mod.MOD_NAME, main_view_list, didSelect);
   }
 }
 

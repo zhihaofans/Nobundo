@@ -32,14 +32,14 @@ class KeyBoard extends ModCore {
           props: {
             data: [
               {
-                title: "test",
+                title: "键盘模式",
                 rows: ["test"]
               }
             ]
           },
           layout: $layout.fill,
           events: {
-            didSelect: (_sender, indexPath, _data) => {
+            didSelect: (sender, indexPath, data) => {
               const row = indexPath.row;
             }
           }

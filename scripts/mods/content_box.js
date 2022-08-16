@@ -5,7 +5,7 @@ class ContentData {
     this.id = id;
     this.timestamp = timestamp;
     this.title = title;
-    this.type = type;
+    this.type = type; //text,image,link
     this.tag = tag;
     this.data = data;
     this.otherData = otherData;
@@ -21,7 +21,7 @@ class Database {
   }
   addContentItem({ id, timestamp, title, type, tag, data, otherData }) {
     const sql =
-        type == "text"
+        type == "text" || type == "link"
           ? `INSERT INTO ${this.SQL_TABLE_ID.CONTENT_LIST} (id, timestamp, title, type, tag, text_data, other_data) values(?, ?, ?, ?, ?, ?, ?)`
           : `INSERT INTO ${this.SQL_TABLE_ID.CONTENT_LIST} (id, timestamp, title, type, tag, blob_data, other_data) values(?, ?, ?, ?, ?, ?, ?)`,
       args = [id, timestamp, title, type, tag, data, otherData],
@@ -56,11 +56,10 @@ class ContentBoxApi {
     this.DB.createContentListTable();
     this.LASTEST_SORT = false;
   }
-  addContent({ title, data, type = "text" }) {
+  addContent({ title, data, type = "text", otherData = "{}" }) {
     const timestamp = this.$.dateTime.getUnixTime(),
       id = `${$text.uuid}-${timestamp}`,
       tag = "[]",
-      otherData = "{}",
       sqlResult = this.DB.addContentItem({
         id,
         timestamp,
@@ -87,6 +86,7 @@ class ContentBoxApi {
       });
     }
   }
+  addLinkContent({ title, link, link_type }) {}
   deleteContent(contentItem) {
     $ui.alert({
       title: "确定删除吗？",

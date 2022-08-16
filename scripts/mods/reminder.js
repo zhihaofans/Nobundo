@@ -129,9 +129,9 @@ class ReminderLib {
 }
 
 class Main {
-  constructor(core) {
-    this.Core = core;
-    this.$ = core.$;
+  constructor(mod) {
+    this.Mod = mod;
+    this.$ = mod.$;
     this.ReminderLib = new ReminderLib();
   }
   init() {
@@ -158,7 +158,7 @@ class Main {
             });
         }
       };
-    listKit.pushString(this.Core.MOD_NAME, mainViewList, didSelect);
+    listKit.pushString(this.Mod.MOD_NAME, mainViewList, didSelect);
   }
   async quickCreate() {
     const nowDate = new Date(),
