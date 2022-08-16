@@ -37,15 +37,6 @@ class ModCore {
         : undefined;
     this.Keychain = new this.Storage.Keychain(this.MOD_INFO.KEYCHAIN_DOMAIN);
   }
-  checkCoreVersion() {
-    if (CORE_VERSION === this.MOD_INFO.CORE_VERSION) {
-      return 0;
-    } else if (CORE_VERSION > this.MOD_INFO.CORE_VERSION) {
-      return -1;
-    } else if (CORE_VERSION < this.MOD_INFO.CORE_VERSION) {
-      return 1;
-    }
-  }
   initSQLite() {
     const SQLite = new this.Storage.SQLite(this.SQLITE_FILE);
     SQLite.createSimpleTable(this.MOD_INFO.DATABASE_ID);
@@ -77,30 +68,16 @@ class ModLoader {
         modCore.MOD_INFO.NAME.length > 0 &&
         modCore.MOD_INFO.AUTHOR.length > 0
       ) {
-        const needUpdateCore = modCore.checkCoreVersion();
-        if (needUpdateCore == 0) {
-          const modId = modCore.MOD_INFO.ID;
-          if (
-            this.MOD_LIST.id.indexOf(modId) < 0 &&
-            this.MOD_LIST.mods[modId] == undefined
-          ) {
-            this.MOD_LIST.id.push(modId);
-            this.MOD_LIST.mods[modId] = modCore;
-          } else {
-            $console.error(`modId(${modId})已存在`);
-          }
+        $console.error({ modId: modCore.MOD_INFO.ID });
+        const modId = modCore.MOD_INFO.ID;
+        if (
+          this.MOD_LIST.id.indexOf(modId) < 0 &&
+          this.MOD_LIST.mods[modId] == undefined
+        ) {
+          this.MOD_LIST.id.push(modId);
+          this.MOD_LIST.mods[modId] = modCore;
         } else {
-          $console.error({ modId: modCore.MOD_INFO.ID, needUpdateCore });
-          const modId = modCore.MOD_INFO.ID;
-          if (
-            this.MOD_LIST.id.indexOf(modId) < 0 &&
-            this.MOD_LIST.mods[modId] == undefined
-          ) {
-            this.MOD_LIST.id.push(modId);
-            this.MOD_LIST.mods[modId] = modCore;
-          } else {
-            $console.error(`modId(${modId})已存在`);
-          }
+          $console.error(`modId(${modId})已存在`);
         }
       } else {
         $console.error(3);
@@ -118,7 +95,21 @@ class ModLoader {
         $console.error({
           message: error.message,
           fileName,
-          name: "ModLoader.addModByList"
+          name: "ModLoader.addCoreByList"
+        });
+      }
+    });
+  }
+  addModsByList(fileNameList) {
+    fileNameList.map(fileName => {
+      try {
+        const thisMod = require(this.MOD_DIR + fileName);
+        this.addMod(new thisMod(this.App));
+      } catch (error) {
+        $console.error({
+          message: error.message,
+          fileName,
+          name: "ModLoader.addModsByList"
         });
       }
     });
@@ -237,13 +228,37 @@ class ModLoader {
     }
   }
   runKeyboardMod() {
-    const modId = this.CONFIG.CONTEXT_MOD_ID;
+    const modId = this.CONFIG.KEYBOARD_MOD_ID;
     if (modId && modId.length >= 0) {
       const thisMod = this.MOD_LIST.mods[modId];
       try {
         thisMod.runKeyboard();
       } catch (error) {
         $console.error(error);
+        $ui.render({
+          props: {
+            title: "初始化错误"
+          },
+          views: [
+            {
+              type: "list",
+              props: {
+                data: [
+                  {
+                    title: "错误原因",
+                    rows: [error.message]
+                  }
+                ]
+              },
+              layout: $layout.fill,
+              events: {
+                didSelect: (_sender, indexPath, _data) => {
+                  const row = indexPath.row;
+                }
+              }
+            }
+          ]
+        });
         $ui.alert({
           title: "runKeyboardMod.error",
           message: error.message,
@@ -257,7 +272,31 @@ class ModLoader {
         });
       }
     } else {
-      $app.close();
+      //      $app.close();
+      $ui.render({
+        props: {
+          title: "初始化错误"
+        },
+        views: [
+          {
+            type: "list",
+            props: {
+              data: [
+                {
+                  title: "错误原因",
+                  rows: ["未设置modId"]
+                }
+              ]
+            },
+            layout: $layout.fill,
+            events: {
+              didSelect: (_sender, indexPath, _data) => {
+                const row = indexPath.row;
+              }
+            }
+          }
+        ]
+      });
     }
   }
   autoRunMod() {

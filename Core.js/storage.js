@@ -357,6 +357,12 @@ class SQLite {
       return undefined;
     }
   }
+  getError(sqlResult) {
+    return {
+      code: sqlResult.code,
+      message: sqlResult.localizedDescription
+    };
+  }
 }
 
 module.exports = {

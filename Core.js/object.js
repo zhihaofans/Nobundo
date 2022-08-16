@@ -1,10 +1,11 @@
-const __VERSION__ = 1;
+const __VERSION__ = 2;
 class Result {
-  constructor({ success, code, data, error_message }) {
+  constructor({ success, code, data, error_message, message }) {
     this.success = success ?? false;
     this.data = data;
     this.code = code ?? -1;
-    this.error_message = success ? undefined : error_message;
+    this.error_message = success ? undefined : error_message || message;
+    this.message = message;
   }
 }
 class UserException {
