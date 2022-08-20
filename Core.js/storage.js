@@ -162,7 +162,6 @@ class Keychain {
     return $keychain.remove(key, this.DOMAIN);
   }
 }
-
 class Prefs {
   constructor() {}
   getData(key) {
@@ -175,13 +174,40 @@ class Prefs {
     return $prefs.all();
   }
 }
+class ModSQLite {
+  constructor(dataBaseFile, tableId) {
+    this.DATABASE_FILE = dataBaseFile;
+    this.TABLE_ID = tableId;
+    this.SQLITE = new SQLite(this.DATABASE_FILE);
+  }
+  hasTable() {
+    return this.SQLITE.hasTable(this.TABLE_ID);
+  }
+  createTable() {
+    this.SQLITE.createSimpleTable(this.TABLE_ID);
+  }
+  getItem(key) {
+    return this.SQLITE.getSimpleData(this.TABLE_ID, key);
+  }
+  setItem(key, value) {
+    return this.SQLITE.setSimpleData(this.TABLE_ID, key, value);
+  }
+  deleteItem(key) {
+    const sql = `DELETE FROM ${this.TABLE_ID} WHERE key=${key}`;
+    return this.SQLITE.update(sql);
+  }
+  getError(sqlResult) {
+    return this.SQLITE.getError(sqlResult);
+  }
+}
 
 class SQLite {
-  constructor(_dataBaseFile) {
-    this.DATABASEFILE = _dataBaseFile;
+  constructor(dataBaseFile) {
+    this.DATABASEFILE = dataBaseFile;
   }
   hasTable(tableId) {
     const result = this.query(`SELECT * FROM ${tableId}`);
+    $console.info(this.getError(result));
     if (result.error) {
       $console.error(result.error);
     }
@@ -351,16 +377,19 @@ class SQLite {
       if (value) {
         this.setSimpleData(table, sql_key, value.toString());
       }
-      return this.getSimpleData(table, sql_key) || undefined;
+      return this.getSimpleData(table, sql_key);
     } catch (error) {
       $console.error(`SQLite.auto:${error.message}`);
       return undefined;
     }
   }
   getError(sqlResult) {
+    const isError =
+      sqlResult.result == undefined || sqlResult.error != undefined;
     return {
-      code: sqlResult.code,
-      message: sqlResult.localizedDescription
+      error: isError,
+      code: isError ? sqlResult.error.code : undefined,
+      message: isError ? sqlResult.error.localizedDescription : "success"
     };
   }
 }
@@ -371,6 +400,7 @@ module.exports = {
   File,
   Icloud,
   Keychain,
+  ModSQLite,
   Prefs,
   SQLite
 };
