@@ -2,9 +2,9 @@ const { ModCore } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 class Main {
-  constructor(core) {
-    this.Core = core;
-    this.Http = core.Http;
+  constructor(mod) {
+    this.Mod = mod;
+    this.Http = mod.Http;
     this.keychainId = {
       apiKey: "apikey",
       nextseed: "nextseed"
@@ -43,10 +43,10 @@ class Main {
     const nextSeedId = this.keychainId.needseed,
       query = `id%3A5type:png`,
       sorting = `random`,
-      randomSeed = this.Core.Keychain.get(this.keychainId.needseed) || `XekqJ6`,
+      randomSeed = this.Mod.Keychain.get(this.keychainId.needseed) || `XekqJ6`,
       page = 1,
       purity = "111",
-      api_key = this.Core.Keychain.get(this.keychainId.apiKey) || "",
+      api_key = this.Mod.Keychain.get(this.keychainId.apiKey) || "",
       url = `https://wallhaven.cc/api/v1/search?q=${query}&sorting=${sorting}&seed=${randomSeed}&page=${page}&purity=${purity}&categories=${categories}&apikey=${api_key}`,
       httpResult = await this.Http.get(url);
     $console.warn(httpResult);
@@ -63,7 +63,7 @@ class Main {
         apiMeta = httpData.meta,
         nextRandomSeed = apiMeta.seed;
       $console.info(`nextRandomSeed:${nextRandomSeed}`);
-      this.Core.Keychain.set(
+      this.Mod.Keychain.set(
         this.keychainId.needseed,
         nextRandomSeed || randomSeed
       );
@@ -100,8 +100,9 @@ class Wallhaven extends ModCore {
       modName: "Wallhaven",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 6
+      coreVersion: 7
     });
+    this.$ = app.$;
   }
   run() {
     const main = new Main(this);

@@ -78,8 +78,9 @@ class Daoshuri extends ModCore {
       modName: "倒数日",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 6
+      coreVersion: 7
     });
+    this.$ = app.$;
   }
   run() {
     const main = new Main(this);

@@ -118,8 +118,9 @@ class UserLogin {
 class UserInfo {
   constructor(modModule) {
     this.Module = modModule;
-    this.Http = modModule.Mod.Http;
-    this.Data = new UserData(modModule.Mod.Keychain);
+    this.Mod = modModule.Mod;
+    this.Http = this.Mod.Http;
+    this.Data = new UserData(this.Mod.Keychain);
   }
   async AddToView(bvid) {
     const cookie = this.Module.getCookie(),
@@ -304,7 +305,7 @@ class UserInfo {
                           switch (idx) {
                             case 0:
                               try {
-                                this.Module.Mod.ModuleLoader.getModule(
+                                this.Mod.ModuleLoader.getModule(
                                   "bilibili.video"
                                 ).showVideoInfo(selectVideo.bvid);
                               } catch (error) {

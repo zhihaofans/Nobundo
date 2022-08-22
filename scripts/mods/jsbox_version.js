@@ -1,13 +1,12 @@
 class ApiTest {
   constructor(mod) {
-    this.Mod = mod;
-    this.$ = mod.$;
+    this.Http = mod.Http;
   }
   init() {
     this.pickImage();
   }
   async httpHead() {
-    const result = await this.$.http.head({
+    const result = await this.Http.head({
       url: "https://www.httpbin.org/get"
     });
     $console.warn(result.response);
@@ -323,8 +322,11 @@ class Version extends ModCore {
       modName: "JSBox新功能测试",
       version: "3",
       author: "zhihaofans",
-      coreVersion: 6
+      coreVersion: 7
     });
+    this.$ = app.$;
+    this.Http = app.$.http;
+    this.Storage = app.Storage;
   }
   run() {
     const main = new Main(this);

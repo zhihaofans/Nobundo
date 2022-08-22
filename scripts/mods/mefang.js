@@ -765,8 +765,11 @@ class Mefang extends ModCore {
       modName: "么方运动",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 6
+      coreVersion: 7
     });
+    this.$ = app.$;
+    this.Http = app.$.http;
+    this.Storage = app.Storage;
     this.ui = new MefangUi(this);
   }
   run() {

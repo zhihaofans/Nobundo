@@ -301,8 +301,9 @@ class Reminder extends ModCore {
       modName: "提醒事项",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 6
+      coreVersion: 7
     });
+    this.$ = app.$;
   }
   run() {
     $ui.success("run");

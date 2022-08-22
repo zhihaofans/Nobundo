@@ -263,6 +263,8 @@ class Downloader extends ModCore {
       coreVersion: 6
     });
     this.main = new Main(this);
+    this.$ = app.$;
+    this.Http = app.$.http;
   }
   run() {
     $ui.success("run");

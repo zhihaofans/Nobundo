@@ -154,7 +154,7 @@ class ContentBoxApi {
 class ContentBoxView {
   constructor(mod) {
     this.Mod = mod;
-    this.$ = this.Mod.$;
+    this.$ = mod.$;
     this.Api = new ContentBoxApi(this.Mod);
     this.ListView = new next.ListView();
   }
@@ -426,13 +426,14 @@ class ContentBox extends ModCore {
       version: "1",
       author: "zhihaofans",
       useSqlite: false,
-      coreVersion: 6
+      coreVersion: 7
     });
-    this.View = new ContentBoxView(this);
+    this.$ = app.$;
+    this.Storage = app.Storage;
   }
   run() {
     try {
-      this.View.init();
+      new ContentBoxView(this).View.init();
     } catch (error) {
       $console.error(error);
       $ui.alert({

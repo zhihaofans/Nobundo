@@ -144,8 +144,11 @@ class Bilibili extends ModCore {
       modName: "哔哩哔哩",
       version: "5b",
       author: "zhihaofans",
-      coreVersion: 6
+      coreVersion: 7
     });
+    this.$ = app.$;
+    this.Http = app.$.http;
+    this.Storage = app.Storage;
     this.ModuleLoader = new ModuleLoader(this);
     this.biliLauncher = new BilibiliLauncher();
   }

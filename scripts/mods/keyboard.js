@@ -3,6 +3,9 @@ class KeyBoardCore {
   constructor(mod) {
     this.Mod = mod;
   }
+  addText(text) {
+    $keyboard.insert(text);
+  }
 }
 
 class KeyBoard extends ModCore {
@@ -13,12 +16,16 @@ class KeyBoard extends ModCore {
       modName: "键盘输入法",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 6
+      coreVersion: 7
     });
     this.Core = new KeyBoardCore(this);
+    this.App = app;
+    this.$ = app.$;
+    this.Http = app.$.http;
+    this.Storage = app.Storage;
   }
   run() {
-    //    $ui.success("run");
+    //$ui.success("run");
     this.runKeyboard();
   }
   runKeyboard() {
@@ -33,7 +40,7 @@ class KeyBoard extends ModCore {
             data: [
               {
                 title: "键盘模式",
-                rows: ["test"]
+                rows: ["换行"]
               }
             ]
           },
@@ -41,6 +48,11 @@ class KeyBoard extends ModCore {
           events: {
             didSelect: (sender, indexPath, data) => {
               const row = indexPath.row;
+              switch (row) {
+                case 0:
+                  break;
+                default:
+              }
             }
           }
         }

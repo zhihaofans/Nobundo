@@ -401,8 +401,10 @@ class DataCenter extends ModCore {
       modName: "数据中心",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 6
+      coreVersion: 7
     });
+    this.$ = app.$;
+    this.Storage = app.Storage;
   }
   run() {
     const helperView = new HelperView(this);

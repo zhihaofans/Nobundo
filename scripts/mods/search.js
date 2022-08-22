@@ -64,7 +64,7 @@ class Search extends ModCore {
       modName: "搜索",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 6,
+      coreVersion: 7,
       useSqlite: false
     });
   }

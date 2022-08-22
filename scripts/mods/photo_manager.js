@@ -143,7 +143,7 @@ class PhotoManager extends ModCore {
       modName: "相册管理器",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 6,
+      coreVersion: 7,
       useSqlite: false
     });
     this.View = new PhotoManagerView(this);
