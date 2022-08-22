@@ -176,9 +176,8 @@ class Prefs {
 }
 class ModSQLite {
   constructor(dataBaseFile, tableId) {
-    this.DATABASE_FILE = dataBaseFile;
     this.TABLE_ID = tableId;
-    this.SQLITE = new SQLite(this.DATABASE_FILE);
+    this.SQLITE = new SQLite(dataBaseFile);
   }
   hasTable() {
     return this.SQLITE.hasTable(this.TABLE_ID);
@@ -260,7 +259,7 @@ class SQLite {
     this.init().query(sql, handler);
   }
   createSimpleTable(table_id) {
-    if (table_id) {
+    if (table_id != undefined && table_id.length > 0) {
       try {
         const db = this.init(),
           sql = `CREATE TABLE IF NOT EXISTS ${table_id}(id TEXT PRIMARY KEY NOT NULL, value TEXT)`;

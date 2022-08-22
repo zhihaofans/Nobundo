@@ -1,4 +1,4 @@
-const CORE_VERSION = 6;
+const CORE_VERSION = 7;
 class ModCore {
   constructor({
     app,
@@ -12,9 +12,6 @@ class ModCore {
     useSqlite
   }) {
     this.App = app;
-    this.Storage = this.App.Storage;
-    this.$ = this.App.$;
-    this.Http = this.$.http;
     this.MOD_INFO = {
       ID: modId,
       NAME: modName,
@@ -28,25 +25,28 @@ class ModCore {
       IMAGE: image,
       NEED_UPDATE: coreVersion != CORE_VERSION
     };
-    this.SQLITE_FILE = this.App.DEFAULE_SQLITE_FILE;
+    this.SQLITE_FILE = app.DEFAULE_SQLITE_FILE;
     this.SQLITE =
       this.MOD_INFO.USE_SQLITE &&
       this.MOD_INFO.DATABASE_ID.length > 0 &&
-      this.App.DEFAULE_SQLITE_FILE
+      app.DEFAULE_SQLITE_FILE
         ? this.initSQLite()
         : undefined;
-    this.Keychain = new this.Storage.Keychain(this.MOD_INFO.KEYCHAIN_DOMAIN);
+    this.Keychain = new app.Storage.Keychain(this.MOD_INFO.KEYCHAIN_DOMAIN);
   }
   initSQLite() {
-    const SQLite = new this.Storage.SQLite(this.SQLITE_FILE);
-    SQLite.createSimpleTable(this.MOD_INFO.DATABASE_ID);
+    const SQLite = new this.App.Storage.ModSQLite(
+      this.SQLITE_FILE,
+      this.MOD_INFO.DATABASE_ID
+    );
+    SQLite.createTable();
     return SQLite;
   }
 }
 class ModLoader {
   constructor({ app, modDir, gridListMode = false }) {
     this.App = app;
-    this.$ = this.App.$;
+    this.$ = app.$;
     this.MOD_DIR = modDir;
     this.MOD_LIST = { id: [], mods: {} };
     this.CONFIG = {
@@ -61,14 +61,14 @@ class ModLoader {
       this.$.isFunction(modCore.run) ||
       this.$.isFunction(modCore.runWidget) ||
       this.$.isFunction(modCore.runContext) ||
-      this.$.isFunction(modCore.runKeyboard)
+      this.$.isFunction(modCore.runKeyboard) ||
+      this.$.isFunction(modCore.runApi)
     ) {
       if (
         modCore.MOD_INFO.ID.length > 0 &&
         modCore.MOD_INFO.NAME.length > 0 &&
         modCore.MOD_INFO.AUTHOR.length > 0
       ) {
-        $console.error({ modId: modCore.MOD_INFO.ID });
         const modId = modCore.MOD_INFO.ID;
         if (
           this.MOD_LIST.id.indexOf(modId) < 0 &&
@@ -318,7 +318,6 @@ class ModLoader {
                 props: {
                   data: this.getModList().id.map(modId => {
                     const thisMod = this.getModList().mods[modId];
-                    $console.info(thisMod.MOD_INFO.NEED_UPDATE);
                     if (thisMod.MOD_INFO.NEED_UPDATE) {
                       return thisMod.MOD_INFO.NAME + "(待更新)";
                     } else {
