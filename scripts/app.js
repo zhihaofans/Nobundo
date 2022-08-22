@@ -13,7 +13,9 @@ const AppKernel = require("../Core.js/app"),
     "datacenter.js",
     "content_box.js",
     "keyboard.js",
-    "photo_manager.js"
+    "photo_manager.js",
+    "search.js",
+    "network_api.js"
   ];
 
 class App extends AppKernel {
