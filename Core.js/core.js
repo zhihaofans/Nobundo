@@ -194,7 +194,12 @@ class ModLoader {
     }
     return false;
   }
-  runModApi(modId, apiId, data) {
+  runModApi({ modId, apiId, data }) {
+    $console.info({
+      modId,
+      apiId,
+      data
+    });
     if (modId && modId.length >= 0) {
       const thisMod = this.MOD_LIST.mods[modId];
       if (thisMod != undefined && this.$.isFunction(thisMod.runApi)) {
@@ -206,15 +211,15 @@ class ModLoader {
         }
       } else {
         $console.error({
-          func: "runCoreApi",
-          message: "need coreId"
+          func: "runModApi",
+          message: "need mod"
         });
         return false;
       }
     } else {
       $console.error({
-        func: "runCoreApi",
-        message: "need coreId"
+        func: "runModApi",
+        message: "need mod id"
       });
       return false;
     }

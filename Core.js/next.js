@@ -29,6 +29,17 @@ class DateTime {
       }`;
     return result;
   }
+  getFullDateNumber() {
+    //返回20220101格式的日期
+    const dateTime = this.DATE_TIME,
+      year = dateTime.getFullYear(),
+      month = dateTime.getMonth() + 1,
+      date = dateTime.getDate(),
+      result = `${year}${month >= 10 ? month : "0" + month}${
+        date >= 10 ? date : "0" + date
+      }`;
+    return result;
+  }
   getFullDateTimeStr() {
     //返回2022-01-01 00:11:22格式的日期
     const dateTime = this.DATE_TIME,
