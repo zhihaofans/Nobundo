@@ -17,7 +17,7 @@ class Main {
     this.Mod = mod;
     this.$ = mod.$;
     this.Http = mod.Http;
-    this.isShare = this.$.share.isAction();
+    this.isShare = mod.App.isActionEnv();
   }
   init() {
     const mainViewList = ["开始下载"],

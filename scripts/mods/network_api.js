@@ -50,12 +50,12 @@ class NetworkApi extends ModCore {
     this.mxnzp = new MxnzpCore(this);
   }
   run() {
+    const apiKey = this.mxnzp.getApikey();
     $ui.menu({
       items: ["设置apikey"],
       handler: (title, idx) => {
         switch (idx) {
           case 0:
-            const apiKey = this.mxnzp.getApikey();
             $input.text({
               type: $kbType.text,
               placeholder: "app_id",
@@ -79,8 +79,6 @@ class NetworkApi extends ModCore {
                 }
               }
             });
-            break;
-          case 1:
             break;
           default:
         }
