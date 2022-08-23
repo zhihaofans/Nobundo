@@ -1,8 +1,14 @@
 const { ModCore } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
+  next = require("../../Core.js/next"),
   listKit = new uiKit.ListKit();
 class DaoshuriKit {
-  constructor() {}
+  constructor(mod) {
+    this.modLoader = mod.App.modLoader;
+    $console.info({
+      modLoader: this.modLoader.runModApi
+    });
+  }
   getIntervalDate(timestamp1, timestamp2) {
     const date1 = new Date(timestamp1),
       date2 = new Date(timestamp2),
@@ -21,12 +27,21 @@ class DaoshuriKit {
       intervalDays = Math.ceil(intervalTimestamp / 1000 / 60 / 60 / 24);
     return intervalDays;
   }
+  async getChineseCalendar(date) {
+    const apiResult = await this.modLoader.runModApi({
+      modId: "network_api",
+      apiId: "mxnzp.get_chinese_calendar",
+      data: date
+    });
+    return apiResult;
+  }
 }
 class Main {
   constructor(mod) {
     this.Mod = mod;
     this.$ = mod.$;
-    this.DSR = new DaoshuriKit();
+    this.DSR = new DaoshuriKit(mod);
+    this.dateTime = new next.DateTime(1);
   }
   init() {
     //TODO: 加个新增倒数事项的功能
@@ -43,10 +58,14 @@ class Main {
   async getPastDate() {
     const dateResult = await this.$.dateTime.pickDate();
     if (dateResult) {
+      this.dateTime.setDateTime(dateResult);
       const result = this.DSR.getIntervalDate(
-        new Date().getTime(),
-        dateResult.getTime()
-      );
+          new Date().getTime(),
+          dateResult.getTime()
+        ),
+        chineseCalendarData = await this.DSR.getChineseCalendar(
+          this.dateTime.getFullDateNumber()
+        );
       let text = "";
       if (result == 0) {
         text = "今天";
@@ -58,8 +77,8 @@ class Main {
         text = `未知结果：${result}`;
       }
       $ui.alert({
-        title: "结果",
-        message: text,
+        title: text,
+        message: JSON.stringify(chineseCalendarData),
         actions: [
           {
             title: "OK"
