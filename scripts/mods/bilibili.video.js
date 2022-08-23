@@ -119,11 +119,11 @@ class BilibiliVideo extends ModModule {
                         case 1:
                           try {
                             $console.warn("try downloading");
-                            this.Mod.App.ModLoader.runModApi(
-                              "downloader",
-                              "start_downloading",
-                              { url: videoInfo.pic }
-                            );
+                            this.Mod.App.ModLoader.runModApi({
+                              modId: "downloader",
+                              apiId: "start_downloading",
+                              data: { url: videoInfo.pic }
+                            });
                             $console.warn("finished try");
                           } catch (error) {
                             $console.error(error);
