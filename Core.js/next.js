@@ -264,6 +264,41 @@ class UiKit {
       }
     });
   }
+  showMenuList({ title = "MENU", itemList, handler = idx => {}, type }) {
+    //type: menu,push_list,popover
+    switch (type) {
+      case "menu":
+        $ui.menu({
+          items: itemList,
+          handler: (title, idx) => {
+            handler(idx);
+          }
+        });
+        break;
+      case "push_list":
+        $ui.push({
+          props: {
+            title
+          },
+          views: [
+            {
+              type: "list",
+              props: {
+                data: itemList
+              },
+              layout: $layout.fill,
+              events: {
+                didSelect: (sender, indexPath, data) => {
+                  handler(indexPath.row);
+                }
+              }
+            }
+          ]
+        });
+        break;
+      default:
+    }
+  }
 }
 
 module.exports = {

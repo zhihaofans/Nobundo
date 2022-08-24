@@ -10,9 +10,6 @@ function info(message) {
 function isFunction(func) {
   return func != undefined && typeof func == "function";
 }
-function toInt(data) {
-  return Number.parseInt(data);
-}
 function warn(message) {
   $console.warn(message);
 }
@@ -26,6 +23,17 @@ class Alert {
     });
   }
 }
+class ArrayKit {
+  constructor() {}
+  getLastItem(array) {
+    if (Array.isArray(array) && array.length > 0) {
+      return array[array.length - 1];
+    } else {
+      return undefined;
+    }
+  }
+}
+
 class Datetime {
   constructor() {}
   getUnixTime() {
@@ -185,6 +193,15 @@ class Icon {
     );
   }
 }
+class NumberKit {
+  constructor() {}
+  toInt(data) {
+    return Number.parseInt(data);
+  }
+  isNumber(data) {
+    return typeof data === "number";
+  }
+}
 
 class Share {
   constructor() {}
@@ -208,18 +225,19 @@ class Share {
   }
 }
 
-class Str {
+class StringKit {
   constructor() {}
   hasString(string) {
     return this.isString(string) && string.length > 0;
   }
   isString(string) {
-    return typeof string == "string";
+    return typeof string === "string";
   }
 }
 
 module.exports = {
   alert: new Alert(),
+  array: new ArrayKit(),
   base64Encode: $text.base64Encode,
   base64Decode: $text.base64Decode,
   dateTime: new Datetime(),
@@ -228,12 +246,13 @@ module.exports = {
   icon: new Icon(),
   info,
   isFunction,
-  isString: new Str().isString,
+  isString: new StringKit().isString,
+  isNumber: new NumberKit().isNumber,
   file: new File(),
   http: new Http(),
   share: new Share(),
-  string: new Str(),
-  toInt,
+  string: new StringKit(),
+  toInt: new NumberKit().toInt,
   urlEncode: $text.URLEncode,
   urlDecode: $text.URLDecode,
   warn
