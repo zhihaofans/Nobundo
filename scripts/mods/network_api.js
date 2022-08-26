@@ -26,11 +26,15 @@ class MxnzpCore {
       resp = await this.Mod.Http.get({
         url,
         header
-      });
+      }),
+      result = resp.data;
     $console.info({
       resp
     });
-    return resp.data;
+    if (result && result.code == 1) {
+      return resp.data.data;
+    }
+    return undefined;
   }
 }
 
