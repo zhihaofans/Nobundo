@@ -2,12 +2,69 @@ const { ModCore } = require("../../Core.js/core"),
   uiKit = require("../../Core.js/ui"),
   next = require("../../Core.js/next"),
   listKit = new uiKit.ListKit();
+class AnimalKit {
+  constructor(mod) {
+    this.Mod = mod;
+    this.$ = mod.$;
+    this.ANIMAL_LIST = [
+      "鼠",
+      "牛",
+      "虎",
+      "兔",
+      "龙",
+      "蛇",
+      "马",
+      "羊",
+      "猴",
+      "鸡",
+      "狗",
+      "猪"
+    ];
+    this.MIN_AGE = 1;
+    this.MAX_AGE = 100;
+  }
+  async getChineseCalendar(date) {
+    const apiResult = await this.Mod.App.modLoader.runModApi({
+      modId: "network_api",
+      apiId: "mxnzp.get_chinese_calendar",
+      data: date
+    });
+    return apiResult;
+  }
+  async getNowAnimal() {
+    $ui.loading(true);
+    try {
+      const dateKit = new next.DateTime(1),
+        nowDate = dateKit.getFullDateNumber(),
+        chineseCalendarData = await this.getChineseCalendar(nowDate);
+    } catch (error) {
+      $console.error(error);
+    }
+    $ui.loading(false);
+  }
+  getWhatAnimalAge(nowAnimalIndex, whatAnimalIndex) {
+    if (!this.$.isNumber(whatAnimalIndex) || !this.$.isNumber(nowAnimalIndex)) {
+      return undefined;
+    }
+    const animalAgeList = [],
+      diffAge = nowAnimalIndex - whatAnimalIndex;
+    for (let baseAge = this.MIN_AGE; baseAge <= this.MAX_AGE; baseAge += 12) {
+      const thisAge = diffAge + baseAge;
+      if (thisAge > 0) {
+        animalAgeList.push(thisAge);
+      }
+    }
+    const lastAge = animalAgeList[animalAgeList.length - 1];
+    if (lastAge + 12 <= this.MAX_AGE) {
+      animalAgeList.push(lastAge + 12);
+    }
+    return animalAgeList;
+  }
+}
+
 class DaoshuriKit {
   constructor(mod) {
-    this.modLoader = mod.App.modLoader;
-    $console.info({
-      modLoader: this.modLoader.runModApi
-    });
+    this.animalKit = new AnimalKit(mod);
   }
   getIntervalDate(timestamp1, timestamp2) {
     const date1 = new Date(timestamp1),
@@ -27,44 +84,40 @@ class DaoshuriKit {
       intervalDays = Math.ceil(intervalTimestamp / 1000 / 60 / 60 / 24);
     return intervalDays;
   }
-  async getChineseCalendar(date) {
-    const apiResult = await this.modLoader.runModApi({
-      modId: "network_api",
-      apiId: "mxnzp.get_chinese_calendar",
-      data: date
-    });
-    return apiResult;
-  }
 }
 class Main {
   constructor(mod) {
     this.Mod = mod;
     this.$ = mod.$;
     this.DSR = new DaoshuriKit(mod);
-    this.dateTime = new next.DateTime(1);
   }
   init() {
     //TODO: 加个新增倒数事项的功能
-    const mainViewList = ["选择日期"],
+    const mainViewList = ["选择日期", "十二生肖"],
       didSelect = (sender, indexPath, data) => {
         switch (indexPath.row) {
           case 0:
             this.getPastDate();
+            break;
+          case 1:
+            this.DSR.animalKit.getNowAnimal();
             break;
         }
       };
     listKit.pushString(this.Mod.MOD_NAME, mainViewList, didSelect);
   }
   async getPastDate() {
-    const dateResult = await this.$.dateTime.pickDate();
+    const dateResult = await this.$.dateTime.pickDate(),
+      dateTime = new next.DateTime(1);
+    dateTime.setDateTime(dateResult);
     if (dateResult) {
-      this.dateTime.setDateTime(dateResult);
+      $ui.loading(true);
       const result = this.DSR.getIntervalDate(
           new Date().getTime(),
           dateResult.getTime()
         ),
-        chineseCalendarData = await this.DSR.getChineseCalendar(
-          this.dateTime.getFullDateNumber()
+        chineseCalendarData = await this.DSR.animalKit.getChineseCalendar(
+          dateTime.getFullDateNumber()
         );
       let text = "";
       if (result == 0) {
@@ -76,6 +129,7 @@ class Main {
       } else {
         text = `未知结果：${result}`;
       }
+      $ui.loading(false);
       $ui.alert({
         title: text,
         message: JSON.stringify(chineseCalendarData),
@@ -85,6 +139,8 @@ class Main {
           }
         ]
       });
+    } else {
+      $ui.error("取消");
     }
   }
 }
@@ -102,8 +158,12 @@ class Daoshuri extends ModCore {
     this.$ = app.$;
   }
   run() {
-    const main = new Main(this);
-    main.init();
+    try {
+      const main = new Main(this);
+      main.init();
+    } catch (error) {
+      $console.error(error);
+    }
   }
 }
 module.exports = Daoshuri;
