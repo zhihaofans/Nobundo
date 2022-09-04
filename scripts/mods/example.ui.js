@@ -1,12 +1,12 @@
-const { ModModule } = require("../../Core.js/core"),
+const { ModModule } = require("CoreJS"),
   uiKit = require("../../Core.js/ui"),
-  next = require("../../Core.js/next"),
+  Next = require("Next"),
   listKit = new uiKit.ListKit();
 class Main {
   constructor(mod) {
     this.Mod = mod;
-    this.$ = mod.$;
-    this.listViewKit = new next.ListView();
+    this.$ = $;
+    this.listViewKit = new Next.ListView();
   }
   multListTest() {
     const listData = [
@@ -152,15 +152,14 @@ class ExampleModule extends ModModule {
       modId: "example",
       moduleId: "example.ui",
       moduleName: "例子ui",
-      version: "1a"
+      version: "1b"
       //author: "zhihaofans"
     });
     this.Mod = mod;
   }
   initUi() {
-    //    $ui.success("run");
-    const main = new Main(this.Mod);
-    main.init();
+    //$ui.success("run");
+    new Main(this.Mod).init();
   }
 }
 module.exports = ExampleModule;

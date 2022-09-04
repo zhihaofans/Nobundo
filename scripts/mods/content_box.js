@@ -1,4 +1,4 @@
-const { ModCore } = require("../../Core.js/core"),
+const { ModCore } = require("CoreJS"),
   next = require("../../Core.js/next");
 class ContentData {
   constructor({ id, timestamp, title, type, tag, data, otherData }) {
@@ -433,7 +433,7 @@ class ContentBox extends ModCore {
   }
   run() {
     try {
-      new ContentBoxView(this).View.init();
+      new ContentBoxView(this).init();
     } catch (error) {
       $console.error(error);
       $ui.alert({

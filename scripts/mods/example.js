@@ -1,17 +1,19 @@
-const { ModCore, ModuleLoader } = require("../../Core.js/core");
+const { ModCore, ModuleLoader } = require("CoreJS"),
+  $ = require("$"),
+  Next = require("Next");
 class Example extends ModCore {
   constructor(app) {
     super({
       app,
       modId: "example",
       modName: "例子",
-      version: "6b",
+      version: "7",
       author: "zhihaofans",
-      coreVersion: 7,
+      coreVersion: 8,
       useSqlite: false
     });
-    this.$ = app.$;
-    this.Http = app.$.http;
+    this.$ = $;
+    this.Http = $.http;
     this.Storage = app.Storage;
     this.ModuleLoader = new ModuleLoader(this);
   }
@@ -23,7 +25,7 @@ class Example extends ModCore {
     } catch (error) {
       $console.error(error);
     }
-    //    $ui.success("run");
+    //$ui.success("run");
   }
   runWidget() {
     const inputValue = $widget.inputValue ? `[${$widget.inputValue}]` : "";
