@@ -1,4 +1,4 @@
-const { ModModule } = require("../../Core.js/core");
+const { ModModule } = require("CoreJS");
 
 class VideoInfo {
   constructor(modModule) {
@@ -17,7 +17,7 @@ class VideoInfo {
           cookie
         }
       });
-    //    $console.info({ response: resp.response });
+    //$console.info({ response: resp.response });
     if (resp.error) {
       return undefined;
     } else {

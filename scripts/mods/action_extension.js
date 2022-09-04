@@ -1,6 +1,4 @@
-const { ModCore } = require("../../Core.js/core"),
-  Next = require("../../Core.js/next");
-
+const { ModCore } = require("CoreJS");
 class ShareAction {
   constructor() {
     this.hasData = this.getData() != undefined;
@@ -82,9 +80,9 @@ class ActionExtension extends ModCore {
       app,
       modId: "action_extension",
       modName: "分享内容解析",
-      version: "1",
+      version: "2",
       author: "zhihaofans",
-      coreVersion: 7
+      coreVersion: 8
     });
     this.QUERY = $context.query;
     this.isSafari = app.isSafariEnv();

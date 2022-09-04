@@ -1,4 +1,4 @@
-const { ModCore } = require("../../Core.js/core");
+const { ModCore } = require("CoreJS");
 class MxnzpCore {
   constructor(mod) {
     this.Mod = mod;
@@ -28,9 +28,6 @@ class MxnzpCore {
         header
       }),
       result = resp.data;
-    $console.info({
-      resp
-    });
     if (result && result.code == 1) {
       return resp.data.data;
     }
@@ -44,9 +41,9 @@ class NetworkApi extends ModCore {
       app,
       modId: "network_api",
       modName: "在线Api",
-      version: "1",
+      version: "1a",
       author: "zhihaofans",
-      coreVersion: 7,
+      coreVersion: 8,
       useSqlite: true
     });
     this.$ = app.$;

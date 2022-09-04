@@ -1,4 +1,4 @@
-const { ModCore, ModuleLoader } = require("../../Core.js/core"),
+const { ModCore, ModuleLoader } = require("CoreJS"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 class BilibiliLauncher {
@@ -142,9 +142,9 @@ class Bilibili extends ModCore {
       app,
       modId: "bilibili",
       modName: "哔哩哔哩",
-      version: "5b",
+      version: "5c",
       author: "zhihaofans",
-      coreVersion: 7
+      coreVersion: 8
     });
     this.$ = app.$;
     this.Http = app.$.http;

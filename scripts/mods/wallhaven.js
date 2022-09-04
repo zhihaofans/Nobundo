@@ -1,4 +1,4 @@
-const { ModCore } = require("../../Core.js/core"),
+const { ModCore } = require("CoreJS"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 class Main {
@@ -98,9 +98,9 @@ class Wallhaven extends ModCore {
       app,
       modId: "wallhaven",
       modName: "Wallhaven",
-      version: "1",
+      version: "1a",
       author: "zhihaofans",
-      coreVersion: 7
+      coreVersion: 8
     });
     this.$ = app.$;
   }

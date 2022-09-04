@@ -273,7 +273,7 @@ class v2_19_0 {
     window.invoke("addSubview", label);
   }
 }
-const { ModCore } = require("../../Core.js/core"),
+const { ModCore } = require("CoreJS"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit(),
   versionList = [
@@ -320,9 +320,9 @@ class Version extends ModCore {
       app,
       modId: "jsbox_version",
       modName: "JSBox新功能测试",
-      version: "3",
+      version: "3a",
       author: "zhihaofans",
-      coreVersion: 7
+      coreVersion: 8
     });
     this.$ = app.$;
     this.Http = app.$.http;

@@ -1,5 +1,5 @@
 const { ModCore } = require("CoreJS"),
-  next = require("../../Core.js/next");
+  next = require("Next");
 class ContentData {
   constructor({ id, timestamp, title, type, tag, data, otherData }) {
     this.id = id;
@@ -423,10 +423,10 @@ class ContentBox extends ModCore {
       app,
       modId: "content_box",
       modName: "内容盒子",
-      version: "1",
+      version: "2",
       author: "zhihaofans",
       useSqlite: false,
-      coreVersion: 7
+      coreVersion: 8
     });
     this.$ = app.$;
     this.Storage = app.Storage;

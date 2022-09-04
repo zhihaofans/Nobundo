@@ -1,4 +1,4 @@
-const { ModCore } = require("../../Core.js/core");
+const { ModCore } = require("CoreJS");
 class PhotoData {
   constructor(photo) {
     this.Photo = photo;
@@ -141,9 +141,9 @@ class PhotoManager extends ModCore {
       app,
       modId: "photo_manager",
       modName: "相册管理器",
-      version: "1",
+      version: "1a",
       author: "zhihaofans",
-      coreVersion: 7,
+      coreVersion: 8,
       useSqlite: false
     });
     this.View = new PhotoManagerView(this);

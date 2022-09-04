@@ -1,4 +1,4 @@
-const { ModCore } = require("../../Core.js/core");
+const { ModCore } = require("CoreJS");
 class MathKit {
   constructor(mod) {
     this.Mod = mod;
@@ -69,9 +69,9 @@ class KeyBoard extends ModCore {
       app,
       modId: "keyboard",
       modName: "键盘输入法",
-      version: "1",
+      version: "1a",
       author: "zhihaofans",
-      coreVersion: 7
+      coreVersion: 8
     });
     this.$ = app.$;
     this.Http = app.$.http;

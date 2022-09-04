@@ -1,5 +1,5 @@
-const { ModCore } = require("../../Core.js/core"),
-  Next = require("../../Core.js/next");
+const { ModCore } = require("CoreJS"),
+  Next = require("Next");
 class KeychainCore {
   constructor(domain) {
     this.DOMAIN = domain;
@@ -399,9 +399,9 @@ class DataCenter extends ModCore {
       app,
       modId: "datacenter",
       modName: "数据中心",
-      version: "1",
+      version: "2",
       author: "zhihaofans",
-      coreVersion: 7
+      coreVersion: 8
     });
     this.$ = app.$;
     this.Storage = app.Storage;

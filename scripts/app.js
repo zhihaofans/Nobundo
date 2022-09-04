@@ -1,5 +1,4 @@
-const AppKernel = require("../Core.js/app"),
-  { ModLoader } = require("CoreJS"),
+const { AppKernel, ModLoader } = require("CoreJS"),
   coreModList = [
     "bilibili.js",
     "jsbox_version.js",

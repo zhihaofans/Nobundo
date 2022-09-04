@@ -1,4 +1,4 @@
-const { ModCore } = require("../../Core.js/core");
+const { ModCore } = require("CoreJS");
 class SearchEngineCore {
   constructor({ id, name }) {
     this.ID = id;
@@ -62,9 +62,9 @@ class Search extends ModCore {
       app,
       modId: "search",
       modName: "搜索",
-      version: "1",
+      version: "1a",
       author: "zhihaofans",
-      coreVersion: 7,
+      coreVersion: 8,
       useSqlite: false
     });
   }

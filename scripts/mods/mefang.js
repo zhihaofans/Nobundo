@@ -1,5 +1,5 @@
-const { ModCore } = require("../../Core.js/core"),
-  NextJs = require("../../Core.js/next"),
+const { ModCore } = require("CoreJS"),
+  NextJs = require("Next"),
   ListView = new NextJs.ListView();
 class CourseData {
   // 课程
@@ -763,9 +763,9 @@ class Mefang extends ModCore {
       app,
       modId: "mefang",
       modName: "么方运动",
-      version: "1",
+      version: "1a",
       author: "zhihaofans",
-      coreVersion: 7
+      coreVersion: 8
     });
     this.$ = app.$;
     this.Http = app.$.http;

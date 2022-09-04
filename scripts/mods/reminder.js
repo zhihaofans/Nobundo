@@ -1,4 +1,4 @@
-const { ModCore } = require("../../Core.js/core"),
+const { ModCore } = require("CoreJS"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 class ReminderLib {
@@ -299,9 +299,9 @@ class Reminder extends ModCore {
       app,
       modId: "reminder",
       modName: "提醒事项",
-      version: "1",
+      version: "1a",
       author: "zhihaofans",
-      coreVersion: 7
+      coreVersion: 8
     });
     this.$ = app.$;
   }
