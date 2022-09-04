@@ -15,10 +15,6 @@ class UserUUID {
   }
   saveUserData() {
     $keychain.set(this.KEYCHAIN_DOMAIN, "uuid", this.UUID);
-    $file.write({
-      data: $data({ string: this.UUID }),
-      path: this.DATA_DIR + "uuid"
-    });
   }
   getDeviceUUID() {
     const UUID =

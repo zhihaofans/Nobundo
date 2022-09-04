@@ -1,7 +1,6 @@
 const START_TIME = new Date().getTime(),
   NEED_JSBOX_VERSION = 1361,
   NOW_JSBOX_VERSION = Number.parseInt($app.info.build),
-  { UserUUID } = require("./uuid"),
   { VersionException } = require("./object"),
   $ = require("./$"),
   Storage = require("./storage");
@@ -25,7 +24,6 @@ class AppKernel {
     $.file.mkdirs(this.DATA_DIR.ICLOUD);
     $.file.mkdirs(this.DATA_DIR.LOCAL);
     this.l10n(require(l10nPath));
-    this.UUID = new UserUUID(this);
     if (this.DEBUG) {
       $.info(`appName:${this.AppInfo.name}`);
       $.info(`appId:${this.AppInfo.id}`);

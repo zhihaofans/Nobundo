@@ -195,11 +195,6 @@ class ModLoader {
     return false;
   }
   runModApi({ modId, apiId, data }) {
-    $console.info({
-      modId,
-      apiId,
-      data
-    });
     if (modId && modId.length >= 0) {
       const thisMod = this.MOD_LIST.mods[modId];
       if (thisMod != undefined && this.$.isFunction(thisMod.runApi)) {
@@ -237,6 +232,7 @@ class ModLoader {
     if (modId && modId.length >= 0) {
       const thisMod = this.MOD_LIST.mods[modId];
       try {
+        $keyboard.height = 360;
         thisMod.runKeyboard();
       } catch (error) {
         $console.error(error);
