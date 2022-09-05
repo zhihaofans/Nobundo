@@ -2,7 +2,6 @@ const { ModCore } = require("CoreJS");
 class MathKit {
   constructor(mod) {
     this.Mod = mod;
-    this.$ = mod.$;
     this.MathKit = require("math");
   }
   mathComputing(str) {
@@ -28,7 +27,7 @@ class KeyBoardCore {
   clearAllSpace() {
     const oldText = $keyboard.selectedText;
     if (oldText.length > 0) {
-      this.addText(oldText.replace(" ", ""));
+      this.addText(oldText.replaceAll(" ", ""));
     }
     this.playClickSound();
   }
@@ -58,6 +57,18 @@ class KeyBoardCore {
           this.addText(selectText + "=" + result);
         }
         this.playClickSound();
+      } else {
+        $ui.alert({
+          title: "计算出错",
+          message: "计算服务返回空白数据",
+          actions: [
+            {
+              title: "OK",
+              disabled: false, // Optional
+              handler: () => {}
+            }
+          ]
+        });
       }
     }
   }
