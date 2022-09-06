@@ -9,8 +9,9 @@ class Example extends ModCore {
       modName: "例子",
       version: "7",
       author: "zhihaofans",
-      coreVersion: 8,
-      useSqlite: false
+      coreVersion: 9,
+      allowWidget: true,
+      allowApi: true
     });
     this.$ = $;
     this.Http = $.http;

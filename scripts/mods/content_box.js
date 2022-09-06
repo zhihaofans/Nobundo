@@ -425,7 +425,7 @@ class ContentBox extends ModCore {
       modName: "内容盒子",
       version: "2",
       author: "zhihaofans",
-      useSqlite: false,
+      allowApi: true,
       coreVersion: 8
     });
     this.$ = app.$;

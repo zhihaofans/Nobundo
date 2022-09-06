@@ -82,6 +82,7 @@ class ActionExtension extends ModCore {
       modName: "分享内容解析",
       version: "2",
       author: "zhihaofans",
+      allowContext: true,
       coreVersion: 8
     });
     this.QUERY = $context.query;

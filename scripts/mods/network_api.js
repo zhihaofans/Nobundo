@@ -43,8 +43,10 @@ class NetworkApi extends ModCore {
       modName: "在线Api",
       version: "1a",
       author: "zhihaofans",
-      coreVersion: 8,
-      useSqlite: true
+      useSqlite: true,
+      allowApi: true,
+      allowWidget: true,
+      coreVersion: 8
     });
     this.$ = app.$;
     this.Http = app.$.http;

@@ -64,8 +64,8 @@ class Search extends ModCore {
       modName: "搜索",
       version: "1a",
       author: "zhihaofans",
-      coreVersion: 8,
-      useSqlite: false
+      allowApi: true,
+      coreVersion: 8
     });
   }
   run() {
@@ -75,8 +75,6 @@ class Search extends ModCore {
   }
 
   runApi({ url, data, callback }) {
-    //TODO:允许其他Mod调用
-    this.allowApi = false;
     return undefined;
   }
 }

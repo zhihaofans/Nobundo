@@ -82,6 +82,7 @@ class KeyBoard extends ModCore {
       modName: "键盘输入法",
       version: "1a",
       author: "zhihaofans",
+      allowKeyboard: true,
       coreVersion: 8
     });
     this.$ = app.$;
