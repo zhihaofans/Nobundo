@@ -1,4 +1,5 @@
 const { ModCore } = require("CoreJS"),
+  $ = require("$"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 class Main {
@@ -48,8 +49,10 @@ class Main {
       purity = "111",
       api_key = this.Mod.Keychain.get(this.keychainId.apiKey) || "",
       url = `https://wallhaven.cc/api/v1/search?q=${query}&sorting=${sorting}&seed=${randomSeed}&page=${page}&purity=${purity}&categories=${categories}&apikey=${api_key}`,
-      httpResult = await this.Http.get(url);
-    $console.warn(httpResult);
+      httpResult = await this.Http.get({ url });
+    $console.warn({
+      httpResult
+    });
     if (httpResult.error) {
       $console.error(httpResult.error);
       $ui.loading(false);
@@ -98,11 +101,12 @@ class Wallhaven extends ModCore {
       app,
       modId: "wallhaven",
       modName: "Wallhaven",
-      version: "1a",
+      version: "1b",
       author: "zhihaofans",
-      coreVersion: 8
+      coreVersion: 9
     });
-    this.$ = app.$;
+    this.$ = $;
+    this.Http = $.http;
   }
   run() {
     const main = new Main(this);
