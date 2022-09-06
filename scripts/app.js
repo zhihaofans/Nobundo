@@ -12,9 +12,9 @@ const { AppKernel, ModLoader } = require("CoreJS"),
     "datacenter.js",
     "content_box.js",
     "keyboard.js",
-    "photo_manager.js",
     "search.js",
-    "network_api.js"
+    "network_api.js",
+    "mod_manager.js"
   ];
 
 class App extends AppKernel {
