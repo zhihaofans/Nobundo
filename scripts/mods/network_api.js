@@ -1,4 +1,5 @@
-const { ModCore } = require("CoreJS");
+const { ModCore } = require("CoreJS"),
+  $ = require("$");
 class MxnzpCore {
   constructor(mod) {
     this.Mod = mod;
@@ -48,8 +49,8 @@ class NetworkApi extends ModCore {
       allowWidget: true,
       coreVersion: 8
     });
-    this.$ = app.$;
-    this.Http = app.$.http;
+    this.$ = $;
+    this.Http = $.http;
     this.mxnzp = new MxnzpCore(this);
   }
   run() {

@@ -83,7 +83,7 @@ class ActionExtension extends ModCore {
       version: "2",
       author: "zhihaofans",
       allowContext: true,
-      coreVersion: 8
+      coreVersion: 9
     });
     this.QUERY = $context.query;
     this.isSafari = app.isSafariEnv();

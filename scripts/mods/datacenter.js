@@ -1,5 +1,6 @@
 const { ModCore } = require("CoreJS"),
-  Next = require("Next");
+  Next = require("Next"),
+  $ = require("$");
 class KeychainCore {
   constructor(domain) {
     this.DOMAIN = domain;
@@ -401,10 +402,10 @@ class DataCenter extends ModCore {
       modName: "数据中心",
       version: "2",
       author: "zhihaofans",
-      coreVersion: 8
+      coreVersion: 9
     });
-    this.$ = app.$;
-    this.Storage = app.Storage;
+    this.$ = $;
+    this.Storage = Next.Storage;
   }
   run() {
     const helperView = new HelperView(this);

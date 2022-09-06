@@ -1,4 +1,5 @@
 const { ModCore } = require("CoreJS"),
+  $ = require("$"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 class DownloaderCore {
@@ -260,11 +261,11 @@ class Downloader extends ModCore {
       modName: "下载器",
       version: "2",
       author: "zhihaofans",
-      coreVersion: 8
+      coreVersion: 9
     });
     this.main = new Main(this);
-    this.$ = app.$;
-    this.Http = app.$.http;
+    this.$ = $;
+    this.Http = $.http;
   }
   run() {
     $ui.success("run");

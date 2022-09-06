@@ -51,7 +51,7 @@ class ModManager extends ModCore {
       modName: "模组管理器",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 8,
+      coreVersion: 9,
       useSqlite: false
     });
     this.$ = $;

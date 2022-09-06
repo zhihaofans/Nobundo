@@ -1,5 +1,6 @@
 const { ModCore } = require("CoreJS"),
   NextJs = require("Next"),
+  $ = require("$"),
   ListView = new NextJs.ListView();
 class CourseData {
   // 课程
@@ -765,11 +766,11 @@ class Mefang extends ModCore {
       modName: "么方运动",
       version: "1a",
       author: "zhihaofans",
-      coreVersion: 8
+      coreVersion: 9
     });
-    this.$ = app.$;
-    this.Http = app.$.http;
-    this.Storage = app.Storage;
+    this.$ = $;
+    this.Http = $.http;
+    this.Storage = NextJs.Storage;
     this.ui = new MefangUi(this);
   }
   run() {

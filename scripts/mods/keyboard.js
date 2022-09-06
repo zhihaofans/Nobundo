@@ -1,4 +1,6 @@
-const { ModCore } = require("CoreJS");
+const { ModCore } = require("CoreJS"),
+  $ = require("$"),
+  Next = require("Next");
 class MathKit {
   constructor(mod) {
     this.Mod = mod;
@@ -83,11 +85,11 @@ class KeyBoard extends ModCore {
       version: "1a",
       author: "zhihaofans",
       allowKeyboard: true,
-      coreVersion: 8
+      coreVersion: 9
     });
-    this.$ = app.$;
-    this.Http = app.$.http;
-    this.Storage = app.Storage;
+    this.$ = $;
+    this.Http = $.http;
+    this.Storage = Next.Storage;
     this.Core = new KeyBoardCore(this);
   }
   run() {

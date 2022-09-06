@@ -1,4 +1,6 @@
-const { ModCore } = require("CoreJS");
+const { ModCore } = require("CoreJS"),
+  Next = require("Next"),
+  $ = require("$");
 class SearchEngineCore {
   constructor({ id, name }) {
     this.ID = id;
@@ -65,8 +67,9 @@ class Search extends ModCore {
       version: "1a",
       author: "zhihaofans",
       allowApi: true,
-      coreVersion: 8
+      coreVersion: 9
     });
+    this.$ = $;
   }
   run() {
     //$ui.success("run");

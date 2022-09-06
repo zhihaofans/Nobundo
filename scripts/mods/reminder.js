@@ -1,5 +1,6 @@
 const { ModCore } = require("CoreJS"),
   uiKit = require("../../Core.js/ui"),
+  $ = require("$"),
   listKit = new uiKit.ListKit();
 class ReminderLib {
   constructor() {}
@@ -301,9 +302,9 @@ class Reminder extends ModCore {
       modName: "提醒事项",
       version: "1a",
       author: "zhihaofans",
-      coreVersion: 8
+      coreVersion: 9
     });
-    this.$ = app.$;
+    this.$ = $;
   }
   run() {
     $ui.success("run");

@@ -1,5 +1,6 @@
 const { ModCore } = require("CoreJS"),
   uiKit = require("../../Core.js/ui"),
+  $ = require("$"),
   next = require("Next"),
   listKit = new uiKit.ListKit();
 class AnimalKit {
@@ -153,9 +154,9 @@ class Daoshuri extends ModCore {
       modName: "倒数日",
       version: "2",
       author: "zhihaofans",
-      coreVersion: 8
+      coreVersion: 9
     });
-    this.$ = app.$;
+    this.$ = $;
   }
   run() {
     try {

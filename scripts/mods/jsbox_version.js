@@ -1,3 +1,8 @@
+const { ModCore } = require("CoreJS"),
+  $ = require("$"),
+  Next = require("Next"),
+  uiKit = require("../../Core.js/ui"),
+  listKit = new uiKit.ListKit();
 class ApiTest {
   constructor(mod) {
     this.Http = mod.Http;
@@ -273,27 +278,24 @@ class v2_19_0 {
     window.invoke("addSubview", label);
   }
 }
-const { ModCore } = require("CoreJS"),
-  uiKit = require("../../Core.js/ui"),
-  listKit = new uiKit.ListKit(),
-  versionList = [
-    {
-      version: "2.19.0",
-      classObject: v2_19_0,
-      index: "init"
-    },
-    {
-      version: "ui测试",
-      classObject: UiTest,
-      index: "init"
-    },
-    {
-      version: "api测试",
-      classObject: ApiTest,
-      index: "init",
-      needCore: true
-    }
-  ];
+const versionList = [
+  {
+    version: "2.19.0",
+    classObject: v2_19_0,
+    index: "init"
+  },
+  {
+    version: "ui测试",
+    classObject: UiTest,
+    index: "init"
+  },
+  {
+    version: "api测试",
+    classObject: ApiTest,
+    index: "init",
+    needCore: true
+  }
+];
 
 class Main {
   constructor(mod) {
@@ -322,11 +324,11 @@ class Version extends ModCore {
       modName: "JSBox新功能测试",
       version: "3a",
       author: "zhihaofans",
-      coreVersion: 8
+      coreVersion: 9
     });
-    this.$ = app.$;
-    this.Http = app.$.http;
-    this.Storage = app.Storage;
+    this.$ = $;
+    this.Http = $.http;
+    this.Storage = Next.Storage;
   }
   run() {
     const main = new Main(this);
