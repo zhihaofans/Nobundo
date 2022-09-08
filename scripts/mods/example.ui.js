@@ -5,7 +5,7 @@ const { ModModule } = require("CoreJS"),
 class Main {
   constructor(mod) {
     this.Mod = mod;
-    this.$ = $;
+    this.$ = mod.$;
     this.listViewKit = new Next.ListView();
   }
   multListTest() {
