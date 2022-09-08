@@ -1,24 +1,82 @@
 const { ModCore } = require("CoreJS"),
   $ = require("$"),
   Next = require("Next");
-class MathKit {
+class ClipboardCore {
   constructor(mod) {
     this.Mod = mod;
-    this.MathKit = require("math");
+    this.Keychain = mod.Keychain;
+    this.MAX_LENGTH = 10;
+    this.KEYCHAIN_ITEM_LIST = "item_list";
   }
-  mathComputing(str) {
-    //数学计算
-    if (str == undefined || str.length == 0) {
-      return undefined;
+  addItem(str) {
+    const itemList = this.getItemList(),
+      oldLength = itemList.length;
+    itemList.unshift(str);
+    const newLength = itemList.length;
+    if (newLength == oldLength + 1) {
+      return this.setItemList(itemList);
+    } else {
+      return false;
     }
-    return this.MathKit.evaluate(str);
+  }
+  getItemList() {
+    const dataStr = this.Keychain.getValue(this.KEYCHAIN_ITEM_LIST) || "[]";
+    if (dataStr.length > 0) {
+      try {
+        const listData = JSON.parse(dataStr);
+        if (listData == undefined) {
+          return [];
+        } else {
+          return listData.map(item => $text.base64Decode(item)) || [];
+        }
+      } catch (error) {
+        $console.error(error);
+        return [];
+      }
+    } else {
+      return [];
+    }
+  }
+  setItemList(listData) {
+    $console.warn(listData);
+    if (listData.length > 0) {
+      return this.Keychain.setValue(
+        this.KEYCHAIN_ITEM_LIST,
+        JSON.stringify(listData.map(item => $text.base64Encode(item)))
+      );
+    } else {
+      return false;
+    }
+  }
+  clearItemList() {
+    return this.Keychain.remove(this.KEYCHAIN_ITEM_LIST);
+  }
+  removeItemIndex(idx) {
+    const itemList = this.getItemList(),
+      oldLength = itemList.length;
+    if (oldLength == 0) {
+      return false;
+    } else {
+      const oldList = itemList.splice(idx, 1),
+        newLength = itemList.length;
+      $console.info({
+        oldList,
+        itemList
+      });
+      if (newLength == 0) {
+        return this.clearItemList();
+      } else if (newLength == oldLength - 1) {
+        return this.setItemList(itemList);
+      } else {
+        return false;
+      }
+    }
   }
 }
 
 class KeyBoardCore {
   constructor(mod) {
     this.Mod = mod;
-    this.mathKit = new MathKit(mod);
   }
   addText(text) {
     $keyboard.insert(text);
@@ -51,7 +109,8 @@ class KeyBoardCore {
         ]
       });
     } else {
-      const result = this.mathKit.mathComputing(selectText);
+      const mathKit = new require("math"),
+        result = mathKit.evaluate(selectText);
       if (result != undefined) {
         if (onlyResult) {
           this.addText(result);
@@ -75,6 +134,121 @@ class KeyBoardCore {
     }
   }
 }
+class KeyBoardMainView {
+  constructor(mod) {
+    this.Mod = mod;
+    this.clipBoardCore = new ClipboardCore(mod);
+  }
+  showClipboardView() {
+    $ui.push({
+      props: {
+        title: "剪切板"
+      },
+      views: [
+        {
+          type: "list",
+          props: {
+            data: [
+              {
+                title: "功能",
+                rows: ["粘贴"]
+              },
+              {
+                title: "剪切板",
+                rows: this.clipBoardCore.getItemList()
+              }
+            ]
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (sender, indexPath, data) => {
+              const section = indexPath.section,
+                row = indexPath.row;
+              switch (section) {
+                case 0:
+                  switch (row) {
+                    case 0:
+                      const text = $clipboard.text;
+                      if (text != undefined && text.length > 0) {
+                        try {
+                          const result = this.clipBoardCore.addItem(text);
+                          if (result) {
+                            $ui.success("粘贴成功,请重新进入");
+                          } else {
+                            $ui.error("粘贴失败");
+                          }
+                        } catch (error) {
+                          $console.error(error);
+                          $ui.error("发生内部错误");
+                        }
+                      }
+                      break;
+                    default:
+                  }
+
+                  break;
+                case 1:
+                  $ui.menu({
+                    items: ["删除"],
+                    handler: (title, idx) => {
+                      switch (idx) {
+                        case 0:
+                          try {
+                            const result = this.clipBoardCore.removeItemIndex(
+                              row
+                            );
+                            if (result) {
+                              $ui.success("删除成功,请重新进入");
+                            } else {
+                              $ui.error("删除失败");
+                            }
+                          } catch (error) {
+                            $console.error(error);
+                            $ui.error("发生内部错误");
+                          }
+                          break;
+                        default:
+                      }
+                    }
+                  });
+                  break;
+                default:
+              }
+            }
+          }
+        }
+      ]
+    });
+  }
+  init() {
+    $ui.push({
+      props: {
+        title: this.Mod.MOD_INFO.NAME
+      },
+      views: [
+        {
+          type: "list",
+          props: {
+            data: ["设置", "剪切板"]
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (sender, indexPath, data) => {
+              const section = indexPath.section,
+                row = indexPath.row;
+              switch (row) {
+                case 1:
+                  this.showClipboardView();
+                  break;
+                default:
+              }
+            }
+          }
+        }
+      ]
+    });
+  }
+}
 
 class KeyBoard extends ModCore {
   constructor(app) {
@@ -93,14 +267,11 @@ class KeyBoard extends ModCore {
     this.Core = new KeyBoardCore(this);
   }
   run() {
-    //$ui.success("run");
-    this.runKeyboard();
+    const mainView = new KeyBoardMainView(this);
+    mainView.init();
   }
   runKeyboard() {
     $ui.render({
-      props: {
-        title: ""
-      },
       views: [
         {
           type: "list",
