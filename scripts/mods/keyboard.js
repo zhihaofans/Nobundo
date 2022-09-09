@@ -19,6 +19,9 @@ class ClipboardCore {
       return false;
     }
   }
+  getItem(idx) {
+    return this.getItemList()[idx];
+  }
   getItemList() {
     const dataStr = this.Keychain.getValue(this.KEYCHAIN_ITEM_LIST) || "[]";
     if (dataStr.length > 0) {
@@ -109,19 +112,34 @@ class KeyBoardCore {
         ]
       });
     } else {
-      const mathKit = new require("math"),
-        result = mathKit.evaluate(selectText);
-      if (result != undefined) {
-        if (onlyResult) {
-          this.addText(result);
+      try {
+        const mathKit = new require("math"),
+          result = mathKit.evaluate(selectText);
+        if (result != undefined) {
+          if (onlyResult) {
+            this.addText(result);
+          } else {
+            this.addText(selectText + "=" + result);
+          }
+          this.playClickSound();
         } else {
-          this.addText(selectText + "=" + result);
+          $ui.alert({
+            title: "计算出错",
+            message: "计算服务返回空白数据",
+            actions: [
+              {
+                title: "OK",
+                disabled: false, // Optional
+                handler: () => {}
+              }
+            ]
+          });
         }
-        this.playClickSound();
-      } else {
+      } catch (error) {
+        $console.error(error);
         $ui.alert({
-          title: "计算出错",
-          message: "计算服务返回空白数据",
+          title: "发生错误",
+          message: JSON.stringify(error) || error.message,
           actions: [
             {
               title: "OK",
@@ -133,8 +151,15 @@ class KeyBoardCore {
       }
     }
   }
+  getSelectText() {
+    if (this.hasText()) {
+      return $keyboard.selectedText;
+    } else {
+      return undefined;
+    }
+  }
 }
-class KeyBoardMainView {
+class MainView {
   constructor(mod) {
     this.Mod = mod;
     this.clipBoardCore = new ClipboardCore(mod);
@@ -249,6 +274,169 @@ class KeyBoardMainView {
     });
   }
 }
+class KeyBoardView {
+  constructor(mod) {
+    this.Mod = mod;
+    this.clipBoardCore = new ClipboardCore(mod);
+  }
+  importSelectText() {
+    const text = this.Mod.Core.getSelectText();
+    if (text != undefined && text.length > 0) {
+      try {
+        const result = this.clipBoardCore.addItem(text);
+        if (result) {
+          $ui.success("导入成功,请重新进入");
+        } else {
+          $ui.error("导入失败");
+        }
+      } catch (error) {
+        $console.error(error);
+        $ui.error("发生内部错误");
+      }
+    }
+  }
+  importClipboard() {
+    const text = $clipboard.text;
+    if (text != undefined && text.length > 0) {
+      try {
+        const result = this.clipBoardCore.addItem(text);
+        if (result) {
+          $ui.success("导入成功,请重新进入");
+        } else {
+          $ui.error("导入失败");
+        }
+      } catch (error) {
+        $console.error(error);
+        $ui.error("发生内部错误");
+      }
+    }
+  }
+  showClipboardView() {
+    $ui.push({
+      props: {
+        title: "剪切板",
+        navBarHidden: true
+      },
+      views: [
+        {
+          type: "list",
+          props: {
+            data: [
+              {
+                title: "功能",
+                rows: ["从系统剪切板导入", "导入所选文本"]
+              },
+              {
+                title: "剪切板(新▶旧)",
+                rows: this.clipBoardCore.getItemList()
+              }
+            ]
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (sender, indexPath, data) => {
+              const section = indexPath.section,
+                row = indexPath.row;
+              switch (section) {
+                case 0:
+                  switch (row) {
+                    case 0:
+                      this.importClipboard();
+                      break;
+                    case 1:
+                      this.importSelectText();
+                      break;
+                    default:
+                  }
+
+                  break;
+                case 1:
+                  $ui.menu({
+                    items: ["粘贴", "删除"],
+                    handler: (title, idx) => {
+                      switch (idx) {
+                        case 0:
+                          this.Mod.Core.addText(
+                            this.clipBoardCore.getItem(row)
+                          );
+                          break;
+                        case 1:
+                          try {
+                            const result = this.clipBoardCore.removeItemIndex(
+                              row
+                            );
+                            if (result) {
+                              $ui.success("删除成功,请重新进入");
+                            } else {
+                              $ui.error("删除失败");
+                            }
+                          } catch (error) {
+                            $console.error(error);
+                            $ui.error("发生内部错误");
+                          }
+                          break;
+                        default:
+                      }
+                    }
+                  });
+                  break;
+                default:
+              }
+            }
+          }
+        }
+      ]
+    });
+  }
+  init() {
+    $ui.render({
+      views: [
+        {
+          type: "list",
+          props: {
+            data: [
+              {
+                title: "键盘模式",
+                rows: [
+                  "清空空格",
+                  "数学计算",
+                  "数学计算并替换为结果",
+                  "剪切板",
+                  "收起键盘⬇️"
+                ]
+              }
+            ]
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (sender, indexPath, data) => {
+              const row = indexPath.row;
+              switch (row) {
+                case 0:
+                  this.Mod.Core.clearAllSpace();
+                  break;
+                case 1:
+                  this.Mod.Core.mathComputing(false);
+                  break;
+                case 2:
+                  this.Mod.Core.mathComputing(true);
+                  break;
+                case 3:
+                  this.showClipboardView();
+                  break;
+                case 4:
+                  $keyboard.dismiss();
+                  break;
+
+                default:
+              }
+            }
+          }
+        }
+      ]
+    });
+  }
+}
 
 class KeyBoard extends ModCore {
   constructor(app) {
@@ -267,43 +455,10 @@ class KeyBoard extends ModCore {
     this.Core = new KeyBoardCore(this);
   }
   run() {
-    const mainView = new KeyBoardMainView(this);
-    mainView.init();
+    new MainView(this).init();
   }
   runKeyboard() {
-    $ui.render({
-      views: [
-        {
-          type: "list",
-          props: {
-            data: [
-              {
-                title: "键盘模式",
-                rows: ["清空空格", "数学计算", "数学计算并替换为结果"]
-              }
-            ]
-          },
-          layout: $layout.fill,
-          events: {
-            didSelect: (sender, indexPath, data) => {
-              const row = indexPath.row;
-              switch (row) {
-                case 0:
-                  this.Core.clearAllSpace();
-                  break;
-                case 1:
-                  this.Core.mathComputing(false);
-                  break;
-                case 2:
-                  this.Core.mathComputing(true);
-                  break;
-                default:
-              }
-            }
-          }
-        }
-      ]
-    });
+    new KeyBoardView(this).init();
   }
 }
 module.exports = KeyBoard;
