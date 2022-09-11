@@ -12,7 +12,6 @@ const { AppKernel, ModLoader } = require("CoreJS"),
     "datacenter.js",
     "content_box.js",
     "keyboard.js",
-    "search.js",
     "network_api.js",
     "mod_manager.js"
   ];
