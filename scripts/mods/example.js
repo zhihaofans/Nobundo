@@ -29,13 +29,13 @@ class Example extends ModCore {
     //$ui.success("run");
   }
   runWidget() {
-    const inputValue = $widget.inputValue ? `[${$widget.inputValue}]` : "";
+    const inputValue = $widget.inputValue ? $widget.inputValue : "Hello!";
     $widget.setTimeline({
       render: ctx => {
         return {
           type: "text",
           props: {
-            text: `${inputValue}Hello, Example!`
+            text: inputValue
           }
         };
       }
