@@ -46,8 +46,7 @@ class NetworkApi extends ModCore {
       author: "zhihaofans",
       useSqlite: true,
       allowApi: true,
-      allowWidget: true,
-      coreVersion: 8
+      coreVersion: 9
     });
     this.$ = $;
     this.Http = $.http;
@@ -86,19 +85,6 @@ class NetworkApi extends ModCore {
             break;
           default:
         }
-      }
-    });
-  }
-  runWidget() {
-    const inputValue = $widget.inputValue ? `[${$widget.inputValue}]` : "";
-    $widget.setTimeline({
-      render: ctx => {
-        return {
-          type: "text",
-          props: {
-            text: `${inputValue}Hello, network_api!`
-          }
-        };
       }
     });
   }
