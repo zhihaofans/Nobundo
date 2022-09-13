@@ -8,13 +8,18 @@ class VideoData {
     //      tid	num	分区tid
     //      tname	str	子分区名称
     //      copyright	num	视频类型	1：原创 2：转载
+    this.author_face = videoData.owner.face;
+    this.author_mid = videoData.owner.mid;
+    this.author_name = videoData.owner.name;
     this.avid = videoData.aid;
     this.bvid = videoData.bvid;
     this.copyright = videoData.copyright; //1：原创 2：转载
     this.cover_image = videoData.pic; //视频封面
     this.desc = videoData.desc; //简介
     this.parts_count = videoData.videos; //稿件分P总数
+    this.publish_location = videoData.pub_location; //发布定位
     this.publish_time = videoData.pubdate; //发布时间
+    this.short_link = videoData.short_link_v2 || videoData.short_link;
     this.staff = videoData.staff; //合作成员列表
     this.tid = videoData.tid; //分区id
     this.title = videoData.title;
@@ -46,21 +51,22 @@ class PopularVideo {
       $console.error(resp.error);
       return undefined;
     } else {
-      const result = resp.data,
-        codeMessageList = {
-          "0": "成功",
-          "-400": "请求错误"
-        };
+      const result = resp.data;
+
+      $console.info({
+        result
+      });
       if (result.code == 0) {
         //resultData={list:[热门视频列表],no_more:true下页没有数据\false下页还有数据}
         const resultData = { no_more: result.data.no_more, list: [] };
         resultData.list = result.data.list.map(video => new VideoData(video));
         return resultData;
       } else {
-        $console.error(
-          result.code + codeMessageList[result.code.toString()] ||
-            result.message
-        );
+        const { code, message } = result;
+        $console.error({
+          code,
+          message
+        });
         return undefined;
       }
     }
@@ -84,7 +90,6 @@ class VideoInfo {
           cookie
         }
       });
-    //$console.info({ response: resp.response });
     if (resp.error) {
       return undefined;
     } else {
@@ -99,13 +104,63 @@ class VideoInfo {
           "62004": "稿件审核中"
         };
       if (result.code == 0) {
-        //$console.info(resultData);
         return resultData;
       } else {
-        $console.error(result.code + codeMessageList[result.code.toString()]);
+        $console.error(result.code + codeMessageList[new String(result.code)]);
         return undefined;
       }
     }
+  }
+  pushVideoInfoList(title, videoList) {
+    $ui.push({
+      props: {
+        title
+      },
+      views: [
+        {
+          type: "list",
+          props: {
+            autoRowHeight: true,
+            estimatedRowHeight: 44,
+            data: videoList.map(thisVideo => {
+              return {
+                title: `${thisVideo.author_mid}@${thisVideo.author_name}`,
+                rows: [
+                  `av${thisVideo.avid} | ${thisVideo.bvid}`,
+                  thisVideo.title
+                ]
+              };
+            })
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (sender, indexPath, data) => {
+              const selectVideo = videoList[indexPath.section];
+              $ui.menu({
+                items: ["查看视频信息", "通过哔哩哔哩APP打开"],
+                handler: (title, idx) => {
+                  switch (idx) {
+                    case 0:
+                      try {
+                        this.Module.showVideoInfo(selectVideo.bvid);
+                      } catch (error) {
+                        $console.error(error);
+                        $ui.error("Error");
+                      }
+                      break;
+                    case 1:
+                      $app.openURL(selectVideo.short_link);
+
+                      break;
+                    default:
+                  }
+                }
+              });
+            }
+          }
+        }
+      ]
+    });
   }
 }
 class VideoUi {
@@ -113,7 +168,14 @@ class VideoUi {
     this.ModModule = modModule;
     this.Popular = modModule.Popular;
   }
-  getPopularVideo() {}
+  async getPopularVideo() {
+    try {
+      const popularList = await this.Popular.getPopularVideoList();
+      $console.info(popularList);
+    } catch (error) {
+      $console.error(error);
+    }
+  }
   getViewUiList() {
     return [
       {
@@ -136,6 +198,9 @@ class BilibiliVideo extends ModModule {
     this.$ = mod.$;
     this.Info = new VideoInfo(this);
     this.Popular = new PopularVideo(this);
+  }
+  getVideoDataObject(videoItem) {
+    return new VideoData(videoItem);
   }
   getViewUiList() {
     return new VideoUi(this).getViewUiList();

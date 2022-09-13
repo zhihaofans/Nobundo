@@ -1,6 +1,6 @@
 const { ModModule } = require("CoreJS"),
   uiKit = require("../../Core.js/ui"),
-  next = require("Next"),
+  Next = require("Next"),
   listKit = new uiKit.ListKit();
 class UserData {
   constructor(keychain) {
@@ -242,7 +242,10 @@ class UserInfo {
   }
   async getLaterToWatch() {
     $ui.loading(true);
-    const url = "https://api.bilibili.com/x/v2/history/toview",
+    const videoModule = this.Module.Mod.ModuleLoader.getModule(
+        "bilibili.video"
+      ),
+      url = "https://api.bilibili.com/x/v2/history/toview",
       header = { cookie: this.Data.cookie() },
       timeout = 5,
       resp = await this.Http.get({
@@ -271,59 +274,19 @@ class UserInfo {
         if (result.code == 0) {
           const data = result.data,
             listCount = data.count,
-            later2watchList = data.list;
+            later2watchList = data.list,
+            title = `稍后再看共${listCount}个视频`;
           if (listCount > 0) {
-            $ui.push({
-              props: {
-                title: `稍后再看共${listCount}个视频`
-              },
-              views: [
-                {
-                  type: "list",
-                  props: {
-                    autoRowHeight: true,
-                    estimatedRowHeight: 44,
-                    data: later2watchList.map(thisVideo => {
-                      return {
-                        title: `${thisVideo.owner.mid}@${thisVideo.owner.name}`,
-                        rows: [
-                          `av${thisVideo.aid} | ${thisVideo.bvid}`,
-                          thisVideo.title
-                        ]
-                      };
-                    })
-                  },
-                  layout: $layout.fill,
-                  events: {
-                    didSelect: (_sender, indexPath, _data) => {
-                      const selectVideo = later2watchList[indexPath.section];
-                      $ui.menu({
-                        items: ["查看视频信息", "通过哔哩哔哩APP打开"],
-                        handler: (title, idx) => {
-                          switch (idx) {
-                            case 0:
-                              try {
-                                this.Mod.ModuleLoader.getModule(
-                                  "bilibili.video"
-                                ).showVideoInfo(selectVideo.bvid);
-                              } catch (error) {
-                                $console.error(error);
-                                $ui.error("Error");
-                              }
-                              break;
-                            case 1:
-                              $app.openURL(selectVideo.short_link_v2);
-
-                              break;
-                            default:
-                          }
-                        }
-                      });
-                    }
-                  }
-                }
-              ]
-            });
+            try {
+              videoModule.Info.pushVideoInfoList(
+                title,
+                later2watchList.map(item =>
+                  videoModule.getVideoDataObject(item)
+                )
+              );
+            } catch (error) {
+              $console.error(error);
+            }
           } else {
             $ui.error("请添加视频");
           }
