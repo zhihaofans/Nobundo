@@ -1,7 +1,6 @@
 try {
   let allLibNotNeedUpdate = true;
   const libCheckResult = libVersionCheck();
-  $console.info(libCheckResult);
   Object.keys(libCheckResult).map(libId => {
     if (libCheckResult[libId] == false) {
       allLibNotNeedUpdate = false;
