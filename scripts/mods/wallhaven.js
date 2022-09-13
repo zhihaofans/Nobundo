@@ -41,10 +41,10 @@ class Main {
   }
   async random(categories = "111") {
     $ui.loading(true);
-    const nextSeedId = this.keychainId.needseed,
+    const nextSeedId = this.keychainId.nextseed,
       query = `id%3A5type:png`,
       sorting = `random`,
-      randomSeed = this.Mod.Keychain.get(this.keychainId.needseed) || `XekqJ6`,
+      randomSeed = this.Mod.Keychain.get(this.keychainId.nextseed) || `XekqJ6`,
       page = 1,
       purity = "111",
       api_key = this.Mod.Keychain.get(this.keychainId.apiKey) || "",
