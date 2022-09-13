@@ -1,4 +1,71 @@
-const { ModModule } = require("CoreJS");
+const { ModModule } = require("CoreJS"),
+  Next = require("Next");
+class VideoData {
+  constructor(videoData) {
+    //      bvid	str	稿件bvid
+    //      aid	num	稿件avid
+    //      videos	num	稿件分P总数	默认为1
+    //      tid	num	分区tid
+    //      tname	str	子分区名称
+    //      copyright	num	视频类型	1：原创 2：转载
+    this.avid = videoData.aid;
+    this.bvid = videoData.bvid;
+    this.copyright = videoData.copyright; //1：原创 2：转载
+    this.cover_image = videoData.pic; //视频封面
+    this.desc = videoData.desc; //简介
+    this.parts_count = videoData.videos; //稿件分P总数
+    this.publish_time = videoData.pubdate; //发布时间
+    this.staff = videoData.staff; //合作成员列表
+    this.tid = videoData.tid; //分区id
+    this.title = videoData.title;
+    this.tname = videoData.tname; //子分区名称
+    this.upload_time = videoData.ctime; //投稿时间戳
+  }
+}
+class PopularVideo {
+  constructor(modModule) {
+    this.Module = modModule;
+    this.Http = new Next.Http(5);
+  }
+  async getPopularVideoList(isLogin = true) {
+    const cookie = isLogin
+        ? this.Module.Mod.ModuleLoader.getModule("bilibili.user").getCookie()
+        : undefined,
+      url = `https://api.bilibili.com/x/web-interface/popular`,
+      resp = await this.Http.get({
+        url,
+        params: {
+          pn: 1,
+          ps: 20
+        },
+        header: {
+          cookie
+        }
+      });
+    if (resp.error) {
+      $console.error(resp.error);
+      return undefined;
+    } else {
+      const result = resp.data,
+        codeMessageList = {
+          "0": "成功",
+          "-400": "请求错误"
+        };
+      if (result.code == 0) {
+        //resultData={list:[热门视频列表],no_more:true下页没有数据\false下页还有数据}
+        const resultData = { no_more: result.data.no_more, list: [] };
+        resultData.list = result.data.list.map(video => new VideoData(video));
+        return resultData;
+      } else {
+        $console.error(
+          result.code + codeMessageList[result.code.toString()] ||
+            result.message
+        );
+        return undefined;
+      }
+    }
+  }
+}
 
 class VideoInfo {
   constructor(modModule) {
@@ -41,6 +108,21 @@ class VideoInfo {
     }
   }
 }
+class VideoUi {
+  constructor(modModule) {
+    this.ModModule = modModule;
+    this.Popular = modModule.Popular;
+  }
+  getPopularVideo() {}
+  getViewUiList() {
+    return [
+      {
+        title: "热门视频",
+        func: () => this.getPopularVideo()
+      }
+    ];
+  }
+}
 
 class BilibiliVideo extends ModModule {
   constructor(mod) {
@@ -53,6 +135,10 @@ class BilibiliVideo extends ModModule {
     this.Mod = mod;
     this.$ = mod.$;
     this.Info = new VideoInfo(this);
+    this.Popular = new PopularVideo(this);
+  }
+  getViewUiList() {
+    return new VideoUi(this).getViewUiList();
   }
   async showVideoInfo(bvid) {
     if (bvid != undefined && bvid.length > 0) {

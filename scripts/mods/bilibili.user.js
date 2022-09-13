@@ -31,6 +31,7 @@ class UserLogin {
   isLogin() {
     return this.Data.cookie().length > 0;
   }
+
   async getWebLoginKey() {
     const url = "https://passport.bilibili.com/qrcode/getLoginUrl",
       header = {},
@@ -67,7 +68,6 @@ class UserLogin {
       if (resp.data) {
         const result = resp.data,
           response = resp.response;
-        $console.info(result);
         if (result.status) {
           const scanTs = result.ts,
             setCookie = response.headers["Set-Cookie"];
@@ -98,7 +98,6 @@ class UserLogin {
           const cookie = { DedeUserID, DedeUserID__ckMd5, SESSDATA, bili_jct },
             cookieSuccess = this.Data.cookie(cookie),
             uidSuccess = this.Data.uid(DedeUserID);
-          $console.info({ scanTs, cookieSuccess, uidSuccess });
           if (cookieSuccess && uidSuccess && cookie != undefined) {
             $ui.success("登录成功，请返回");
           } else {
@@ -147,7 +146,6 @@ class UserInfo {
         header,
         timeout
       });
-    $console.info({ resp });
     if (resp.error) {
       $ui.loading(false);
       $ui.alert({
@@ -506,7 +504,11 @@ class BilibiliUser extends ModModule {
     this.Vip = new Vip(this);
   }
   getCookie() {
-    return this.Login.Data.cookie();
+    const cookie = this.Login.Data.cookie();
+    $console.warn({
+      cookie
+    });
+    return cookie;
   }
   isLogin() {
     return this.Login.isLogin();

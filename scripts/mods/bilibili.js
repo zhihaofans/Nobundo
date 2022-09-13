@@ -1,12 +1,9 @@
 const { ModCore, ModuleLoader } = require("CoreJS"),
   Next = require("Next"),
-  $ = require("$"),
   uiKit = require("../../Core.js/ui"),
   listKit = new uiKit.ListKit();
 class BilibiliLauncher {
-  constructor(name) {
-    this.NAME = name;
-  }
+  constructor() {}
   app(mode, id) {
     $app.openURL(`bilibili://${mode}/${id}`);
   }
@@ -67,7 +64,6 @@ class BilibiliApi {
       }
     });
     const sign = $text.URLEncode($text.URLEncode(paramsStr) + appSec);
-    $console.info(sign);
     return $text.MD5(sign);
   }
   async getUserInfo(cookie) {
@@ -79,7 +75,6 @@ class BilibiliApi {
         header,
         timeout
       });
-    $console.info({ result });
     return result.data;
   }
 }
@@ -96,7 +91,7 @@ class Main {
     const mainViewList = [
         "扫描二维码登录",
         "查看登录数据",
-        "查看用户信息",
+        "(空白)",
         "查看大会员特权",
         "稍后再看",
         "历史记录"
@@ -109,7 +104,7 @@ class Main {
           case 1:
             $ui.alert({
               title: "Cookie",
-              message: this.UserModule.getCookie(),
+              message: JSON.stringify(this.UserModule.getCookie()),
               actions: [
                 {
                   title: "OK",
@@ -133,8 +128,61 @@ class Main {
             this.UserModule.Info.getHistory();
             break;
         }
-      };
-    listKit.pushString(this.Mod.MOD_INFO.NAME, mainViewList, didSelect);
+      },
+      videoMenuList = this.Video.getViewUiList();
+    $ui.push({
+      props: {
+        title: this.Mod.MOD_INFO.NAME
+      },
+      views: [
+        {
+          type: "list",
+          props: {
+            data: [
+              {
+                title: "",
+                rows: mainViewList
+              },
+              {
+                title: "视频",
+                rows: videoMenuList.map(item => item.title)
+              }
+            ]
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (sender, indexPath, data) => {
+              const section = indexPath.section,
+                row = indexPath.row;
+              switch (section) {
+                case 0:
+                  didSelect(sender, indexPath, data);
+                  break;
+                case 1:
+                  try {
+                    videoMenuList[row].func();
+                  } catch (error) {
+                    $console.error(error);
+                    $ui.alert({
+                      title: "videoMenuList[row].func",
+                      message: error.message,
+                      actions: [
+                        {
+                          title: "OK",
+                          disabled: false, // Optional
+                          handler: () => {}
+                        }
+                      ]
+                    });
+                  }
+                  break;
+                default:
+              }
+            }
+          }
+        }
+      ]
+    });
   }
 }
 
@@ -148,7 +196,7 @@ class Bilibili extends ModCore {
       author: "zhihaofans",
       coreVersion: 9
     });
-    this.$ = $;
+    this.$ = require("$");
     this.Http = $.http;
     this.Storage = Next.Storage;
     this.ModuleLoader = new ModuleLoader(this);
