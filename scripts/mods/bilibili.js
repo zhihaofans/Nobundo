@@ -197,16 +197,20 @@ class Bilibili extends ModCore {
       coreVersion: 9
     });
     this.$ = require("$");
-    this.Http = $.http;
+    this.Http = this.$.http;
     this.Storage = Next.Storage;
     this.ModuleLoader = new ModuleLoader(this);
     this.biliLauncher = new BilibiliLauncher();
   }
   run() {
-    this.ModuleLoader.addModule("bilibili.video.js");
-    this.ModuleLoader.addModule("bilibili.user.js");
-    const main = new Main(this);
-    main.init();
+    try {
+      this.ModuleLoader.addModule("bilibili.video.js");
+      this.ModuleLoader.addModule("bilibili.user.js");
+      const main = new Main(this);
+      main.init();
+    } catch (error) {
+      $console.error(error);
+    }
   }
 }
 module.exports = Bilibili;
