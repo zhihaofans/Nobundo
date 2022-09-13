@@ -1,12 +1,10 @@
 const { ModModule } = require("CoreJS"),
-  uiKit = require("../../Core.js/ui"),
   Next = require("Next"),
-  listKit = new uiKit.ListKit();
+  ListViewKit = new Next.ListView();
 class Main {
   constructor(mod) {
     this.Mod = mod;
     this.$ = mod.$;
-    this.listViewKit = new Next.ListView();
   }
   multListTest() {
     const listData = [
@@ -19,7 +17,7 @@ class Main {
         subTitle: "内容2"
       }
     ];
-    this.listViewKit.pushTwoLineList({
+    ListViewKit.pushTwoLineList({
       title: "example 1",
       items: listData
     });
@@ -120,8 +118,8 @@ class Main {
   }
   init() {
     const mainViewList = ["example 1", "example 2"],
-      didSelect = (sender, indexPath, data) => {
-        switch (indexPath.row) {
+      didSelect = index => {
+        switch (index) {
           case 0:
             this.multListTest();
             break;
@@ -130,8 +128,8 @@ class Main {
             break;
           default:
             $ui.alert({
-              title: indexPath.row,
-              message: data,
+              title: index,
+              message: mainViewList[index],
               actions: [
                 {
                   title: "OK",
@@ -142,7 +140,7 @@ class Main {
             });
         }
       };
-    listKit.pushString(this.Mod.MOD_INFO.NAME, mainViewList, didSelect);
+    ListViewKit.pushSimpleText(this.Mod.MOD_INFO.NAME, mainViewList, didSelect);
   }
 }
 
