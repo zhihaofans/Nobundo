@@ -467,11 +467,7 @@ class BilibiliUser extends ModModule {
     this.Vip = new Vip(this);
   }
   getCookie() {
-    const cookie = this.Login.Data.cookie();
-    $console.warn({
-      cookie
-    });
-    return cookie;
+    return this.Login.Data.cookie();
   }
   isLogin() {
     return this.Login.isLogin();

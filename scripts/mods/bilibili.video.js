@@ -52,10 +52,6 @@ class PopularVideo {
       return undefined;
     } else {
       const result = resp.data;
-
-      $console.info({
-        result
-      });
       if (result.code == 0) {
         //resultData={list:[热门视频列表],no_more:true下页没有数据\false下页还有数据}
         const resultData = { no_more: result.data.no_more, list: [] };
@@ -169,11 +165,14 @@ class VideoUi {
     this.Popular = modModule.Popular;
   }
   async getPopularVideo() {
+    $ui.loading(true);
     try {
       const popularList = await this.Popular.getPopularVideoList();
-      $console.info(popularList);
+      this.ModModule.Info.pushVideoInfoList("前20个热门视频", popularList.list);
     } catch (error) {
       $console.error(error);
+    } finally {
+      $ui.loading(false);
     }
   }
   getViewUiList() {
