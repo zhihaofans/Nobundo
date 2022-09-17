@@ -84,6 +84,7 @@ class Main {
     this.Mod = mod;
     this.Video = this.Mod.ModuleLoader.getModule("bilibili.video");
     this.UserModule = this.Mod.ModuleLoader.getModule("bilibili.user");
+    this.Social = this.Mod.ModuleLoader.getModule("bilibili.social");
     this.Vip = this.UserModule.Vip;
     this.isLoading = false;
   }
@@ -114,6 +115,13 @@ class Main {
               ]
             });
             break;
+          case 2:
+            try {
+              this.Social.getEmote();
+            } catch (error) {
+              $console.error(error);
+            }
+            break;
           case 3:
             try {
               this.Vip.getPrivilegeStatus(sender.cell(indexPath));
@@ -129,7 +137,8 @@ class Main {
             break;
         }
       },
-      videoMenuList = this.Video.getViewUiList();
+      videoMenuList = this.Video.getViewUiList(),
+      socialMenuList = this.Social.getViewUiList();
     $ui.push({
       props: {
         title: this.Mod.MOD_INFO.NAME
@@ -146,6 +155,10 @@ class Main {
               {
                 title: "视频",
                 rows: videoMenuList.map(item => item.title)
+              },
+              {
+                title: "社区",
+                rows: socialMenuList.map(item => item.title)
               }
             ]
           },
@@ -160,11 +173,39 @@ class Main {
                   break;
                 case 1:
                   try {
-                    videoMenuList[row].func();
+                    if (this.Mod.$.isFunction(videoMenuList[row].func)) {
+                      videoMenuList[row].func();
+                    } else {
+                      $ui.loading(false);
+                      $ui.error("error");
+                    }
                   } catch (error) {
                     $console.error(error);
                     $ui.alert({
                       title: "videoMenuList[row].func",
+                      message: error.message,
+                      actions: [
+                        {
+                          title: "OK",
+                          disabled: false, // Optional
+                          handler: () => {}
+                        }
+                      ]
+                    });
+                  }
+                  break;
+                case 2:
+                  try {
+                    if (this.Mod.$.isFunction(socialMenuList[row].func)) {
+                      socialMenuList[row].func();
+                    } else {
+                      $ui.loading(false);
+                      $ui.error("error");
+                    }
+                  } catch (error) {
+                    $console.error(error);
+                    $ui.alert({
+                      title: "socialMenuList[row].func",
                       message: error.message,
                       actions: [
                         {
@@ -206,6 +247,7 @@ class Bilibili extends ModCore {
     try {
       this.ModuleLoader.addModule("bilibili.video.js");
       this.ModuleLoader.addModule("bilibili.user.js");
+      this.ModuleLoader.addModule("bilibili.social.js");
       const main = new Main(this);
       main.init();
     } catch (error) {

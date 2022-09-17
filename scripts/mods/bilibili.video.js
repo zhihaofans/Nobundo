@@ -2,12 +2,6 @@ const { ModModule } = require("CoreJS"),
   Next = require("Next");
 class VideoData {
   constructor(videoData) {
-    //      bvid	str	稿件bvid
-    //      aid	num	稿件avid
-    //      videos	num	稿件分P总数	默认为1
-    //      tid	num	分区tid
-    //      tname	str	子分区名称
-    //      copyright	num	视频类型	1：原创 2：转载
     this.author_face = videoData.owner.face;
     this.author_mid = videoData.owner.mid;
     this.author_name = videoData.owner.name;
@@ -30,14 +24,13 @@ class VideoData {
 class PopularVideo {
   constructor(modModule) {
     this.Module = modModule;
-    this.Http = new Next.Http(5);
   }
   async getPopularVideoList(isLogin = true) {
     const cookie = isLogin
         ? this.Module.Mod.ModuleLoader.getModule("bilibili.user").getCookie()
         : undefined,
       url = `https://api.bilibili.com/x/web-interface/popular`,
-      resp = await this.Http.get({
+      resp = await this.Module.Http.get({
         url,
         params: {
           pn: 1,
@@ -72,16 +65,14 @@ class PopularVideo {
 class VideoInfo {
   constructor(modModule) {
     this.Module = modModule;
-    this.Http = modModule.Mod.Http;
   }
   async getVideoInfo(bvid = "BV17x411w7KC") {
     const cookie = this.Module.Mod.ModuleLoader.getModule(
         "bilibili.user"
       ).getCookie(),
       url = `https://api.bilibili.com/x/web-interface/view?bvid=${bvid}`,
-      resp = await this.Http.get({
+      resp = await this.Module.Http.get({
         url,
-        timeout: 5,
         header: {
           cookie
         }
@@ -180,6 +171,10 @@ class VideoUi {
       {
         title: "热门视频",
         func: () => this.getPopularVideo()
+      },
+      {
+        title: "排行榜视频",
+        func: undefined
       }
     ];
   }
@@ -195,6 +190,7 @@ class BilibiliVideo extends ModModule {
     });
     this.Mod = mod;
     this.$ = mod.$;
+    this.Http = new Next.Http(5);
     this.Info = new VideoInfo(this);
     this.Popular = new PopularVideo(this);
   }
