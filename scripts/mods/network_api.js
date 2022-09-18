@@ -80,27 +80,38 @@ class WidgetView {
   async showTodayLunarCalendar() {
     const dateKit = new Next.DateTime(1),
       nowDate = dateKit.getFullDateNumber(),
-      chineseCalendarData = await this.Mod.mxnzp.getChineseCalendar(nowDate),
-      resultList = [
-        chineseCalendarData.avoid,
-        chineseCalendarData.lunarCalendar,
-        chineseCalendarData.typeDes,
-        `属${chineseCalendarData.chineseZodiac}`,
-        `${chineseCalendarData.yearTips}年`
-      ],
-      randomItem = resultList[Math.floor(Math.random() * resultList.length)];
-    $console.info({
-      randomItem,
-      resultList
-    });
-    $widget.setTimeline(ctx => {
-      return {
-        type: "text",
-        props: {
-          text: randomItem || "showTodayLunarCalendar"
-        }
-      };
-    });
+      chineseCalendarData = await this.Mod.mxnzp.getChineseCalendar(nowDate);
+    if (chineseCalendarData == undefined) {
+      $widget.setTimeline(ctx => {
+        return {
+          type: "text",
+          props: {
+            text: "网络错误"
+          }
+        };
+      });
+    } else {
+      const resultList = [
+          chineseCalendarData.avoid,
+          chineseCalendarData.lunarCalendar,
+          chineseCalendarData.typeDes,
+          `属${chineseCalendarData.chineseZodiac}`,
+          `${chineseCalendarData.yearTips}年`
+        ],
+        randomItem = resultList[Math.floor(Math.random() * resultList.length)];
+      $console.info({
+        randomItem,
+        resultList
+      });
+      $widget.setTimeline(ctx => {
+        return {
+          type: "text",
+          props: {
+            text: randomItem || "showTodayLunarCalendar"
+          }
+        };
+      });
+    }
   }
 }
 
