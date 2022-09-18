@@ -7,9 +7,9 @@ class Example extends ModCore {
       app,
       modId: "example",
       modName: "例子",
-      version: "7",
+      version: "7a",
       author: "zhihaofans",
-      coreVersion: 9,
+      coreVersion: 10,
       allowWidget: true,
       allowApi: true
     });
@@ -28,14 +28,13 @@ class Example extends ModCore {
     }
     //$ui.success("run");
   }
-  runWidget() {
-    const inputValue = $widget.inputValue ? $widget.inputValue : "Hello!";
+  runWidget(widgetId) {
     $widget.setTimeline({
       render: ctx => {
         return {
           type: "text",
           props: {
-            text: inputValue
+            text: widgetId || "Hello!"
           }
         };
       }

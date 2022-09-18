@@ -35,6 +35,18 @@ class App extends AppKernel {
     this.modLoader.setKeyboardMod("keyboard");
     this.modLoader.setWidgetMod("example");
     this.modLoader.setContextMod("action_extension");
+    this.modLoader.WidgetLoader.registerWidget({
+      id: "example",
+      modId: "example",
+      title: "例子",
+      size: $widgetFamily.small
+    });
+    this.modLoader.WidgetLoader.registerWidget({
+      id: "network_api.mxnzp.today.lunarCalendar",
+      modId: "network_api",
+      title: "今日农历日期",
+      size: $widgetFamily.accessoryInline
+    });
     this.modLoader.autoRunMod();
   }
 }
