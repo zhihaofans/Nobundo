@@ -92,11 +92,10 @@ class WidgetView {
       });
     } else {
       const resultList = [
-          chineseCalendarData.avoid,
-          chineseCalendarData.lunarCalendar,
           chineseCalendarData.typeDes,
-          `属${chineseCalendarData.chineseZodiac}`,
-          `${chineseCalendarData.yearTips}年`
+          `${chineseCalendarData.yearTips}年${chineseCalendarData.lunarCalendar}(${chineseCalendarData.chineseZodiac})`,
+          `忌${chineseCalendarData.avoid}`,
+          `宜${chineseCalendarData.suit}`
         ],
         randomItem = resultList[Math.floor(Math.random() * resultList.length)];
       $console.info({
