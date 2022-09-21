@@ -1,8 +1,7 @@
 const { ModCore } = require("CoreJS"),
   $ = require("$"),
   Next = require("Next"),
-  uiKit = require("../../Core.js/ui"),
-  listKit = new uiKit.ListKit();
+  ListView = new Next.ListView();
 class ApiTest {
   constructor(mod) {
     this.Http = mod.Http;
@@ -305,14 +304,14 @@ class Main {
     const main_view_list = versionList.map(v =>
         v.version == $app.info.version ? `${v.version}(当前版本)` : v.version
       ),
-      didSelect = (sender, indexPath, data) => {
-        const thisVer = versionList[indexPath.row],
+      didSelect = index => {
+        const thisVer = versionList[index],
           versionClass = new thisVer.classObject(
             thisVer.needCore == true ? this.Mod : undefined
           );
         versionClass[thisVer.index]();
       };
-    listKit.pushString(this.Mod.MOD_NAME, main_view_list, didSelect);
+    ListView.pushSimpleText(this.Mod.MOD_NAME, main_view_list, didSelect);
   }
 }
 

@@ -1,8 +1,7 @@
 const { ModCore } = require("CoreJS"),
-  uiKit = require("../../Core.js/ui"),
   $ = require("$"),
   next = require("Next"),
-  listKit = new uiKit.ListKit();
+  ListView = new next.ListView();
 class AnimalKit {
   constructor(mod) {
     this.Mod = mod;
@@ -38,6 +37,9 @@ class AnimalKit {
       const dateKit = new next.DateTime(1),
         nowDate = dateKit.getFullDateNumber(),
         chineseCalendarData = await this.getChineseCalendar(nowDate);
+      $console.info({
+        chineseCalendarData
+      });
     } catch (error) {
       $console.error(error);
     }
@@ -95,8 +97,8 @@ class Main {
   init() {
     //TODO: 加个新增倒数事项的功能
     const mainViewList = ["选择日期", "十二生肖"],
-      didSelect = (sender, indexPath, data) => {
-        switch (indexPath.row) {
+      didSelect = index => {
+        switch (index) {
           case 0:
             this.getPastDate();
             break;
@@ -105,7 +107,7 @@ class Main {
             break;
         }
       };
-    listKit.pushString(this.Mod.MOD_NAME, mainViewList, didSelect);
+    ListView.pushSimpleText(this.Mod.MOD_NAME, mainViewList, didSelect);
   }
   async getPastDate() {
     const dateResult = await this.$.dateTime.pickDate(),

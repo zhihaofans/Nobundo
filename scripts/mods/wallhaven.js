@@ -1,7 +1,7 @@
 const { ModCore } = require("CoreJS"),
   $ = require("$"),
-  uiKit = require("../../Core.js/ui"),
-  listKit = new uiKit.ListKit();
+  Next = require("Next"),
+  ListView = new Next.ListView();
 class Main {
   constructor(mod) {
     this.Mod = mod;
@@ -41,8 +41,7 @@ class Main {
   }
   async random(categories = "111") {
     $ui.loading(true);
-    const nextSeedId = this.keychainId.nextseed,
-      query = `id%3A5type:png`,
+    const query = `id%3A5type:png`,
       sorting = `random`,
       randomSeed = this.Mod.Keychain.get(this.keychainId.nextseed) || `XekqJ6`,
       page = 1,
@@ -74,13 +73,13 @@ class Main {
       $console.info(httpData);
       $console.warn(apiData);
       if (apiData.length > 0) {
-        const didSelect = (sender, indexPath, data) => {
+        const didSelect = index => {
           $ui.preview({
             title: "URL",
-            url: apiData[indexPath.row].path
+            url: apiData[index].path
           });
         };
-        listKit.pushString(
+        ListView.pushSimpleText(
           `${apiData.length}张`,
           apiData.map(img => img.id),
           didSelect

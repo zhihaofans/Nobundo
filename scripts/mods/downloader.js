@@ -1,7 +1,7 @@
 const { ModCore } = require("CoreJS"),
   $ = require("$"),
-  uiKit = require("../../Core.js/ui"),
-  listKit = new uiKit.ListKit();
+  Next = require("Mext"),
+  ListView = new Next.ListView();
 class DownloaderCore {
   constructor(mod) {
     this.Mod = mod;
@@ -22,14 +22,14 @@ class Main {
   }
   init() {
     const mainViewList = ["开始下载"],
-      didSelect = (sender, indexPath, data) => {
-        switch (indexPath.row) {
+      didSelect = index => {
+        switch (index) {
           case 0:
             this.inputUrl();
             break;
         }
       };
-    listKit.pushString(this.Core.MOD_NAME, mainViewList, didSelect);
+    ListView.pushSimpleText(this.Core.MOD_NAME, mainViewList, didSelect);
     if (this.isShare) {
       this.loadShare();
     }

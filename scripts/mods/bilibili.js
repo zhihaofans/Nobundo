@@ -1,7 +1,5 @@
 const { ModCore, ModuleLoader } = require("CoreJS"),
-  Next = require("Next"),
-  uiKit = require("../../Core.js/ui"),
-  listKit = new uiKit.ListKit();
+  Next = require("Next");
 class BilibiliLauncher {
   constructor() {}
   app(mode, id) {

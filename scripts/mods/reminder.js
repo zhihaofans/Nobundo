@@ -1,7 +1,7 @@
 const { ModCore } = require("CoreJS"),
-  uiKit = require("../../Core.js/ui"),
+  Next = require("Next"),
   $ = require("$"),
-  listKit = new uiKit.ListKit();
+  ListView = new Next.ListView();
 class ReminderLib {
   constructor() {}
   editEvent(event, handler) {
@@ -45,7 +45,6 @@ class ReminderLib {
     });
   }
   showEvents({ hours }) {
-    const listviewId = "list_reminder_event";
     $reminder.fetch({
       startDate: new Date(),
       hours,
@@ -53,8 +52,8 @@ class ReminderLib {
         $console.warn(resp);
         if (resp.status == true) {
           const events = resp.events,
-            handler = (section, row) => {
-              const thisEvents = events[row];
+            handler = index => {
+              const thisEvents = events[index];
               $console.info(thisEvents);
               $ui.menu({
                 items: ["编辑", "删除"],
@@ -95,12 +94,11 @@ class ReminderLib {
                 }
               });
             };
-          listKit.pushIndex({
-            id: listviewId,
-            title: `提醒事项(共${events.length}个)`,
-            data: events.map(event => event.title),
+          ListView.pushSimpleText(
+            `提醒事项(共${events.length}个)`,
+            events.map(event => event.title),
             handler
-          });
+          );
         } else {
           $ui.alert({
             title: "加载提醒事项错误",
@@ -137,8 +135,8 @@ class Main {
   }
   init() {
     const mainViewList = ["查看所有", "快速添加"],
-      didSelect = (sender, indexPath, data) => {
-        switch (indexPath.row) {
+      didSelect = index => {
+        switch (index) {
           case 0:
             this.showEvents();
             break;
@@ -147,8 +145,7 @@ class Main {
             break;
           default:
             $ui.alert({
-              title: indexPath.row,
-              message: data,
+              title: index,
               actions: [
                 {
                   title: "OK",
@@ -159,7 +156,7 @@ class Main {
             });
         }
       };
-    listKit.pushString(this.Mod.MOD_NAME, mainViewList, didSelect);
+    ListView.pushSimpleText(this.Mod.MOD_NAME, mainViewList, didSelect);
   }
   async quickCreate() {
     const nowDate = new Date(),
