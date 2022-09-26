@@ -1,6 +1,6 @@
 const { ModCore } = require("CoreJS"),
   $ = require("$"),
-  Next = require("Mext"),
+  Next = require("Next"),
   ListView = new Next.ListView();
 class DownloaderCore {
   constructor(mod) {
