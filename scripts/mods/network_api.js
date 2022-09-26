@@ -8,6 +8,9 @@ class CacheData {
       mxnzp_holiday: "mxnzp_holiday"
     };
   }
+  load(key) {
+    return $cache.get(key);
+  }
   remove(key) {
     $cache.remove(key);
   }
@@ -20,27 +23,40 @@ class CacheData {
       }
     });
   }
-  load(key) {
-    return $cache.get(key);
-  }
 }
 
 class MxnzpCore {
   constructor(mod) {
     this.Mod = mod;
-    this.SQLITE = mod.SQLITE;
+    this.Keychain = mod.Keychain;
     this.Cache = new CacheData(mod);
+    this.SQLITE_ID = {
+      APP_ID: "app_id",
+      APP_SECRET: "app_secret"
+    };
   }
   getApikey() {
+    const app_id = this.Keychain.get(this.SQLITE_ID.APP_ID),
+      app_secret = this.Keychain.get(this.SQLITE_ID.APP_SECRET);
+    $console.info({
+      _: "getApikey",
+      app_id,
+      app_secret
+    });
     return {
-      app_id: this.SQLITE.getItem("app_id"),
-      app_secret: this.SQLITE.getItem("app_secret")
+      app_id,
+      app_secret
     };
   }
   setApikey({ app_id, app_secret }) {
+    $console.info({
+      _: "setApikey",
+      app_id,
+      app_secret
+    });
     if (app_id.length > 0 && app_secret.length > 0) {
-      this.SQLITE.setItem("app_id", app_id);
-      this.SQLITE.setItem("app_secret", app_secret);
+      this.Keychain.set(this.SQLITE_ID.APP_ID, app_id);
+      this.Keychain.set(this.SQLITE_ID.APP_SECRET, app_secret);
     }
   }
   async getChineseCalendar(date) {
@@ -52,22 +68,30 @@ class MxnzpCore {
         this.Cache.remove(this.Cache.CACHE_ID_LIST.mxnzp_holiday);
       }
     }
-    const { app_id, app_secret } = this.getApikey(),
-      url = `https://www.mxnzp.com/api/holiday/single/${date}?ignoreHoliday=false`,
-      header = {
-        app_id,
-        app_secret
-      },
-      resp = await this.Mod.Http.get({
-        url,
-        header
-      }),
-      result = resp.data;
-    if (result && result.code == 1) {
-      this.Cache.save(this.Cache.CACHE_ID_LIST.mxnzp_holiday, result.data);
-      return result.data;
-    } else {
-      $console.error(result.msg);
+    const { app_id, app_secret } = this.getApikey();
+    $console.info({
+      _: "getChineseCalendar",
+      app_id,
+      app_secret
+    });
+    if (app_id != undefined && app_secret != undefined) {
+      const url = `https://www.mxnzp.com/api/holiday/single/${date}?ignoreHoliday=false`,
+        header = {
+          app_id,
+          app_secret
+        },
+        resp = await this.Mod.Http.get({
+          url,
+          header
+        }),
+        result = resp.data;
+
+      if (result && result.code == 1) {
+        this.Cache.save(this.Cache.CACHE_ID_LIST.mxnzp_holiday, result.data);
+        return result.data;
+      } else {
+        $console.error(result.msg);
+      }
     }
     return undefined;
   }
@@ -133,12 +157,12 @@ class NetworkApi extends ModCore {
     this.widgetView = new WidgetView(this);
   }
   run() {
-    const apiKey = this.mxnzp.getApikey();
     $ui.menu({
       items: ["设置apikey", "小组件"],
       handler: (title, idx) => {
         switch (idx) {
           case 0:
+            const apiKey = this.mxnzp.getApikey();
             $input.text({
               type: $kbType.text,
               placeholder: "app_id",
