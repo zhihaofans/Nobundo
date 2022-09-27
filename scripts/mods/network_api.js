@@ -38,22 +38,12 @@ class MxnzpCore {
   getApikey() {
     const app_id = this.Keychain.get(this.SQLITE_ID.APP_ID),
       app_secret = this.Keychain.get(this.SQLITE_ID.APP_SECRET);
-    $console.info({
-      _: "getApikey",
-      app_id,
-      app_secret
-    });
     return {
       app_id,
       app_secret
     };
   }
   setApikey({ app_id, app_secret }) {
-    $console.info({
-      _: "setApikey",
-      app_id,
-      app_secret
-    });
     if (app_id.length > 0 && app_secret.length > 0) {
       this.Keychain.set(this.SQLITE_ID.APP_ID, app_id);
       this.Keychain.set(this.SQLITE_ID.APP_SECRET, app_secret);
@@ -69,11 +59,6 @@ class MxnzpCore {
       }
     }
     const { app_id, app_secret } = this.getApikey();
-    $console.info({
-      _: "getChineseCalendar",
-      app_id,
-      app_secret
-    });
     if (app_id != undefined && app_secret != undefined) {
       const url = `https://www.mxnzp.com/api/holiday/single/${date}?ignoreHoliday=false`,
         header = {
