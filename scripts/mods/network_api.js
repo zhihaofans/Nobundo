@@ -5,7 +5,7 @@ class CacheData {
   constructor(mod) {
     this.Mod = mod;
     this.CACHE_ID_LIST = {
-      mxnzp_holiday: "mxnzp_holiday"
+      mxnzp_holiday_single: "mxnzp_holiday_single"
     };
   }
   load(key) {
@@ -50,12 +50,14 @@ class MxnzpCore {
     }
   }
   async getChineseCalendar(date) {
-    const cacheData = this.Cache.load(this.Cache.CACHE_ID_LIST.mxnzp_holiday);
+    const cacheData = this.Cache.load(
+      this.Cache.CACHE_ID_LIST.mxnzp_holiday_single
+    );
     if (cacheData != undefined) {
       if (cacheData.date == date) {
         return cacheData.data;
       } else {
-        this.Cache.remove(this.Cache.CACHE_ID_LIST.mxnzp_holiday);
+        this.Cache.remove(this.Cache.CACHE_ID_LIST.mxnzp_holiday_single);
       }
     }
     const { app_id, app_secret } = this.getApikey();
@@ -70,7 +72,6 @@ class MxnzpCore {
           header
         }),
         result = resp.data;
-
       if (result && result.code == 1) {
         this.Cache.save(this.Cache.CACHE_ID_LIST.mxnzp_holiday, result.data);
         return result.data;
