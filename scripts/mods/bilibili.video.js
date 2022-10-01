@@ -174,7 +174,14 @@ class VideoUi {
       },
       {
         title: "排行榜视频",
-        func: undefined
+        func: () => {
+          $safari.open({
+            url: "https://m.bilibili.com/ranking",
+            entersReader: true,
+            height: 360,
+            handler: () => {}
+          });
+        }
       }
     ];
   }
