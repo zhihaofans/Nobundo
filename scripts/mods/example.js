@@ -7,7 +7,7 @@ class Example extends ModCore {
       app,
       modId: "example",
       modName: "例子",
-      version: "7b",
+      version: "7c",
       author: "zhihaofans",
       coreVersion: 10,
       useSqlite: true,
@@ -18,9 +18,9 @@ class Example extends ModCore {
     this.Http = $.http;
     this.Storage = app.Storage;
     this.ModuleLoader = new ModuleLoader(this);
+    this.ModuleLoader.addModule("example.ui.js");
   }
   run() {
-    this.ModuleLoader.addModule("example.ui.js");
     try {
       this.runSqlite();
       const ui = this.ModuleLoader.getModule("example.ui");
@@ -42,9 +42,19 @@ class Example extends ModCore {
       }
     });
   }
-  runApi({ url, data, callback }) {
-    //TODO:允许其他Mod调用
-    this.allowApi = true;
+  runApi({ apiId, data, callback }) {
+    $console.info({
+      apiId,
+      data,
+      callback
+    });
+    switch (apiId) {
+      case "example.ui":
+        this.ModuleLoader.getModule("example.ui").initUi();
+
+        break;
+      default:
+    }
   }
   runSqlite() {
     const sqlite_key = "last_run_timestamp",
