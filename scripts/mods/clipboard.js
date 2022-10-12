@@ -31,7 +31,7 @@ class ClipboardCore {
     }
   }
   removeItem(index, text) {
-    const itemList = this.getAllItem();
+    let itemList = this.getAllItem();
     if (
       itemList.length == 0 ||
       index == undefined ||
@@ -46,6 +46,9 @@ class ClipboardCore {
       });
       return false;
     }
+    $console.info({
+      itemList
+    });
     if (itemList[index] == text) {
       switch (index) {
         case 0:
@@ -55,8 +58,13 @@ class ClipboardCore {
           itemList.pop();
           break;
         default:
-          const listLeft = itemList.slice(0, index);
+          const listLeft = itemList.slice(0, index + 1),
+            listRight = itemList.slice(index, itemList.length - 1);
+          itemList = listLeft.concat(listRight);
       }
+      $console.info({
+        itemList
+      });
       if (itemList.length == 0) {
         const result = this.clearItemList();
         if (result.result != true) {
@@ -78,18 +86,33 @@ class ClipboardCore {
     }
   }
   setItemList(itemListData) {
-    if (itemListData == undefined || itemListData.length == 0) {
+    $console.info({
+      itemListData
+    });
+    if (itemListData == undefined) {
       $console.error({
         _: "setItemList",
         message: "length"
       });
       return false;
+    } else if (itemListData.length == 0) {
+      return this.clearItemList();
     } else {
       try {
-        return this.Sqlite.setItem(
+        const result = this.Sqlite.setItem(
           this.SQLITE_KEY.item_list,
           JSON.stringify(itemListData)
         );
+        $console.info({
+          result,
+          itemListData
+        });
+        if (result) {
+          if ($ui.get("list_item") != undefined) {
+            $ui.get("list_item").data = itemListData;
+          }
+        }
+        return result;
       } catch (error) {
         $console.error(error);
         return false;
@@ -102,18 +125,17 @@ class ClipboardView {
     this.Mod = mod;
     this.Core = new ClipboardCore(mod);
   }
-  inputText() {
+  inputText(cliboardData) {
     $input.text({
       type: $kbType.text,
       placeholder: "",
-      text: "",
+      text: cliboardData,
       handler: text => {
         if (text.length == 0) {
           $ui.error("请输入内容");
         } else {
           const result = this.Core.addItem(text);
           if (result) {
-            this.init();
             $ui.success("添加成功");
           } else {
             $ui.error("添加失败");
@@ -145,21 +167,45 @@ class ClipboardView {
     } else {
       $ui.push({
         props: {
-          title: "剪切板"
+          title: "剪切板",
+          navButtons: [
+            {
+              title: "菜单",
+              symbol: "list.bullet",
+              menu: {
+                title: "剪切板",
+                pullDown: true,
+                asPrimary: true,
+                items: [
+                  {
+                    title: "输入",
+                    handler: sender => {
+                      this.inputText();
+                    }
+                  },
+                  {
+                    title: "粘贴",
+                    handler: sender => {
+                      this.inputText($clipboard.text);
+                    }
+                  }
+                ]
+              }
+            }
+          ]
         },
         views: [
           {
             type: "list",
             props: {
               data: itemList,
+              id: "list_item",
               actions: [
                 {
                   title: "delete",
                   color: $color("gray"), // default to gray
                   handler: (sender, indexPath) => {
-                    const index = indexPath.row,
-                      text = itemList[index],
-                      result = this.Core.removeItem(index, text);
+                    const result = this.Core.setItemList(sender.data);
                     if (result == true) {
                       $ui.success("删除成功");
                     } else {
@@ -169,7 +215,8 @@ class ClipboardView {
                 },
                 {
                   title: "分享",
-                  handler: function (sender, indexPath) {
+                  disabled: true,
+                  handler: (sender, indexPath) => {
                     $share.sheet([itemList[indexPath.row]]);
                   }
                 }
