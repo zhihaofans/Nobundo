@@ -164,7 +164,7 @@ class MainView {
     this.Mod = mod;
     this.clipBoardCore = new ClipboardCore(mod);
   }
-  showClipboardView() {
+  showClipboardView(clipData) {
     $ui.push({
       props: {
         title: "剪切板"
@@ -176,11 +176,11 @@ class MainView {
             data: [
               {
                 title: "功能",
-                rows: ["粘贴"]
+                rows: ["复制到剪切板"]
               },
               {
                 title: "剪切板",
-                rows: this.clipBoardCore.getItemList()
+                rows: clipData
               }
             ]
           },
@@ -196,12 +196,20 @@ class MainView {
                       const text = $clipboard.text;
                       if (text != undefined && text.length > 0) {
                         try {
-                          const result = this.clipBoardCore.addItem(text);
-                          if (result) {
-                            $ui.success("粘贴成功,请重新进入");
-                          } else {
-                            $ui.error("粘贴失败");
-                          }
+                          this.Mod.App.modLoader.runModApi({
+                            modId: "clipboard",
+                            apiId: "clipboard.add_item",
+                            data: {
+                              text
+                            },
+                            callback: result => {
+                              if (result == true) {
+                                $ui.success("复制成功,请重新进入");
+                              } else {
+                                $ui.error("复制失败");
+                              }
+                            }
+                          });
                         } catch (error) {
                           $console.error(error);
                           $ui.error("发生内部错误");
@@ -218,19 +226,7 @@ class MainView {
                     handler: (title, idx) => {
                       switch (idx) {
                         case 0:
-                          try {
-                            const result = this.clipBoardCore.removeItemIndex(
-                              row
-                            );
-                            if (result) {
-                              $ui.success("删除成功,请重新进入");
-                            } else {
-                              $ui.error("删除失败");
-                            }
-                          } catch (error) {
-                            $console.error(error);
-                            $ui.error("发生内部错误");
-                          }
+                          $ui.error("自己去剪切板mod删");
                           break;
                         default:
                       }
@@ -263,7 +259,33 @@ class MainView {
                 row = indexPath.row;
               switch (row) {
                 case 1:
-                  this.showClipboardView();
+                  try {
+                    this.Mod.App.modLoader.runModApi({
+                      modId: "clipboard",
+                      apiId: "clipboard.get_all_item",
+                      callback: data => this.showClipboardView(data)
+                    });
+                  } catch (error) {
+                    $console.error(error);
+                    $ui.alert({
+                      title: "加载剪切板失败",
+                      message: error.message,
+                      actions: [
+                        {
+                          title: "OK",
+                          disabled: false, // Optional
+                          handler: () => {}
+                        },
+                        {
+                          title: "Cancel",
+                          handler: () => {}
+                        }
+                      ]
+                    });
+                  } finally {
+                    $console.info("showClipboardView finally");
+                  }
+
                   break;
                 default:
               }
