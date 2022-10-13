@@ -276,6 +276,18 @@ class Clipboard extends ModCore {
             return Core.getAllItem();
           }
           break;
+        case "clipboard.add_item":
+          //data:{text:"要添加到剪切板的文本"}
+          const success =
+            data == undefined || data.text == undefined
+              ? false
+              : Core.addItem(data.text);
+          if ($.isFunction(callback)) {
+            callback(success);
+          } else {
+            return callback(success);
+          }
+          break;
         default:
       }
     } catch (error) {
