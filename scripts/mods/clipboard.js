@@ -58,9 +58,9 @@ class ClipboardCore {
           itemList.pop();
           break;
         default:
-          const listLeft = itemList.slice(0, index + 1),
-            listRight = itemList.slice(index, itemList.length - 1);
-          itemList = listLeft.concat(listRight);
+          itemList = itemList
+            .slice(0, index + 1)
+            .concat(itemList.slice(index, itemList.length - 1));
       }
       $console.info({
         itemList
@@ -265,6 +265,23 @@ class Clipboard extends ModCore {
       }
     });
   }
-  runApi({ apiId, data, callback }) {}
+  runApi({ apiId, data, callback }) {
+    try {
+      const Core = new ClipboardCore(this);
+      switch (apiId) {
+        case "clipboard.get_all_item":
+          if ($.isFunction(callback)) {
+            callback(Core.getAllItem());
+          } else {
+            return Core.getAllItem();
+          }
+          break;
+        default:
+      }
+    } catch (error) {
+      $console.error(error);
+      return;
+    }
+  }
 }
 module.exports = Clipboard;
