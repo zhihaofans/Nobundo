@@ -305,12 +305,20 @@ class KeyBoardView {
     const text = this.Mod.Core.getSelectText();
     if (text != undefined && text.length > 0) {
       try {
-        const result = this.clipBoardCore.addItem(text);
-        if (result) {
-          $ui.success("导入成功,请重新进入");
-        } else {
-          $ui.error("导入失败");
-        }
+        this.Mod.App.modLoader.runModApi({
+          modId: "clipboard",
+          apiId: "clipboard.add_item",
+          data: {
+            text
+          },
+          callback: result => {
+            if (result == true) {
+              $ui.success("复制成功,请重新进入剪切板");
+            } else {
+              $ui.error("复制失败");
+            }
+          }
+        });
       } catch (error) {
         $console.error(error);
         $ui.error("发生内部错误");
@@ -321,19 +329,27 @@ class KeyBoardView {
     const text = $clipboard.text;
     if (text != undefined && text.length > 0) {
       try {
-        const result = this.clipBoardCore.addItem(text);
-        if (result) {
-          $ui.success("导入成功,请重新进入");
-        } else {
-          $ui.error("导入失败");
-        }
+        this.Mod.App.modLoader.runModApi({
+          modId: "clipboard",
+          apiId: "clipboard.add_item",
+          data: {
+            text
+          },
+          callback: result => {
+            if (result == true) {
+              $ui.success("复制成功,请重新进入剪切板");
+            } else {
+              $ui.error("复制失败");
+            }
+          }
+        });
       } catch (error) {
         $console.error(error);
         $ui.error("发生内部错误");
       }
     }
   }
-  showClipboardView() {
+  showClipboardView(clipData) {
     $ui.push({
       props: {
         title: "剪切板",
@@ -346,11 +362,11 @@ class KeyBoardView {
             data: [
               {
                 title: "功能",
-                rows: ["从系统剪切板导入", "导入所选文本"]
+                rows: ["从系统剪切板复制", "复制所选文本"]
               },
               {
-                title: "剪切板(新▶旧)",
-                rows: this.clipBoardCore.getItemList()
+                title: "剪切板(旧▶新)",
+                rows: clipData || []
               }
             ]
           },
@@ -373,34 +389,7 @@ class KeyBoardView {
 
                   break;
                 case 1:
-                  $ui.menu({
-                    items: ["粘贴", "删除"],
-                    handler: (title, idx) => {
-                      switch (idx) {
-                        case 0:
-                          this.Mod.Core.addText(
-                            this.clipBoardCore.getItem(row)
-                          );
-                          break;
-                        case 1:
-                          try {
-                            const result = this.clipBoardCore.removeItemIndex(
-                              row
-                            );
-                            if (result) {
-                              $ui.success("删除成功,请重新进入");
-                            } else {
-                              $ui.error("删除失败");
-                            }
-                          } catch (error) {
-                            $console.error(error);
-                            $ui.error("发生内部错误");
-                          }
-                          break;
-                        default:
-                      }
-                    }
-                  });
+                  this.Mod.Core.addText(clipData[row]);
                   break;
                 default:
               }
@@ -444,12 +433,19 @@ class KeyBoardView {
                   this.Mod.Core.mathComputing(true);
                   break;
                 case 3:
-                  this.showClipboardView();
+                  try {
+                    this.Mod.App.modLoader.runModApi({
+                      modId: "clipboard",
+                      apiId: "clipboard.get_all_item",
+                      callback: data => this.showClipboardView(data)
+                    });
+                  } catch (error) {
+                    $ui.error("加载剪切板失败");
+                  }
                   break;
                 case 4:
                   $keyboard.dismiss();
                   break;
-
                 default:
               }
             }
@@ -466,7 +462,7 @@ class KeyBoard extends ModCore {
       app,
       modId: "keyboard",
       modName: "键盘输入法",
-      version: "1a",
+      version: "2",
       author: "zhihaofans",
       allowKeyboard: true,
       coreVersion: 9
