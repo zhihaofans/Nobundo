@@ -116,7 +116,7 @@ class ContentBoxApi {
     });
   }
   getContent(id) {}
-  getContentList() {
+  getContentList(type = undefined) {
     const queryResult = this.DB.getContentList();
     if (queryResult.error == undefined) {
       const resultData = queryResult.result.map(item => {

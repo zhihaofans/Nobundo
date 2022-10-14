@@ -70,11 +70,11 @@ class UserData {
   }
   getHeader() {
     return {
-      "Referer":
+      Referer:
         "https://servicewechat.com/wxeee6ace100d9a29a/99/page-frame.html",
       "User-Agent": `Mozilla/5.0 (iPhone; CPU iPhone OS 16_0_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 MicroMessenger/8.0.29(0x18001d2f) NetType/4G Language/zh_CN`,
-      "token": this.getToken(),
-      "tkid": this.getTkid()
+      token: this.getToken(),
+      tkid: this.getTkid()
     };
   }
   getTkid() {
