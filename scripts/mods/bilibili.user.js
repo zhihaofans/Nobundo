@@ -1,7 +1,6 @@
 const { ModModule } = require("CoreJS"),
-  uiKit = require("../../Core.js/ui"),
   Next = require("Next"),
-  listKit = new uiKit.ListKit();
+  ListViewKit = new Next.ListView();
 class UserData {
   constructor(keychain) {
     this.Keychain = keychain;
@@ -132,8 +131,8 @@ class UserInfo {
         header,
         timeout,
         body: postData
-      }),
-      response = resp.response;
+      });
+    //response = resp.response;
     $console.info({ resp, header });
   }
   async getHistory() {
@@ -317,8 +316,8 @@ class UserInfo {
         url,
         header,
         timeout
-      }),
-      response = resp.response;
+      });
+    //response = resp.response;
     $console.info({ resp, header });
   }
 }
@@ -477,9 +476,9 @@ class BilibiliUser extends ModModule {
       color: $color("#FF0000")
     });
     const loginKey = await this.Login.getWebLoginKey(),
-      lisiItem = ["查看二维码", "已扫二维码"],
-      didSelect = (sender, indexPath, data) => {
-        switch (indexPath.row) {
+      menuList = ["查看二维码", "已扫二维码"],
+      didSelect = index => {
+        switch (index) {
           case 0:
             $quicklook.open({
               image: loginKey.qrcode
@@ -494,7 +493,7 @@ class BilibiliUser extends ModModule {
       loginKey
     });
     listItem.stopLoading();
-    listKit.pushString("二维码登录", lisiItem, didSelect);
+    ListViewKit.pushSimpleText("二维码登录", menuList, didSelect);
   }
 }
 module.exports = BilibiliUser;
