@@ -23,27 +23,29 @@ class AnimalKit {
     this.MIN_AGE = 1;
     this.MAX_AGE = 100;
   }
-  async getChineseCalendar(date) {
-    const apiResult = await this.Mod.App.modLoader.runModApi({
+  getChineseCalendar(date, callback) {
+    this.Mod.App.modLoader.runModApi({
       modId: "network_api",
       apiId: "mxnzp.get_chinese_calendar",
-      data: date
+      data: date,
+      callback
     });
-    return apiResult;
   }
-  async getNowAnimal() {
+  getNowAnimal() {
     $ui.loading(true);
     try {
       const dateKit = new next.DateTime(1),
-        nowDate = dateKit.getFullDateNumber(),
-        chineseCalendarData = await this.getChineseCalendar(nowDate);
-      $console.info({
-        chineseCalendarData
+        nowDate = dateKit.getFullDateNumber();
+      this.getChineseCalendar(nowDate, chineseCalendarData => {
+        $console.info({
+          chineseCalendarData
+        });
+        $ui.loading(false);
       });
     } catch (error) {
       $console.error(error);
+      $ui.loading(false);
     }
-    $ui.loading(false);
   }
   getWhatAnimalAge(nowAnimalIndex, whatAnimalIndex) {
     if (!this.$.isNumber(whatAnimalIndex) || !this.$.isNumber(nowAnimalIndex)) {
@@ -116,32 +118,34 @@ class Main {
     if (dateResult) {
       $ui.loading(true);
       const result = this.DSR.getIntervalDate(
-          new Date().getTime(),
-          dateResult.getTime()
-        ),
-        chineseCalendarData = await this.DSR.animalKit.getChineseCalendar(
-          dateTime.getFullDateNumber()
-        );
-      let text = "";
-      if (result == 0) {
-        text = "今天";
-      } else if (result < 0) {
-        text = `${result * -1}天前`;
-      } else if (result > 0) {
-        text = `${result}天后`;
-      } else {
-        text = `未知结果：${result}`;
-      }
-      $ui.loading(false);
-      $ui.alert({
-        title: text,
-        message: JSON.stringify(chineseCalendarData),
-        actions: [
-          {
-            title: "OK"
+        new Date().getTime(),
+        dateResult.getTime()
+      );
+      this.DSR.animalKit.getChineseCalendar(
+        dateTime.getFullDateNumber(),
+        data => {
+          let text = "";
+          if (result == 0) {
+            text = "今天";
+          } else if (result < 0) {
+            text = `${result * -1}天前`;
+          } else if (result > 0) {
+            text = `${result}天后`;
+          } else {
+            text = `未知结果：${result}`;
           }
-        ]
-      });
+          $ui.loading(false);
+          $ui.alert({
+            title: text,
+            message: JSON.stringify(data),
+            actions: [
+              {
+                title: "OK"
+              }
+            ]
+          });
+        }
+      );
     } else {
       $ui.error("取消");
     }
@@ -156,7 +160,7 @@ class Daoshuri extends ModCore {
       modName: "倒数日",
       version: "2",
       author: "zhihaofans",
-      coreVersion: 9
+      coreVersion: 10
     });
     this.$ = $;
   }
