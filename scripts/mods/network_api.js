@@ -185,11 +185,20 @@ class NetworkApi extends ModCore {
       }
     });
   }
-  runApi(apiId, data) {
+  async runApi({ apiId, data, callback }) {
     switch (apiId) {
       case "mxnzp.get_chinese_calendar":
-        return this.mxnzp.getChineseCalendar(data);
-
+        try {
+          const result = await this.mxnzp.getChineseCalendar(data);
+          $console.info({
+            result
+          });
+          callback(result);
+        } catch (error) {
+          $console.error(error);
+          callback(undefined);
+        }
+        break;
       default:
         return undefined;
     }
