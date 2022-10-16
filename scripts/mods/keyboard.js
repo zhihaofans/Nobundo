@@ -1,81 +1,6 @@
 const { ModCore } = require("CoreJS"),
   $ = require("$"),
   Next = require("Next");
-class ClipboardCore {
-  constructor(mod) {
-    this.Mod = mod;
-    this.Keychain = mod.Keychain;
-    this.MAX_LENGTH = 10;
-    this.KEYCHAIN_ITEM_LIST = "item_list";
-  }
-  addItem(str) {
-    const itemList = this.getItemList(),
-      oldLength = itemList.length;
-    itemList.unshift(str);
-    const newLength = itemList.length;
-    if (newLength == oldLength + 1) {
-      return this.setItemList(itemList);
-    } else {
-      return false;
-    }
-  }
-  getItem(idx) {
-    return this.getItemList()[idx];
-  }
-  getItemList() {
-    const dataStr = this.Keychain.getValue(this.KEYCHAIN_ITEM_LIST) || "[]";
-    if (dataStr.length > 0) {
-      try {
-        const listData = JSON.parse(dataStr);
-        if (listData == undefined) {
-          return [];
-        } else {
-          return listData.map(item => $text.base64Decode(item)) || [];
-        }
-      } catch (error) {
-        $console.error(error);
-        return [];
-      }
-    } else {
-      return [];
-    }
-  }
-  setItemList(listData) {
-    $console.warn(listData);
-    if (listData.length > 0) {
-      return this.Keychain.setValue(
-        this.KEYCHAIN_ITEM_LIST,
-        JSON.stringify(listData.map(item => $text.base64Encode(item)))
-      );
-    } else {
-      return false;
-    }
-  }
-  clearItemList() {
-    return this.Keychain.remove(this.KEYCHAIN_ITEM_LIST);
-  }
-  removeItemIndex(idx) {
-    const itemList = this.getItemList(),
-      oldLength = itemList.length;
-    if (oldLength == 0) {
-      return false;
-    } else {
-      const oldList = itemList.splice(idx, 1),
-        newLength = itemList.length;
-      $console.info({
-        oldList,
-        itemList
-      });
-      if (newLength == 0) {
-        return this.clearItemList();
-      } else if (newLength == oldLength - 1) {
-        return this.setItemList(itemList);
-      } else {
-        return false;
-      }
-    }
-  }
-}
 
 class KeyBoardCore {
   constructor(mod) {
@@ -162,7 +87,6 @@ class KeyBoardCore {
 class MainView {
   constructor(mod) {
     this.Mod = mod;
-    this.clipBoardCore = new ClipboardCore(mod);
   }
   showClipboardView(clipData) {
     $ui.push({
@@ -299,7 +223,6 @@ class MainView {
 class KeyBoardView {
   constructor(mod) {
     this.Mod = mod;
-    this.clipBoardCore = new ClipboardCore(mod);
   }
   importSelectText() {
     const text = this.Mod.Core.getSelectText();
