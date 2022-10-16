@@ -175,15 +175,66 @@ class VideoUi {
       {
         title: "排行榜视频",
         func: () => {
-          $safari.open({
-            url: "https://m.bilibili.com/ranking",
-            entersReader: true,
-            height: 360,
-            handler: () => {}
+          //          $safari.open({
+          //            url: "https://m.bilibili.com/ranking",
+          //            entersReader: true,
+          //            height: 360,
+          //            handler: test => {
+          //              $console.info({
+          //                test
+          //              });
+          //            }
+          //          });
+          this.showVideoListWeb("https://m.bilibili.com/ranking", () => {
+            $console.info("已关闭排行榜网页");
           });
         }
       }
     ];
+  }
+  showVideoListWeb(url, callback) {
+    const modLoader = this.ModModule.Mod.App.modLoader;
+    try {
+      if (url == undefined || url.length == 0) {
+        if ($.isFunction(callback)) {
+          callback();
+        } else {
+          return undefined;
+        }
+      } else {
+      }
+      modLoader.runModApi({
+        modId: "web_browser",
+        apiId: "web_browser.openurl",
+        data: {
+          url,
+          header: {},
+          decideNavigation: (sender, action) => {
+            const url = action.requestURL;
+            $console.info(sender);
+
+            if (
+              url.startsWith("https://d.bilibili.com") ||
+              url == "about:blank"
+            ) {
+              return false;
+            }
+            if (url.startsWith("https://m.bilibili.com/video/BV")) {
+              return false;
+            }
+            if (!url.startsWith("https://") && !url.startsWith("http://")) {
+              $ui.error("已拦截非法链接");
+              $ui.title = sender.title;
+              return false;
+            }
+            return true;
+          }
+        },
+        callback
+      });
+    } catch (error) {
+      $console.error(error);
+    }
   }
 }
 

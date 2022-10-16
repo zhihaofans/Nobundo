@@ -1,4 +1,4 @@
-const { ModCore, ModuleLoader } = require("CoreJS"),
+const { ModCore } = require("CoreJS"),
   $ = require("$"),
   Next = require("Next");
 class BrowserCore {
