@@ -243,10 +243,17 @@ class ContentBoxView {
         $console.info(resp);
         if (resp.status) {
           const { filename, data } = resp;
-          this.Api.addContent({
-            title: filename,
-            data,
-            type: "image"
+          $input.text({
+            type: $kbType.text,
+            placeholder: "标题",
+            text: filename,
+            handler: text => {
+              this.Api.addContent({
+                title: text.length > 0 ? text : filename,
+                data,
+                type: "image"
+              });
+            }
           });
         } else {
           if (resp.error.description == "canceled") {
