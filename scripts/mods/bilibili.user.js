@@ -454,10 +454,10 @@ class Vip {
 class BilibiliUser extends ModModule {
   constructor(mod) {
     super({
-      modId: "bilibili",
-      moduleId: "bilibili.user",
-      moduleName: "哔哩哔哩用户模块",
-      version: "1"
+      mod,
+      id: "bilibili.user",
+      name: "哔哩哔哩用户模块",
+      version: "2"
       //author: "zhihaofans"
     });
     this.Mod = mod;

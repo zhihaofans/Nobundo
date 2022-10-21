@@ -79,10 +79,10 @@ class Emote {
 class BilibiliSocial extends ModModule {
   constructor(mod) {
     super({
-      modId: "bilibili",
-      moduleId: "bilibili.social",
-      moduleName: "哔哩哔哩社交模块",
-      version: "1"
+      mod,
+      id: "bilibili.social",
+      name: "哔哩哔哩社交模块",
+      version: "2"
     });
     this.Mod = mod;
     this.Emote = new Emote(this);

@@ -1,4 +1,5 @@
 const { AppKernel, ModLoader } = require("CoreJS"),
+  $ = require("$"),
   coreModList = [
     "bilibili.js",
     "jsbox_version.js",
@@ -29,7 +30,7 @@ class App extends AppKernel {
     } catch (error) {
       $console.error(error);
     } finally {
-      this.$.info(`启动耗时${new Date().getTime() - this.START_TIME}ms`);
+      $.info(`启动耗时${new Date().getTime() - this.START_TIME}ms`);
     }
   }
   initModList() {

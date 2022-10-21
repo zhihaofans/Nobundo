@@ -1,5 +1,6 @@
 const { ModCore, ModuleLoader } = require("CoreJS"),
-  Next = require("Next");
+  Next = require("Next"),
+  $ = require("$");
 class BilibiliLauncher {
   constructor() {}
   app(mode, id) {
@@ -28,7 +29,7 @@ class BilibiliLauncher {
 class BilibiliApi {
   constructor(mod) {
     this.Mod = mod;
-    this.$ = mod.$;
+    this.$ = $;
     this.Http = mod.Http;
   }
   getAppsecByAppkey(appkey) {
@@ -233,9 +234,9 @@ class Bilibili extends ModCore {
       modName: "哔哩哔哩",
       version: "5c",
       author: "zhihaofans",
-      coreVersion: 9
+      coreVersion: 11
     });
-    this.$ = require("$");
+    this.$ = $;
     this.Http = this.$.http;
     this.Storage = Next.Storage;
     this.ModuleLoader = new ModuleLoader(this);
@@ -243,9 +244,11 @@ class Bilibili extends ModCore {
   }
   run() {
     try {
-      this.ModuleLoader.addModule("bilibili.video.js");
       this.ModuleLoader.addModule("bilibili.user.js");
+      this.ModuleLoader.addModule("bilibili.video.js");
+
       this.ModuleLoader.addModule("bilibili.social.js");
+      this.ModuleLoader.addModule("bilibili.ui.js");
       const main = new Main(this);
       main.init();
     } catch (error) {

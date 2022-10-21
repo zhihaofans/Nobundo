@@ -147,13 +147,14 @@ class Main {
 class ExampleModule extends ModModule {
   constructor(mod) {
     super({
-      modId: "example",
-      moduleId: "example.ui",
-      moduleName: "例子ui",
+      mod,
+      id: "example.ui",
+      name: "例子ui",
       version: "1b"
       //author: "zhihaofans"
     });
-    this.Mod = mod;
+    //this.Mod = mod;
+    $console.info(this.Mod)
   }
   initUi() {
     //$ui.success("run");

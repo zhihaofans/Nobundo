@@ -7,16 +7,16 @@ class Example extends ModCore {
       app,
       modId: "example",
       modName: "例子",
-      version: "7c",
+      version: "8",
       author: "zhihaofans",
-      coreVersion: 10,
+      coreVersion: 11,
       useSqlite: true,
       allowWidget: true,
       allowApi: true
     });
     this.$ = $;
     this.Http = $.http;
-    this.Storage = app.Storage;
+    this.Storage = Next.Storage;
     this.ModuleLoader = new ModuleLoader(this);
     this.ModuleLoader.addModule("example.ui.js");
   }

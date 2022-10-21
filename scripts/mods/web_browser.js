@@ -105,7 +105,7 @@ class WebBrowser extends ModCore {
     });
     this.$ = $;
     this.Http = $.http;
-    this.Storage = app.Storage;
+    this.Storage = Next.Storage;
     this.CONFIG = {
       WEB_HOMEPAGE: "https://baidu.com"
     };

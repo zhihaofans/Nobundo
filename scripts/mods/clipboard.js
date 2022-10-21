@@ -247,7 +247,7 @@ class Clipboard extends ModCore {
     });
     this.$ = $;
     this.Http = $.http;
-    this.Storage = app.Storage;
+    this.Storage = Next.Storage;
     this.Ui = new ClipboardView(this);
   }
   run() {

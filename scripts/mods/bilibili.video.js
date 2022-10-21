@@ -1,5 +1,6 @@
 const { ModModule } = require("CoreJS"),
-  Next = require("Next");
+  Next = require("Next"),
+  $ = require("$");
 class VideoData {
   constructor(videoData) {
     this.author_face = videoData.owner.face;
@@ -193,7 +194,8 @@ class VideoUi {
     ];
   }
   showVideoListWeb(url, callback) {
-    const modLoader = this.ModModule.Mod.App.modLoader;
+    const modLoader = this.ModModule.Mod.App.modLoader,
+      urlStartsWithBlacklist = ["https://d.bilibili.com", "bilibili://"];
     try {
       if (url == undefined || url.length == 0) {
         if ($.isFunction(callback)) {
@@ -211,18 +213,15 @@ class VideoUi {
           header: {},
           decideNavigation: (sender, action) => {
             const url = action.requestURL;
-            $console.info(sender);
-
-            if (
-              url.startsWith("https://d.bilibili.com") ||
-              url == "about:blank"
-            ) {
-              return false;
-            }
+            $console.info(url);
             if (url.startsWith("https://m.bilibili.com/video/BV")) {
               return false;
             }
-            if (!url.startsWith("https://") && !url.startsWith("http://")) {
+            if (
+              !url.startsWith("https://") &&
+              !url.startsWith("http://") &&
+              !$.string.startsWithList(url, urlStartsWithBlacklist)
+            ) {
               $ui.error("已拦截非法链接");
               $ui.title = sender.title;
               return false;
@@ -241,13 +240,12 @@ class VideoUi {
 class BilibiliVideo extends ModModule {
   constructor(mod) {
     super({
-      modId: "bilibili",
-      moduleId: "bilibili.video",
-      moduleName: "哔哩哔哩视频",
-      version: "1"
+      mod,
+      id: "bilibili.video",
+      name: "哔哩哔哩视频",
+      version: "2"
     });
-    this.Mod = mod;
-    this.$ = mod.$;
+    this.$ = $;
     this.Http = new Next.Http(5);
     this.Info = new VideoInfo(this);
     this.Popular = new PopularVideo(this);
@@ -301,6 +299,13 @@ class BilibiliVideo extends ModModule {
                 title: "@" + videoInfo.owner.name,
                 func: () => {
                   $share.sheet([videoInfo.owner.name]);
+                }
+              }, {
+                title: "查看头像",
+                func: () => {
+                  $ui.preview({
+                                              url: videoInfo.owner.face
+                                            });
                 }
               }
             ]
