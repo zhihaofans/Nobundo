@@ -1,24 +1,86 @@
 const { ModCore, ModuleLoader } = require("CoreJS"),
   $ = require("$"),
-  Next = require("Next");
+  { Http, Storage } = require("Next");
+let APP_VERSION = "",
+  APP_NAME = "";
+class HttpExample {
+  constructor() {
+    this.Http = new Http(5);
+    this.HEADER = {
+      "User-Agent": `${APP_NAME}(${APP_VERSION})`,
+      cookie: ""
+    };
+  }
+  async get({ url, params }) {
+    return await this.Http.get({
+      url,
+      params,
+      header: this.HEADER
+    });
+  }
+  getAsync({ url, params, callback }) {
+    this.Http.getAsync({
+      url,
+      params,
+      header: this.HEADER,
+      handler: resp => {
+        $console.info({
+          resp
+        });
+        if (resp.error) {
+          callback(undefined);
+        } else {
+          callback(resp.data);
+        }
+      }
+    });
+  }
+  async post({ url, params, body }) {
+    return await this.Http.post({
+      url,
+      params,
+      body,
+      header: this.HEADER
+    });
+  }
+  postAsync({ url, params, body, callback }) {
+    this.Http.getAsync({
+      url,
+      params,
+      body,
+      header: this.HEADER,
+      handler: resp => {
+        $console.info({
+          resp
+        });
+        if (resp.error) {
+          callback(undefined);
+        } else {
+          callback(resp.data);
+        }
+      }
+    });
+  }
+}
 class Example extends ModCore {
   constructor(app) {
     super({
       app,
       modId: "example",
       modName: "例子",
-      version: "8",
+      version: "9",
       author: "zhihaofans",
-      coreVersion: 11,
+      coreVersion: 12,
       useSqlite: true,
       allowWidget: true,
       allowApi: true
     });
     this.$ = $;
-    this.Http = $.http;
-    this.Storage = Next.Storage;
+    this.Storage = Storage;
     this.ModuleLoader = new ModuleLoader(this);
     this.ModuleLoader.addModule("example.ui.js");
+    APP_VERSION = app.AppInfo.version;
+    APP_NAME = app.AppInfo.name;
   }
   run() {
     try {
