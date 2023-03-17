@@ -16,7 +16,8 @@ const { AppKernel, ModLoader } = require("CoreJS"),
     "network_api.js",
     "mod_manager.js",
     "web_browser.js",
-    "clipboard.js"
+    "clipboard.js",
+    "scoop.js"
   ];
 
 class App extends AppKernel {
