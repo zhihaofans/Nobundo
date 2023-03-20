@@ -40,7 +40,7 @@ class Scoop extends ModCore {
       modName: "scoop",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 11,
+      coreVersion: 12,
       useSqlite: false
     });
     this.Http = new Next.Http(5);
@@ -51,8 +51,31 @@ class Scoop extends ModCore {
   }
   run() {
     try {
-      const ui = this.ModuleLoader.getModule("scoop.nodejs");
-      ui.initUi();
+      const itemList = ["Node.js"];
+      $ui.push({
+        props: {
+          title: "listview"
+        },
+        views: [
+          {
+            type: "list",
+            props: {
+              data: itemList
+            },
+            layout: $layout.fill,
+            events: {
+              didSelect: (sender, indexPath, data) => {
+                switch (indexPath.row) {
+                  case 0:
+                    this.ModuleLoader.getModule("scoop.nodejs").initUi();
+                    break;
+                  default:
+                }
+              }
+            }
+          }
+        ]
+      });
     } catch (error) {
       $console.error(error);
     }
