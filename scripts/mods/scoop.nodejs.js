@@ -327,7 +327,7 @@ class ScoopNodejs extends ModModule {
     super({
       mod,
       id: "scoop.nodejs",
-      name: "scoop.nodejs",
+      name: "Scoop Node.js规则生成器",
       version: "1"
       //author: "zhihaofans"
     });

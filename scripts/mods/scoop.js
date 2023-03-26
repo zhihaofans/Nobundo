@@ -48,10 +48,11 @@ class Scoop extends ModCore {
     this.JsonGenerator = new JsonGenerator();
     this.ModuleLoader = new ModuleLoader(this);
     this.ModuleLoader.addModule("scoop.nodejs.js");
+    this.ModuleLoader.addModule("scoop.dotnet.js");
   }
   run() {
     try {
-      const itemList = ["Node.js"];
+      const itemList = ["Node.js", ".Net"];
       $ui.push({
         props: {
           title: "listview"
@@ -68,6 +69,9 @@ class Scoop extends ModCore {
                 switch (indexPath.row) {
                   case 0:
                     this.ModuleLoader.getModule("scoop.nodejs").initUi();
+                    break;
+                  case 1:
+                    this.ModuleLoader.getModule("scoop.dotnet").initUi();
                     break;
                   default:
                 }
