@@ -146,7 +146,8 @@ class NodejsView {
     const fileNameList = {
         "taobao.lts": "Nodejs-LTS-TaobaoMirror.json",
         "tuna.lts": "Nodejs-LTS-tuna.json",
-        "taobao.current": "Nodejs-TaobaoMirror.json"
+        "taobao.current": "Nodejs-TaobaoMirror.json",
+        "tuna.current": "Nodejs-tuna.json"
       },
       fileName = fileNameList[`${site}.${versionCode}`];
     $console.info({
@@ -176,7 +177,6 @@ class NodejsView {
         $ui.error("未知站点");
         return undefined;
     }
-
     $share.sheet([
       {
         name: fileName,
