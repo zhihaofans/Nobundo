@@ -199,11 +199,11 @@ class NodejsView {
           const items = [
             {
               title: `LTS:v${this.LastestVersionData.lts.version}`,
-              rows: ["taobao", "tuna"]
+              rows: ["taobao", "tuna", "复制更新日志"]
             },
             {
               title: `CURRENT:v${this.LastestVersionData.current.version}`,
-              rows: ["taobao", "tuna"]
+              rows: ["taobao", "tuna", "复制更新日志"]
             }
           ];
           $ui.push({
@@ -241,6 +241,17 @@ class NodejsView {
                               this.LastestVersionData.lts.x86hash
                             );
                             break;
+                          case 2:
+                            $input.text({
+                              type: $kbType.text,
+                              placeholder: "",
+                              text: `Update to v${this.LastestVersionData.lts.version}`,
+                              handler: text => {
+                                $clipboard.text = text;
+                                $ui.success("复制成功");
+                              }
+                            });
+                            break;
                           default:
                         }
                         break;
@@ -264,10 +275,20 @@ class NodejsView {
                               this.LastestVersionData.current.x86hash
                             );
                             break;
+                          case 2:
+                            $input.text({
+                              type: $kbType.text,
+                              placeholder: "",
+                              text: `Update to v${this.LastestVersionData.current.version}`,
+                              handler: text => {
+                                $clipboard.text = text;
+                                $ui.success("复制成功");
+                              }
+                            });
+                            break;
                           default:
                         }
                         break;
-
                       default:
                     }
                   }
