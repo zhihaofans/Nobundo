@@ -3,7 +3,9 @@ const { ModModule } = require("CoreJS"),
   Http = new Next.Http(5),
   ListViewKit = new Next.ListView();
 class DataGetter {
-  constructor() {}
+  constructor(mod) {
+    this.Mod = mod;
+  }
   genJsonData(channelVersion, windowsdesktopData) {
     const { version, x64hash, x86hash } = this.getHashData(windowsdesktopData);
     const result = {
@@ -46,10 +48,7 @@ class DataGetter {
         }
       }
     };
-    $console.info({
-      result
-    });
-    return JSON.stringify(result, null, 2);
+    return this.Mod.Util.toFormatJson(result);
   }
   getHashData(windowsdesktopData) {
     const result = {
@@ -116,12 +115,7 @@ class DataGetter {
         $ui.error("错误版本!");
         return;
       }
-      $share.sheet([
-        {
-          name: fileName,
-          data: jsonStr
-        }
-      ]);
+      this.Mod.Util.shareStr(fileName, jsonStr);
     } else {
       $ui.error("版本号不符合");
     }
@@ -162,7 +156,7 @@ class Main {
   constructor(mod) {
     this.Mod = mod;
     this.$ = mod.$;
-    this.dataGatter = new DataGetter();
+    this.dataGatter = new DataGetter(mod);
   }
   init() {
     this.dataGatter.init();

@@ -4,7 +4,9 @@ const { ModModule } = require("CoreJS"),
   $ = require("$"),
   ListViewKit = new Next.ListView();
 class DataGetter {
-  constructor(mod) {}
+  constructor(mod) {
+    this.Mod = mod;
+  }
   async getHashFile(version) {
     const url = `https://nodejs.org/dist/v${version}/SHASUMS256.txt`,
       resp = await Http.get({
@@ -120,13 +122,11 @@ class DataGetter {
       ]
     };
   }
-  toFormatJson(json) {
-    return JSON.stringify(json, null, 2);
-  }
 }
 class NodejsView {
   constructor(_module) {
     this.Module = _module;
+    this.Mod = _module.Mod;
     this.DataGetter = new DataGetter();
     this.VersionFile = undefined;
     this.LastestVersionData = {
@@ -177,12 +177,7 @@ class NodejsView {
         $ui.error("未知站点");
         return undefined;
     }
-    $share.sheet([
-      {
-        name: fileName,
-        data: this.DataGetter.toFormatJson(jsonData)
-      }
-    ]);
+    this.Mod.Util.shareJsonData(fileName, jsonData);
   }
   async init() {
     $ui.loading(true);
@@ -242,15 +237,9 @@ class NodejsView {
                             );
                             break;
                           case 2:
-                            $input.text({
-                              type: $kbType.text,
-                              placeholder: "",
-                              text: `Update to v${this.LastestVersionData.lts.version}`,
-                              handler: text => {
-                                $clipboard.text = text;
-                                $ui.success("复制成功");
-                              }
-                            });
+                            this.Mod.Util.copy(
+                              `Update to v${this.LastestVersionData.lts.version}`
+                            );
                             break;
                           default:
                         }
@@ -276,15 +265,9 @@ class NodejsView {
                             );
                             break;
                           case 2:
-                            $input.text({
-                              type: $kbType.text,
-                              placeholder: "",
-                              text: `Update to v${this.LastestVersionData.current.version}`,
-                              handler: text => {
-                                $clipboard.text = text;
-                                $ui.success("复制成功");
-                              }
-                            });
+                            this.Mod.Util.copy(
+                              `Update to v${this.LastestVersionData.current.version}`
+                            );
                             break;
                           default:
                         }

@@ -32,12 +32,45 @@ class JsonGenerator {
     }
   }
 }
+class ScoopUtil {
+  constructor() {}
+  copy(text) {
+    $input.text({
+      type: $kbType.text,
+      placeholder: "",
+      text,
+      handler: text => {
+        $clipboard.text = text;
+        $ui.success("复制成功");
+      }
+    });
+  }
+  shareJsonData(fileName, jsonData) {
+    $share.sheet([
+      {
+        name: fileName,
+        data: this.toFormatJson(jsonData)
+      }
+    ]);
+  }
+  shareStr(fileName, data) {
+    $share.sheet([
+      {
+        name: fileName,
+        data
+      }
+    ]);
+  }
+  toFormatJson(json) {
+    return JSON.stringify(json, null, 2);
+  }
+}
 class Scoop extends ModCore {
   constructor(app) {
     super({
       app,
       modId: "scoop",
-      modName: "scoop",
+      modName: "Scoop",
       version: "1",
       author: "zhihaofans",
       coreVersion: 12,
@@ -49,10 +82,12 @@ class Scoop extends ModCore {
     this.ModuleLoader = new ModuleLoader(this);
     this.ModuleLoader.addModule("scoop.nodejs.js");
     this.ModuleLoader.addModule("scoop.dotnet.js");
+    this.ModuleLoader.addModule("scoop.git.js");
+    this.Util = new ScoopUtil();
   }
   run() {
     try {
-      const itemList = ["Node.js", ".Net"];
+      const itemList = ["Node.js", ".Net", "Git"];
       $ui.push({
         props: {
           title: "listview"
@@ -72,6 +107,9 @@ class Scoop extends ModCore {
                     break;
                   case 1:
                     this.ModuleLoader.getModule("scoop.dotnet").initUi();
+                    break;
+                  case 2:
+                    this.ModuleLoader.getModule("scoop.git").initUi();
                     break;
                   default:
                 }
