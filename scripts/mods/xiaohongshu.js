@@ -94,7 +94,7 @@ class Xiaohongshu extends ModCore {
       coreVersion: 12,
       useSqlite: false,
       allowWidget: false,
-      allowApi: true
+      allowApi: false
     });
   }
   run() {
@@ -109,9 +109,20 @@ class Xiaohongshu extends ModCore {
               .getNoteByUrl(link)
               .then(result => {
                 if (result.code === 100) {
-                  $quicklook.open({
-                    list: result.data.pics
-                  });
+                  //                  $quicklook.open({
+                  //                    list: result.data.pics
+                  //                  });
+                  this.ApiManager.runApi({
+                    apiId: "zhihaofans.viewer.open.image",
+                    data: {
+                      images: result.data.pics
+                    }
+                  })
+                    .then(result => {})
+                    .catch(fail => {
+                      $console.error(fail);
+                      $ui.error("runApi fail");
+                    });
                 } else {
                   $ui.alert({
                     title: "Hello",
