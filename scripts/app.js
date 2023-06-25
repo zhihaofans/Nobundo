@@ -18,7 +18,8 @@ const { AppKernel, ModLoader } = require("CoreJS"),
     "web_browser.js",
     "clipboard.js",
     "scoop.js",
-    "xiaohongshu.js"
+    "xiaohongshu.js",
+    "viewer.js"
   ];
 
 class App extends AppKernel {
