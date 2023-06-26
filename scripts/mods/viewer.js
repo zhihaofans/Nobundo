@@ -8,7 +8,32 @@ class ViewerCore {
       try {
         new GridView().showWaterfallImages({
           title: "浏览图片",
-          imageList: urlList
+          imageList: urlList,
+          onClick: (index, url) => {
+            $ui.menu({
+              items: ["预览", "保存"],
+              handler: (title, idx) => {
+                switch (idx) {
+                  case 0:
+                    $quicklook.open({
+                      url
+                    });
+                    break;
+                  case 1:
+                    $photo.save({
+                      image: $image(url),
+                      handler: success => {
+                        success
+                          ? $ui.success("保存成功")
+                          : $ui.error("保存失败");
+                      }
+                    });
+                    break;
+                  default:
+                }
+              }
+            });
+          }
         });
       } catch (error) {
         $console.error(error);
@@ -34,12 +59,11 @@ class Viewer extends ModCore {
       apiList: [
         {
           apiId: "zhihaofans.viewer.open.image",
-          func: ({ data, callback }) =>
-            this.runApi({
-              apiId: "zhihaofans.viewer.open.image",
-              data,
-              callback
-            })
+          func: ({ data, callback }) => {
+            new ViewerCore().openImage({
+              urlList: data.images
+            });
+          }
         }
       ]
     });
