@@ -9,6 +9,7 @@ class ViewerCore {
         new GridView().showWaterfallImages({
           title: "浏览图片",
           imageList: thumbUrlList ? thumbUrlList : urlList,
+          columns: 3,
           onClick: (index, url) => {
             const imgUrl = urlList[index],
               thumbUrl = thumbUrlList ? thumbUrlList[index] : undefined;
