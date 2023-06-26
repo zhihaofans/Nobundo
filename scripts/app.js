@@ -1,7 +1,6 @@
 const { AppKernel, ModLoader } = require("CoreJS"),
   $ = require("$"),
   coreModList = [
-    "bilibili.js",
     "jsbox_version.js",
     "wallhaven.js",
     "downloader.js",
