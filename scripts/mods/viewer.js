@@ -3,13 +3,19 @@ const { ModCore, ModuleLoader } = require("CoreJS"),
   { GridView, Storage } = require("Next");
 class ViewerCore {
   constructor() {}
-  openImage({ images, urlList }) {
+  openImage({ images, urlList, thumbUrlList }) {
     if (urlList) {
       try {
         new GridView().showWaterfallImages({
           title: "浏览图片",
-          imageList: urlList,
+          imageList: thumbUrlList ? thumbUrlList : urlList,
           onClick: (index, url) => {
+            const imgUrl = urlList[index],
+              thumbUrl = thumbUrlList ? thumbUrlList[index] : undefined;
+            $console.info({
+              imgUrl,
+              thumbUrl
+            });
             $ui.menu({
               items: ["预览", "保存"],
               handler: (title, idx) => {
@@ -23,9 +29,7 @@ class ViewerCore {
                     $photo.save({
                       image: $image(url),
                       handler: success => {
-                        success
-                          ? $ui.success("保存成功")
-                          : $ui.error("保存失败");
+                        $.toast(success, "保存成功", "保存失败");
                       }
                     });
                     break;
@@ -61,7 +65,8 @@ class Viewer extends ModCore {
           apiId: "zhihaofans.viewer.open.image",
           func: ({ data, callback }) => {
             new ViewerCore().openImage({
-              urlList: data.images
+              urlList: data.images,
+              thumbUrlList: data.thumbs
             });
           }
         }
@@ -113,7 +118,8 @@ class Viewer extends ModCore {
     switch (apiId) {
       case "zhihaofans.viewer.open.image":
         new ViewerCore().openImage({
-          urlList: data.images
+          urlList: data.images,
+          thumbUrlList: data.thumbUrlList
         });
         break;
       default:
