@@ -5,7 +5,7 @@ const { ModCore } = require("CoreJS"),
 class Main {
   constructor(mod) {
     this.Mod = mod;
-    this.Http = mod.Http;
+    this.Http = new Next.Http(5);
     this.keychainId = {
       apiKey: "apikey",
       nextseed: "nextseed"
@@ -39,58 +39,62 @@ class Main {
     //TODO
     $ui.error("TODO");
   }
-  async random(categories = "111") {
-    $ui.loading(true);
-    const query = `id%3A5type:png`,
-      sorting = `random`,
-      randomSeed = this.Mod.Keychain.get(this.keychainId.nextseed) || `XekqJ6`,
-      page = 1,
-      purity = "111",
-      api_key = this.Mod.Keychain.get(this.keychainId.apiKey) || "",
-      url = `https://wallhaven.cc/api/v1/search?q=${query}&sorting=${sorting}&seed=${randomSeed}&page=${page}&purity=${purity}&categories=${categories}&apikey=${api_key}`,
-      httpResult = await this.Http.get({ url });
-    $console.warn({
-      httpResult
-    });
-    if (httpResult.error) {
-      $console.error(httpResult.error);
-      $ui.loading(false);
-      $ui.alert({
-        title: "mod.wallhaven.error",
-        message: httpResult.error.message
-      });
-    } else if (httpResult.data) {
-      const httpData = httpResult.data,
-        apiData = httpData.data,
-        apiMeta = httpData.meta,
-        nextRandomSeed = apiMeta.seed;
-      $console.info(`nextRandomSeed:${nextRandomSeed}`);
-      this.Mod.Keychain.set(
-        this.keychainId.needseed,
-        nextRandomSeed || randomSeed
-      );
-      $ui.loading(false);
-      $console.info(httpData);
-      $console.warn(apiData);
-      if (apiData.length > 0) {
-        const didSelect = index => {
-          $ui.preview({
-            title: "URL",
-            url: apiData[index].path
+  goRandom(categories = "111") {
+    return new Promise((resolve, reject) => {
+      $.startLoading();
+      const query = `id%3A5type:png`,
+        sorting = `random`,
+        randomSeed =
+          this.Mod.Keychain.get(this.keychainId.nextseed) || `XekqJ6`,
+        page = 1,
+        purity = "111",
+        api_key = this.Mod.Keychain.get(this.keychainId.apiKey) || "",
+        url = `https://wallhaven.cc/api/v1/search?q=${query}&sorting=${sorting}&seed=${randomSeed}&page=${page}&purity=${purity}&categories=${categories}&apikey=${api_key}`;
+      this.Http.getThen({
+        url
+      })
+        .then(resp => {
+          const httpData = resp.data,
+            apiData = httpData.data,
+            apiMeta = httpData.meta,
+            nextRandomSeed = apiMeta.seed;
+          $console.info(`nextRandomSeed:${nextRandomSeed}`);
+          this.Mod.Keychain.set(
+            this.keychainId.needseed,
+            nextRandomSeed || randomSeed
+          );
+          $.stopLoading();
+          $.info(httpData);
+          $.warn(apiData);
+          if (apiData.length > 0) {
+            this.Mod.ApiManager.runApi({
+              apiId: "zhihaofans.viewer.open.image",
+              data: {
+                images: apiData.map(img => img.path),
+                thumbs: apiData.map(img => img.thumbs.small)
+              }
+            })
+              .then(result => {})
+              .catch(fail => {
+                $console.error(fail);
+                $ui.error("runApi fail");
+              });
+          } else {
+            $ui.toast("空白");
+          }
+        })
+        .catch(fail => {
+          $console.error(fail);
+          $.stopLoading();
+          $ui.alert({
+            title: "mod.wallhaven.error",
+            message: fail.message
           });
-        };
-        ListView.pushSimpleText(
-          `${apiData.length}张`,
-          apiData.map(img => img.id),
-          didSelect
-        );
-      } else {
-        $ui.toast("空白");
-      }
-    }
+        });
+    });
   }
   animeRandom() {
-    this.random("010");
+    this.goRandom("010");
   }
 }
 
@@ -102,7 +106,7 @@ class Wallhaven extends ModCore {
       modName: "Wallhaven",
       version: "1b",
       author: "zhihaofans",
-      coreVersion: 9
+      coreVersion: 12
     });
     this.$ = $;
     this.Http = $.http;
