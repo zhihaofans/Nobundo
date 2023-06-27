@@ -112,17 +112,25 @@ class Xiaohongshu extends ModCore {
                   //                  $quicklook.open({
                   //                    list: result.data.pics
                   //                  });
-                  this.ApiManager.runApi({
-                    apiId: "zhihaofans.viewer.open.image",
-                    data: {
-                      images: result.data.pics
-                    }
-                  })
-                    .then(result => {})
-                    .catch(fail => {
-                      $console.error(fail);
-                      $ui.error("runApi fail");
+                  if ($.hasString(result.data.playurl)) {
+                    this.hasVideo({
+                      videoUrl: result.data.playurl,
+                      imageUrl: result.data.photo,
+                      title: result.data.title
                     });
+                  } else {
+                    this.ApiManager.runApi({
+                      apiId: "zhihaofans.viewer.open.image",
+                      data: {
+                        images: result.data.pics
+                      }
+                    })
+                      .then(result => {})
+                      .catch(fail => {
+                        $console.error(fail);
+                        $ui.error("runApi fail");
+                      });
+                  }
                 } else {
                   $ui.alert({
                     title: "Hello",
@@ -151,6 +159,53 @@ class Xiaohongshu extends ModCore {
       $console.error(error);
     }
     //$ui.success("run");
+  }
+  hasVideo({ videoUrl, imageUrl, title }) {
+    $ui.alert({
+      title: "这本书有视频",
+      message: "是否使用视频模式",
+      actions: [
+        {
+          title: "打开视频模式",
+          disabled: false, // Optional
+          handler: () => {
+            this.ApiManager.runApi({
+              apiId: "zhihaofans.viewer.open.video",
+              data: {
+                video: videoUrl,
+                image: imageUrl,
+                title
+              }
+            })
+              .then(result => {})
+              .catch(fail => {
+                $console.error(fail);
+                $ui.error("runApi fail");
+              });
+          }
+        },
+        {
+          title: "打开图片模式",
+          handler: () => {
+            this.ApiManager.runApi({
+              apiId: "zhihaofans.viewer.open.image",
+              data: {
+                images: [imageUrl]
+              }
+            })
+              .then(result => {})
+              .catch(fail => {
+                $console.error(fail);
+                $ui.error("runApi fail");
+              });
+          }
+        },
+        {
+          title: "取消",
+          handler: () => {}
+        }
+      ]
+    });
   }
   runB() {
     new XHSCore().getNote("");
