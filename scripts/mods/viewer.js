@@ -48,6 +48,57 @@ class ViewerCore {
       $ui.error("need image");
     }
   }
+  openVideo({ title, image, video }) {
+    if (image && video) {
+      try {
+        new GridView().showWaterfallImages({
+          title: title || "浏览视频",
+          imageList: [image],
+          columns: 2,
+          onClick: (index, url) => {
+            $console.info({
+              title,
+              image,
+              video
+            });
+            $ui.menu({
+              items: ["预览图片", "保存图片", "预览视频", "保存视频"],
+              handler: (title, idx) => {
+                switch (idx) {
+                  case 0:
+                    $quicklook.open({
+                      image
+                    });
+                    break;
+                  case 1:
+                    $photo.save({
+                      image: $image(image),
+                      handler: success => {
+                        $.toast(success, "保存成功", "保存失败");
+                      }
+                    });
+                    break;
+                  case 2:
+                    $ui.preview({
+                      title: title || "预览视频",
+                      url: video
+                    });
+
+                    break;
+                  default:
+                    $ui.error("error");
+                }
+              }
+            });
+          }
+        });
+      } catch (error) {
+        $console.error(error);
+      }
+    } else {
+      $ui.error("需要视频与封面图");
+    }
+  }
 }
 class Viewer extends ModCore {
   constructor(app) {
@@ -68,6 +119,16 @@ class Viewer extends ModCore {
             new ViewerCore().openImage({
               urlList: data.images,
               thumbUrlList: data.thumbs
+            });
+          }
+        },
+        {
+          apiId: "zhihaofans.viewer.open.video",
+          func: ({ data, callback }) => {
+            new ViewerCore().openVideo({
+              image: data.image,
+              video: data.video,
+              title: data.title
             });
           }
         }
