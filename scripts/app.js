@@ -45,13 +45,7 @@ class App extends AppKernel {
       title: "例子",
       size: $widgetFamily.small
     });
-    this.modLoader.WidgetLoader.registerWidget({
-      id: "network_api.mxnzp.today.lunarCalendar",
-      modId: "network_api",
-      title: "今日农历日期",
-      size: $widgetFamily.accessoryInline
-    });
-    this.modLoader.autoRunMod();
+    this.modLoader.showGridModList();
   }
 }
 function run() {
