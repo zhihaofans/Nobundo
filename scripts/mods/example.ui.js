@@ -4,7 +4,6 @@ const { ModModule } = require("CoreJS"),
 class Main {
   constructor(mod) {
     this.Mod = mod;
-    this.$ = mod.$;
   }
   multListTest() {
     const listData = [
@@ -154,7 +153,7 @@ class ExampleModule extends ModModule {
       //author: "zhihaofans"
     });
     //this.Mod = mod;
-    $console.info(this.Mod)
+    $console.info(this.Mod);
   }
   initUi() {
     //$ui.success("run");

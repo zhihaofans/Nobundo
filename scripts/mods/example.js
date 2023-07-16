@@ -68,14 +68,14 @@ class Example extends ModCore {
       app,
       modId: "example",
       modName: "例子",
-      version: "9",
+      version: "10",
       author: "zhihaofans",
-      coreVersion: 12,
+      coreVersion: 13,
       useSqlite: true,
       allowWidget: true,
-      allowApi: true
+      allowApi: true,
+      iconName: "command"
     });
-    this.$ = $;
     this.Storage = Storage;
     this.ModuleLoader = new ModuleLoader(this);
     this.ModuleLoader.addModule("example.ui.js");
