@@ -141,49 +141,98 @@ class NodejsView {
         x86hash: "sha256:"
       }
     };
-  }
-  shareData(site, versionCode, version, x64hash, x86hash) {
-    const fileNameList = {
-        "taobao.lts": "Nodejs-LTS-TaobaoMirror.json",
-        "tuna.lts": "Nodejs-LTS-tuna.json",
-        "taobao.current": "Nodejs-TaobaoMirror.json",
-        "tuna.current": "Nodejs-tuna.json"
+    this.VersionData = {
+      "lts_taobao": {
+        file_name: "Nodejs-LTS-TaobaoMirror.json",
+        name: "Nodejs-LTS-TaobaoMirror"
       },
-      fileName = fileNameList[`${site}.${versionCode}`];
+      "lts_tuna": {
+        file_name: "Nodejs-LTS-tuna.json",
+        name: "Nodejs-LTS-tuna"
+      },
+      "current_taobao": {
+        file_name: "Nodejs-TaobaoMirror.json",
+        name: "Nodejs-TaobaoMirror"
+      },
+      "current_tuna": {
+        file_name: "Nodejs-tuna.json",
+        name: "Nodejs-tuna"
+      }
+    };
+  }
+  shareData(site, version, versionCode, x64hash, x86hash) {
     $console.info({
-      fileName,
       site,
       version,
+      versionCode,
       x64hash,
-      x86hash
+      x86hash,
+      all_data: this.VersionData
     });
-    let jsonData = {};
-    switch (site.toLowerCase()) {
-      case "tuna":
-        jsonData = this.DataGetter.tuna({
-          version,
-          x64hash,
-          x86hash
-        });
-        break;
-      case "taobao":
-        jsonData = this.DataGetter.taobao({
-          version,
-          x64hash,
-          x86hash
-        });
-        break;
-      default:
-        $ui.error("未知站点");
-        return undefined;
+    const verCode = `${version}_${site}`,
+      verData = this.VersionData[verCode],
+      fileName = verData?.file_name;
+    $console.info({
+      fileName,
+      verData,
+      verCode
+    });
+    if (verData && fileName) {
+      let jsonData = {};
+      switch (site.toLowerCase()) {
+        case "tuna":
+          jsonData = this.DataGetter.tuna({
+            version: versionCode,
+            x64hash,
+            x86hash
+          });
+          break;
+        case "taobao":
+          jsonData = this.DataGetter.taobao({
+            version: versionCode,
+            x64hash,
+            x86hash
+          });
+          break;
+        default:
+          $ui.error("未知站点");
+          return undefined;
+      }
+      this.Mod.Util.shareJsonData(fileName, jsonData);
+    } else {
+      $ui.error("error200");
     }
-    this.Mod.Util.shareJsonData(fileName, jsonData);
+  }
+  go(site, version, isCopy) {
+    $console.info({
+      version,
+      site,
+      isCopy
+    });
+    const versionInfo =
+      version === "lts"
+        ? this.LastestVersionData.lts
+        : this.LastestVersionData.current;
+    const verId = `${version}_${site}`;
+    const verCode = this.LastestVersionData[version];
+    if (isCopy === true) {
+      this.Mod.Util.copy(
+        `${this.VersionData[verId].name}:Update to v${versionInfo.version}`
+      );
+    } else {
+      this.shareData(
+        site,
+        version,
+        versionInfo.version,
+        versionInfo.x64hash,
+        versionInfo.x86hash
+      );
+    }
   }
   async init() {
     $ui.loading(true);
     $ui.warning("正在加载最新数据");
     this.VersionFile = await this.DataGetter.getVersionList();
-
     if (this.VersionFile === undefined || this.VersionFile.length === 0) {
       $ui.loading(false);
       $ui.error("获取最新数据失败");
@@ -194,13 +243,24 @@ class NodejsView {
           const items = [
             {
               title: `LTS:v${this.LastestVersionData.lts.version}`,
-              rows: ["taobao", "tuna", "复制更新日志"]
+              rows: [
+                "导出taobao",
+                "导出tuna",
+                "复制taobao更新日志",
+                "复制tuna更新日志"
+              ]
             },
             {
               title: `CURRENT:v${this.LastestVersionData.current.version}`,
-              rows: ["taobao", "tuna", "复制更新日志"]
+              rows: [
+                "导出taobao",
+                "导出tuna",
+                "复制taobao更新日志",
+                "复制tuna更新日志"
+              ]
             }
           ];
+
           $ui.push({
             props: {
               title: "Node.js"
@@ -219,27 +279,16 @@ class NodejsView {
                       case 0:
                         switch (row) {
                           case 0:
-                            this.shareData(
-                              "taobao",
-                              "lts",
-                              this.LastestVersionData.lts.version,
-                              this.LastestVersionData.lts.x64hash,
-                              this.LastestVersionData.lts.x86hash
-                            );
+                            this.go("taobao", "lts", false);
                             break;
                           case 1:
-                            this.shareData(
-                              "tuna",
-                              "lts",
-                              this.LastestVersionData.lts.version,
-                              this.LastestVersionData.lts.x64hash,
-                              this.LastestVersionData.lts.x86hash
-                            );
+                            this.go("tuna", "lts", false);
                             break;
                           case 2:
-                            this.Mod.Util.copy(
-                              `Update to v${this.LastestVersionData.lts.version}`
-                            );
+                            this.go("taobao", "lts", true);
+                            break;
+                          case 3:
+                            this.go("tuna", "lts", true);
                             break;
                           default:
                         }
@@ -247,27 +296,16 @@ class NodejsView {
                       case 1:
                         switch (row) {
                           case 0:
-                            this.shareData(
-                              "taobao",
-                              "current",
-                              this.LastestVersionData.current.version,
-                              this.LastestVersionData.current.x64hash,
-                              this.LastestVersionData.current.x86hash
-                            );
+                            this.go("taobao", "current", false);
                             break;
                           case 1:
-                            this.shareData(
-                              "tuna",
-                              "current",
-                              this.LastestVersionData.current.version,
-                              this.LastestVersionData.current.x64hash,
-                              this.LastestVersionData.current.x86hash
-                            );
+                            this.go("tuna", "current", false);
                             break;
                           case 2:
-                            this.Mod.Util.copy(
-                              `Update to v${this.LastestVersionData.current.version}`
-                            );
+                            this.go("taobao", "current", true);
+                            break;
+                          case 3:
+                            this.go("tuna", "current", true);
                             break;
                           default:
                         }
@@ -326,7 +364,7 @@ class NodejsView {
     });
   }
 }
-class ScoopNodejs extends ModModule {
+class ScoopModule extends ModModule {
   constructor(mod) {
     super({
       mod,
@@ -341,4 +379,4 @@ class ScoopNodejs extends ModModule {
     new NodejsView(this).init();
   }
 }
-module.exports = ScoopNodejs;
+module.exports = ScoopModule;
