@@ -83,11 +83,12 @@ class Scoop extends ModCore {
     this.ModuleLoader.addModule("scoop.nodejs.js");
     this.ModuleLoader.addModule("scoop.dotnet.js");
     this.ModuleLoader.addModule("scoop.git.js");
+    this.ModuleLoader.addModule("scoop.everything.js");
     this.Util = new ScoopUtil();
   }
   run() {
     try {
-      const itemList = ["Node.js", ".Net", "Git"];
+      const itemList = ["Node.js", ".Net", "Git", "Everything"];
       $ui.push({
         props: {
           title: "listview"
@@ -110,6 +111,9 @@ class Scoop extends ModCore {
                     break;
                   case 2:
                     this.ModuleLoader.getModule("scoop.git").initUi();
+                    break;
+                  case 3:
+                    this.ModuleLoader.getModule("scoop.everything").initUi();
                     break;
                   default:
                 }
