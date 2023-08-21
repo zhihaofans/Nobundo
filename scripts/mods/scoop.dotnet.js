@@ -8,6 +8,12 @@ class DataGetter {
   }
   genJsonData(channelVersion, windowsdesktopData) {
     const { version, x64hash, x86hash } = this.getHashData(windowsdesktopData);
+    $console.info({
+      windowsdesktopData,
+      version,
+      x64hash,
+      x86hash
+    });
     const result = {
       version,
       "description":
@@ -18,7 +24,11 @@ class DataGetter {
         "url": "https://github.com/dotnet/core/blob/master/LICENSE.TXT"
       },
       "notes":
-        "You can remove .NET Desktop Runtime installer with 'scoop uninstall DotNetDesktopRuntime-installer' after installation",
+        "You can remove .NET Desktop Runtime installer with 'scoop uninstall " +
+        (channelVersion === "6.0"
+          ? "DotNetDesktopRuntime6-installer"
+          : "DotNetDesktopRuntime-installer") +
+        "' after installation",
       "architecture": {
         "64bit": {
           "url": `https://dotnetcli.blob.core.windows.net/dotnet/WindowsDesktop/${version}/windowsdesktop-runtime-${version}-win-x64.exe#/windowsdesktop-runtime-win-x64.exe`,
@@ -40,15 +50,16 @@ class DataGetter {
             [
               "windowsdesktop-runtime-win-x86.exe",
               channelVersion === "6.0"
-                ? "Install .NET 6 Desktop Runtime (x64)"
-                : "Install .NET 6 Desktop Runtime (x86)"
+                ? "Install .NET 6 Desktop Runtime (x86)"
+                : "Install .NET Desktop Runtime (x86)"
             ]
           ],
           "post_install": ['&"$dir\\windowsdesktop-runtime-win-x86.exe"']
         }
       }
     };
-    return this.Mod.Util.toFormatJson(result);
+    return result;
+    //return this.Mod.Util.toFormatJson(result);
   }
   getHashData(windowsdesktopData) {
     const result = {
@@ -58,29 +69,36 @@ class DataGetter {
       x86hash: undefined,
       x86url: undefined
     };
-    windowsdesktopData.files.map(file => {
-      const { name, url, hash } = file;
-      switch (name) {
-        case "windowsdesktop-runtime-win-x64.exe":
-          result.x64hash = hash;
-          result.x64url = url;
-          break;
-        case "windowsdesktop-runtime-win-x86.exe":
-          result.x86hash = hash;
-          result.x86url = url;
-          break;
-        default:
-      }
-    });
-    return result;
+    try {
+      windowsdesktopData.files.map(file => {
+        const { name, url, hash } = file;
+        switch (name) {
+          case "windowsdesktop-runtime-win-x64.exe":
+            result.x64hash = hash;
+            result.x64url = url;
+            break;
+          case "windowsdesktop-runtime-win-x86.exe":
+            result.x86hash = hash;
+            result.x86url = url;
+            break;
+          default:
+        }
+      });
+      return result;
+    } catch (error) {
+      $console.error(error);
+      return undefined;
+    }
   }
   getLastestVersionData(channelVersion = "7.0") {
     return new Promise(async (resolve, reject) => {
+      $console.info("getLastestVersionData.start", channelVersion);
       const url = `https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/${channelVersion}/releases.json`,
         resp = await Http.get({
           url
         }),
         { data, error } = resp;
+      $console.info("getLastestVersionData.end", `error:${error != undefined}`);
       $console.info({
         data
       });
@@ -100,6 +118,10 @@ class DataGetter {
       lastestVersionData = versionData["releases"][0]["windowsdesktop"];
     $console.info({
       lastestVersionData
+    });
+    $console.info({
+      ver: lastestVersionData["version"],
+      versionCode
     });
     if (lastestVersionData["version"] === versionCode) {
       const jsonStr = this.genJsonData(
@@ -122,6 +144,7 @@ class DataGetter {
   }
   init(channelVersion = "7.0") {
     switch (channelVersion) {
+      case "8.0":
       case "7.0":
       case "6.0":
         $ui.loading(true);
@@ -189,7 +212,7 @@ class Main {
   }
 }
 
-class ScoopDotNetModule extends ModModule {
+class ScoopModule extends ModModule {
   constructor(mod) {
     super({
       mod,
@@ -198,12 +221,85 @@ class ScoopDotNetModule extends ModModule {
       version: "1"
       //author: "zhihaofans"
     });
-    //this.Mod = mod;
-    $console.info(this.Mod);
+    this.DataGetter = new DataGetter();
+    this.VERSION_DATA = {
+      "6.0": {
+        FILE_NAME: "DotNetDesktopRuntime6-installer.json",
+        UPDATE_NOTE_NAME: "DotNetDesktopRuntime6-installer"
+      },
+      "7.0": {
+        FILE_NAME: "DotNetDesktopRuntime-installer.json",
+        UPDATE_NOTE_NAME: "DotNetDesktopRuntime-installer"
+      }
+    };
   }
   initUi() {
     //$ui.success("run");
     new Main(this.Mod).initUi();
   }
+  getData(channelVersion) {
+    return new Promise((resolve, reject) => {
+      try {
+        this.DataGetter.getLastestVersionData(channelVersion).then(
+          versionData => {
+            $console.info({
+              channelVersion
+            });
+            const versionCode = versionData["latest-release"],
+              lastestVersionData = versionData["releases"][0]["windowsdesktop"];
+            $console.info({
+              versionCode,
+              lastestVersionData
+            });
+            try {
+              const jsonData = this.DataGetter.genJsonData(
+                channelVersion,
+                lastestVersionData
+              );
+              $console.info({
+                jsonData
+              });
+              resolve(jsonData);
+            } catch (error) {
+              $console.error(error);
+              reject(error);
+            }
+          }
+        );
+      } catch (error) {
+        $console.error(error);
+        reject(error);
+      } finally {
+        $console.info({
+          getData_finally: channelVersion
+        });
+      }
+    });
+  }
+  getFileName(channelVersion) {
+    return this.VERSION_DATA[channelVersion]?.FILE_NAME;
+  }
+  getUpdateNote(channelVersion) {
+    return new Promise((resolve, reject) => {
+      const appId = this.VERSION_DATA[channelVersion]?.UPDATE_NOTE_NAME;
+      $console.info(channelVersion, appId);
+      this.DataGetter.getLastestVersionData(channelVersion).then(
+        versionData => {
+          $console.info(channelVersion);
+          resolve(`${appId}: Update to v${versionData["latest-runtime"]}`);
+        }
+      );
+    });
+  }
+  getVersionList() {
+    if (this.hasMultipleVersion() === true) {
+      return ["7.0", "6.0"];
+    } else {
+      return undefined;
+    }
+  }
+  hasMultipleVersion() {
+    return true;
+  }
 }
-module.exports = ScoopDotNetModule;
+module.exports = ScoopModule;

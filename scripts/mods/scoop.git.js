@@ -16,7 +16,6 @@ class DataGetter {
     $console.info("getScoopData");
     return new Promise(async (resolve, reject) => {
       $console.info("httpS");
-
       const url = this.URL.SCOOP_JSON_FILE_CDN,
         resp = await Http.get({
           url
@@ -88,7 +87,9 @@ class Main {
                   this.saveTaobaoData(result);
                   break;
                 case 1:
-                  this.Mod.Util.copy(`Update to v${result.version}`);
+                  this.Mod.Util.copy(
+                    `Git-TaobaoMirror: Update to v${result.version}`
+                  );
                   break;
                 default:
                   $ui.alert({
@@ -158,10 +159,47 @@ class ScoopGit extends ModModule {
     });
     //this.Mod = mod;
     //$console.info(this.Mod);
+    this.DataGetter = new DataGetter();
   }
   initUi() {
     //$ui.success("run");
     new Main(this.Mod).init();
+  }
+  getData(version) {
+    return new Promise((resolve, reject) => {
+      this.DataGetter.getScoopData().then(result => {
+        $console.info(result);
+        if (result) {
+          resolve(this.DataGetter.scoopToTaobao(result));
+        } else {
+          reject({
+            message: "空白结果"
+          });
+        }
+      });
+    });
+  }
+  getFileName() {
+    return "Git-TaobaoMirror.json";
+  }
+  getUpdateNote(version) {
+    return new Promise((resolve, reject) => {
+      this.DataGetter.getScoopData()
+        .then(result => {
+          resolve(`Git-TaobaoMirror: Update to v${result.version}`);
+        })
+        .catch(reject);
+    });
+  }
+  getVersionList() {
+    if (this.hasMultipleVersion() === true) {
+      return ["1"];
+    } else {
+      return undefined;
+    }
+  }
+  hasMultipleVersion() {
+    return false;
   }
 }
 module.exports = ScoopGit;

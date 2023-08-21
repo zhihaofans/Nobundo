@@ -65,6 +65,117 @@ class ScoopUtil {
     return JSON.stringify(json, null, 2);
   }
 }
+class ScoopCore {
+  constructor(mod) {
+    this.Mod = mod;
+    this.ModuleLoader = mod.ModuleLoader;
+    this.SiteList = {
+      dotnet: this.ModuleLoader.getModule("scoop.dotnet"),
+      everything: this.ModuleLoader.getModule("scoop.everything"),
+      git: this.ModuleLoader.getModule("scoop.git")
+    };
+  }
+  getData(site) {
+    return new Promise((resolve, reject) => {
+      if ($.hasString(site)) {
+        const thisSite = this.SiteList[site];
+        if (thisSite) {
+          thisSite.getData().then(resolve, reject);
+        } else {
+          $console.error(`getData(SiteList[site]=undefined)`);
+          reject(undefined);
+        }
+      } else {
+        $console.error(`getData(${site})`);
+        reject(undefined);
+      }
+    });
+  }
+  init(site, version) {
+    const thisSite = this.SiteList[site];
+    $ui.alert({
+      title: thisSite.MODULE_NAME,
+      message: "Hello World",
+      actions: [
+        {
+          title: "Bye",
+          disabled: false, // Optional
+          handler: () => {}
+        },
+        {
+          title: "导出",
+          handler: () => {
+            $.startLoading();
+            const fileName = thisSite.getFileName(version);
+            thisSite
+              .getData(version)
+              .then(data => {
+                $console.info(data);
+                if (data) {
+                  this.Mod.Util.shareJsonData(fileName, data);
+                } else {
+                  $ui.error("导出空白");
+                }
+              })
+              .catch(error => {
+                $console.error({
+                  getData: site,
+                  thisSite
+                });
+              })
+              .finally(() => {
+                $.stopLoading();
+              });
+          }
+        },
+        {
+          title: "复制更新日志",
+          handler: () => {
+            $.startLoading();
+            thisSite
+              .getUpdateNote(version)
+              .then(updateNote => {
+                $console.info(updateNote);
+                if ($.hasString(updateNote)) {
+                  this.Mod.Util.copy(updateNote);
+                } else {
+                  $ui.error("空白");
+                }
+              })
+              .catch(error => {
+                $console.error({
+                  getUpdateNote: site,
+                  thisSite
+                });
+              })
+              .finally(() => {
+                $.stopLoading();
+              });
+          }
+        }
+      ]
+    });
+  }
+  checkVersion(site) {
+    const thisSite = this.SiteList[site];
+    if ($.hasString(site) && thisSite) {
+      if (thisSite.hasMultipleVersion() === true) {
+        const versionList = thisSite.getVersionList();
+        $console.info(site, versionList);
+        $ui.menu({
+          items: versionList,
+          handler: (title, idx) => {
+            this.init(site, versionList[idx]);
+          }
+        });
+      } else {
+        this.init(site);
+      }
+    } else {
+      $ui.error("错误站点");
+    }
+  }
+}
 class Scoop extends ModCore {
   constructor(app) {
     super({
@@ -85,6 +196,7 @@ class Scoop extends ModCore {
     this.ModuleLoader.addModule("scoop.git.js");
     this.ModuleLoader.addModule("scoop.everything.js");
     this.Util = new ScoopUtil();
+    this.Core = new ScoopCore(this);
   }
   run() {
     try {
@@ -107,13 +219,13 @@ class Scoop extends ModCore {
                     this.ModuleLoader.getModule("scoop.nodejs").initUi();
                     break;
                   case 1:
-                    this.ModuleLoader.getModule("scoop.dotnet").initUi();
+                    this.Core.checkVersion("dotnet");
                     break;
                   case 2:
-                    this.ModuleLoader.getModule("scoop.git").initUi();
+                    this.Core.checkVersion("git");
                     break;
                   case 3:
-                    this.ModuleLoader.getModule("scoop.everything").initUi();
+                    this.Core.checkVersion("everything");
                     break;
                   default:
                 }

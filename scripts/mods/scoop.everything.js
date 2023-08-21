@@ -1,6 +1,7 @@
 const { ModModule } = require("CoreJS"),
   Next = require("Next"),
   Http = new Next.Http(5),
+  $ = require("$"),
   ListViewKit = new Next.ListView();
 class DataGetter {
   constructor() {
@@ -58,7 +59,10 @@ class DataGetter {
               hash = itemList[0],
               fileName = itemList[1];
             $console.info(itemList, typeof fileHash);
-            if (fileName.indexOf(`Everything-${version}.x86-Setup.exe`) >= 0) {
+            if (
+              $.hasString(fileName) &&
+              fileName.indexOf(`Everything-${version}.x86-Setup.exe`) >= 0
+            ) {
               fileHash.x86 = hash;
             } else if (
               fileName.indexOf(`Everything-${version}.x64-Setup.exe`) >= 0
@@ -215,7 +219,6 @@ class Main {
       });
   }
 }
-
 class ScoopModule extends ModModule {
   constructor(mod) {
     super({
@@ -227,10 +230,67 @@ class ScoopModule extends ModModule {
     });
     //this.Mod = mod;
     //$console.info(this.Mod);
+    this.DataGetter = new DataGetter();
   }
   initUi() {
     //$ui.success("run");
     new Main(this.Mod).init();
+  }
+  getData(version) {
+    return new Promise((resolve, reject) => {
+      this.DataGetter.getScoopData()
+        .then(scoopData => {
+          const version = scoopData.version;
+          this.DataGetter.getVersionInfo(version)
+            .then(result => {
+              if (result) {
+                const x64hash = result[`Everything-${version}.x64-Setup.exe`],
+                  x86hash = result[`Everything-${version}.x86-Setup.exe`],
+                  jsonData = this.DataGetter.scoopToJson({
+                    version,
+                    x64hash,
+                    x86hash
+                  });
+                $console.info({
+                  jsonData
+                });
+                resolve(jsonData);
+              } else {
+                $ui.error("result error:line 255");
+                reject(undefined);
+              }
+            })
+            .catch(fail => {
+              $console.error(fail);
+              reject(fail);
+            });
+        })
+        .catch(fail => {
+          $console.error(fail);
+          reject(undefined);
+        });
+    });
+  }
+  getFileName(version) {
+    return "Everything-installer.json";
+  }
+  getUpdateNote() {
+    return new Promise((resolve, reject) => {
+      this.DataGetter.getScoopData()
+        .then(result => {
+          resolve(`Everything-installer: Update to v${result.version}`);
+        })
+        .catch(fail => {
+          $console.error(fail);
+          reject(undefined);
+        });
+    });
+  }
+  getVersionList() {
+    return undefined;
+  }
+  hasMultipleVersion() {
+    return false;
   }
 }
 module.exports = ScoopModule;
