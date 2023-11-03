@@ -106,7 +106,8 @@ class Wallhaven extends ModCore {
       modName: "Wallhaven",
       version: "1b",
       author: "zhihaofans",
-      coreVersion: 12
+      coreVersion: 13,
+      iconName: "person.crop.square"
     });
     this.$ = $;
     this.Http = $.http;

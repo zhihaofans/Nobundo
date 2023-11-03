@@ -18,7 +18,7 @@ class Main {
     this.Mod = mod;
     this.$ = mod.$;
     this.Http = mod.Http;
-    this.isShare = mod.App.isActionEnv();
+    this.isShare = $.isActionEnv();
   }
   init() {
     const mainViewList = ["开始下载"],
@@ -259,9 +259,10 @@ class Downloader extends ModCore {
       app,
       modId: "downloader",
       modName: "下载器",
-      version: "2",
+      version: "3",
       author: "zhihaofans",
-      coreVersion: 9
+      coreVersion: 12,
+      iconName: "square.and.arrow.down"
     });
     this.main = new Main(this);
     this.$ = $;

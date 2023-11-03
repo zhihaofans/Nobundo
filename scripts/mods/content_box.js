@@ -15,7 +15,7 @@ class ContentData {
 class Database {
   constructor(mod) {
     this.SQLITE_FILE = `${mod.App.DATA_DIR.LOCAL}${mod.MOD_INFO.AUTHOR}.${mod.MOD_INFO.ID}.db`;
-    this.SQLite = new mod.Storage.SQLite(this.SQLITE_FILE);
+    this.SQLite = next.Storage.SQLite(this.SQLITE_FILE);
     this.SQL_TABLE_ID = {
       CONTENT_LIST: "ContentList"
     };
@@ -52,13 +52,12 @@ class Database {
 class ContentBoxApi {
   constructor(mod) {
     this.Mod = mod;
-    this.$ = mod.$;
     this.DB = new Database(mod);
     this.DB.createContentListTable();
     this.LASTEST_SORT = false;
   }
   addContent({ title, data, type = "text", otherData = "{}" }) {
-    const timestamp = this.$.dateTime.getUnixTime(),
+    const timestamp = $.dateTime.getUnixTime(),
       id = `${$text.uuid}-${timestamp}`,
       tag = "[]",
       sqlResult = this.DB.addContentItem({
@@ -199,7 +198,7 @@ class ContentBoxView {
   }
   askToImportClipboard() {
     const clipText = $clipboard.text;
-    if (this.$.string.hasString(clipText)) {
+    if (this.$.hasString(clipText)) {
       $ui.alert({
         title: "是否导入剪贴板内容",
         message: clipText,
@@ -436,7 +435,6 @@ class ContentBox extends ModCore {
       allowApi: true,
       coreVersion: 9
     });
-    this.$ = $;
     this.Storage = next.Storage;
   }
   run() {

@@ -1,4 +1,5 @@
-const { ModCore } = require("CoreJS");
+const { ModCore } = require("CoreJS"),
+  $ = require("$");
 class ShareAction {
   constructor() {
     this.hasData = this.getData() != undefined;
@@ -80,14 +81,13 @@ class ActionExtension extends ModCore {
       app,
       modId: "action_extension",
       modName: "分享内容解析",
-      version: "2",
+      version: "3",
       author: "zhihaofans",
       allowContext: true,
-      coreVersion: 9
+      coreVersion: 13,
+      iconName: "arrowshape.turn.up.right"
     });
     this.QUERY = $context.query;
-    this.isSafari = app.isSafariEnv();
-    this.isShare = app.isActionEnv();
   }
   run() {
     $ui.alert({
@@ -103,9 +103,9 @@ class ActionExtension extends ModCore {
     });
   }
   runContext() {
-    if (this.isSafari) {
+    if ($.isSafariEnv()) {
       this.runSafari();
-    } else if (this.isShare) {
+    } else if ($.isActionEnv()) {
       this.runShare();
     } else {
       this.run();

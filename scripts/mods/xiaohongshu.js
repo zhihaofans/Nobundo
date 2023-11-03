@@ -91,7 +91,8 @@ class Xiaohongshu extends ModCore {
       modName: "小红书",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 12,
+      coreVersion: 13,
+      iconName: "book.fill",
       useSqlite: false,
       allowWidget: false,
       allowApi: false
