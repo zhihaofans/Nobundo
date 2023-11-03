@@ -18,7 +18,9 @@ const { AppKernel, ModLoader } = require("CoreJS"),
     "scoop.js",
     "xiaohongshu.js",
     "viewer.js",
-    "jsdelivr.js"
+    "jsdelivr.js",
+    "search.js",
+    "tikhub.js"
   ];
 
 class App extends AppKernel {
@@ -46,7 +48,12 @@ class App extends AppKernel {
       title: "例子",
       size: $widgetFamily.small
     });
-    this.modLoader.showGridModList();
+
+    if ($.isKeyboardEnv()) {
+      this.modLoader.runKeyboardMod();
+    } else {
+      this.modLoader.showGridModList();
+    }
   }
 }
 function run() {
