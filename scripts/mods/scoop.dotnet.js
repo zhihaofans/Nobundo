@@ -23,12 +23,6 @@ class DataGetter {
         "identifier": "MIT",
         "url": "https://github.com/dotnet/core/blob/master/LICENSE.TXT"
       },
-      "notes":
-        "You can remove .NET Desktop Runtime installer with 'scoop uninstall " +
-        (channelVersion === "6.0"
-          ? "DotNetDesktopRuntime6-installer"
-          : "DotNetDesktopRuntime-installer") +
-        "' after installation",
       "architecture": {
         "64bit": {
           "url": `https://dotnetcli.blob.core.windows.net/dotnet/WindowsDesktop/${version}/windowsdesktop-runtime-${version}-win-x64.exe#/windowsdesktop-runtime-win-x64.exe`,
@@ -36,9 +30,7 @@ class DataGetter {
           "shortcuts": [
             [
               "windowsdesktop-runtime-win-x64.exe",
-              channelVersion === "6.0"
-                ? "Install .NET 6 Desktop Runtime (x64)"
-                : "Install .NET Desktop Runtime (x64)"
+              `Install .NET ${channelVersion} Desktop Runtime (x64)`
             ]
           ],
           "post_install": ['&"$dir\\windowsdesktop-runtime-win-x64.exe"']
@@ -49,9 +41,7 @@ class DataGetter {
           "shortcuts": [
             [
               "windowsdesktop-runtime-win-x86.exe",
-              channelVersion === "6.0"
-                ? "Install .NET 6 Desktop Runtime (x86)"
-                : "Install .NET Desktop Runtime (x86)"
+              `Install .NET ${channelVersion} Desktop Runtime (x86)`
             ]
           ],
           "post_install": ['&"$dir\\windowsdesktop-runtime-win-x86.exe"']
@@ -228,8 +218,12 @@ class ScoopModule extends ModModule {
         UPDATE_NOTE_NAME: "DotNetDesktopRuntime6-installer"
       },
       "7.0": {
-        FILE_NAME: "DotNetDesktopRuntime-installer.json",
-        UPDATE_NOTE_NAME: "DotNetDesktopRuntime-installer"
+        FILE_NAME: "DotNetDesktopRuntime7-installer.json",
+        UPDATE_NOTE_NAME: "DotNetDesktopRuntime7-installer"
+      },
+      "8.0": {
+        FILE_NAME: "DotNetDesktopRuntime8-installer.json",
+        UPDATE_NOTE_NAME: "DotNetDesktopRuntime8-installer"
       }
     };
   }
@@ -293,7 +287,7 @@ class ScoopModule extends ModModule {
   }
   getVersionList() {
     if (this.hasMultipleVersion() === true) {
-      return ["7.0", "6.0"];
+      return ["8.0", "7.0", "6.0"];
     } else {
       return undefined;
     }

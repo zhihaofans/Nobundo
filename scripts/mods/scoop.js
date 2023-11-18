@@ -72,7 +72,8 @@ class ScoopCore {
     this.SiteList = {
       dotnet: this.ModuleLoader.getModule("scoop.dotnet"),
       everything: this.ModuleLoader.getModule("scoop.everything"),
-      git: this.ModuleLoader.getModule("scoop.git")
+      git: this.ModuleLoader.getModule("scoop.git"),
+      nodejs: this.ModuleLoader.getModule("scoop.nodejs")
     };
   }
   getData(site) {
@@ -193,14 +194,13 @@ class Scoop extends ModCore {
     this.ModuleLoader = new ModuleLoader(this);
     this.ModuleLoader.addModule("scoop.nodejs.js");
     this.ModuleLoader.addModule("scoop.dotnet.js");
-    this.ModuleLoader.addModule("scoop.git.js");
     this.ModuleLoader.addModule("scoop.everything.js");
     this.Util = new ScoopUtil();
     this.Core = new ScoopCore(this);
   }
   run() {
     try {
-      const itemList = ["Node.js", ".Net", "Git", "Everything"];
+      const itemList = ["Node.js", ".Net", "Everything"];
       $ui.push({
         props: {
           title: "listview"
@@ -216,15 +216,12 @@ class Scoop extends ModCore {
               didSelect: (sender, indexPath, data) => {
                 switch (indexPath.row) {
                   case 0:
-                    this.ModuleLoader.getModule("scoop.nodejs").initUi();
+                    this.Core.checkVersion("nodejs");
                     break;
                   case 1:
                     this.Core.checkVersion("dotnet");
                     break;
                   case 2:
-                    this.Core.checkVersion("git");
-                    break;
-                  case 3:
                     this.Core.checkVersion("everything");
                     break;
                   default:

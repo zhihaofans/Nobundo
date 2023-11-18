@@ -6,6 +6,24 @@ const { ModModule } = require("CoreJS"),
 class DataGetter {
   constructor(mod) {
     this.Mod = mod;
+    this.VersionData = {
+      "lts_taobao": {
+        file_name: "Nodejs-LTS-TaobaoMirror.json",
+        name: "Nodejs-LTS-TaobaoMirror"
+      },
+      "lts_tuna": {
+        file_name: "Nodejs-LTS-tuna.json",
+        name: "Nodejs-LTS-tuna"
+      },
+      "current_taobao": {
+        file_name: "Nodejs-TaobaoMirror.json",
+        name: "Nodejs-TaobaoMirror"
+      },
+      "current_tuna": {
+        file_name: "Nodejs-tuna.json",
+        name: "Nodejs-tuna"
+      }
+    };
   }
   async getHashFile(version) {
     const url = `https://nodejs.org/dist/v${version}/SHASUMS256.txt`,
@@ -141,24 +159,7 @@ class NodejsView {
         x86hash: "sha256:"
       }
     };
-    this.VersionData = {
-      "lts_taobao": {
-        file_name: "Nodejs-LTS-TaobaoMirror.json",
-        name: "Nodejs-LTS-TaobaoMirror"
-      },
-      "lts_tuna": {
-        file_name: "Nodejs-LTS-tuna.json",
-        name: "Nodejs-LTS-tuna"
-      },
-      "current_taobao": {
-        file_name: "Nodejs-TaobaoMirror.json",
-        name: "Nodejs-TaobaoMirror"
-      },
-      "current_tuna": {
-        file_name: "Nodejs-tuna.json",
-        name: "Nodejs-tuna"
-      }
-    };
+    this.VersionData = this.DataGetter.VersionData;
   }
   shareData(site, version, versionCode, x64hash, x86hash) {
     $console.info({
@@ -373,10 +374,66 @@ class ScoopModule extends ModModule {
       version: "1"
       //author: "zhihaofans"
     });
+    this.DataGetter = new DataGetter();
   }
   initUi() {
     //    $ui.success("run");
     new NodejsView(this).init();
+  }
+  getData(version) {
+    return new Promise((resolve, reject) => {
+      resolve({
+        version,
+        "description": "Locate files and folders by name instantly.",
+        "homepage": "https://www.voidtools.com",
+        "license": "MIT",
+        "architecture": {
+          "64bit": {
+            "url": `https://www.voidtools.com/Everything-${version}.x64-Setup.exe#/Everything-Setup.exe`,
+            "hash": "x64hash"
+          },
+          "32bit": {
+            "url": `https://www.voidtools.com/Everything-${version}.x86-Setup.exe#/Everything-Setup.exe`,
+            "hash": "x86hash"
+          }
+        },
+        "shortcuts": [["Everything-Setup.exe", "Install Everything"]],
+        "checkver": "Download Everything ([\\d.]+)",
+        "autoupdate": {
+          "architecture": {
+            "64bit": {
+              "url":
+                "https://www.voidtools.com/Everything-$version.x64-Setup.exe#/Everything-Setup.exe"
+            },
+            "32bit": {
+              "url":
+                "https://www.voidtools.com/Everything-$version.x86-Setup.exe#/Everything-Setup.exe"
+            }
+          },
+          "hash": {
+            "url": "$baseurl/Everything-$version.sha256"
+          }
+        }
+      });
+    });
+  }
+  getFileName(version) {
+    return "Everything-installer.json";
+  }
+  getUpdateNote(version) {
+    return new Promise((resolve, reject) => {
+      resolve("scoop: Update to v1");
+    });
+  }
+  getVersionList() {
+    if (this.hasMultipleVersion() === true) {
+      return Object.keys(this.DataGetter.VersionData);
+    } else {
+      return undefined;
+    }
+  }
+  hasMultipleVersion() {
+    return true
   }
 }
 module.exports = ScoopModule;
