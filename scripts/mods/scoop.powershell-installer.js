@@ -9,13 +9,14 @@ class DataGetter {
       SCOOP_JSON_FILE:
         "https://github.com/ScoopInstaller/Main/raw/master/bucket/git.json",
       SCOOP_JSON_FILE_CDN:
-        "https://cdn.jsdelivr.net/gh/ScoopInstaller/Main@master/bucket/git.json"
+        "https://cdn.jsdelivr.net/gh/chawyehsu/dorado@master/bucket/git.json"
     };
   }
   getScoopData() {
     $console.info("getScoopData");
     return new Promise(async (resolve, reject) => {
       $console.info("httpS");
+
       const url = this.URL.SCOOP_JSON_FILE_CDN,
         resp = await Http.get({
           url
@@ -32,7 +33,7 @@ class DataGetter {
       }
     });
   }
-  scoopToTaobao(scoopData) {
+  scoopToData(scoopData) {
     if (scoopData === undefined) {
       return undefined;
     }
@@ -70,7 +71,7 @@ class Main {
     this.Mod = mod;
     this.DataGetter = new DataGetter();
   }
-  saveTaobaoData(scoopData) {
+  saveData(scoopData) {
     const taobaoData = this.DataGetter.scoopToTaobao(scoopData);
     this.Mod.Util.shareJsonData("Git-TaobaoMirror.json", taobaoData);
   }
@@ -80,15 +81,15 @@ class Main {
       .then(result => {
         $console.info(result);
         if (result) {
-          const mainViewList = [`taobao(${result.version})`, "复制更新日志"],
+          const mainViewList = [`导出(${result.version})`, "复制更新日志"],
             didSelect = index => {
               switch (index) {
                 case 0:
-                  this.saveTaobaoData(result);
+                  this.saveData(result);
                   break;
                 case 1:
                   this.Mod.Util.copy(
-                    `Git-TaobaoMirror: Update to v${result.version}`
+                    `PowerShell-installer:Update to v${result.version}`
                   );
                   break;
                 default:
@@ -105,7 +106,7 @@ class Main {
                   });
               }
             };
-          ListViewKit.pushSimpleText("Git", mainViewList, didSelect);
+          ListViewKit.pushSimpleText("PowerShell", mainViewList, didSelect);
         } else {
           $ui.alert({
             title: "Hello",
@@ -148,58 +149,21 @@ class Main {
   }
 }
 
-class ScoopGit extends ModModule {
+class ScoopPowershell extends ModModule {
   constructor(mod) {
     super({
       mod,
-      id: "scoop.git",
-      name: "Scoop Git规则生成器",
+      id: "scoop.powershell",
+      name: "Scoop PowerShell规则生成器",
       version: "1"
       //author: "zhihaofans"
     });
     //this.Mod = mod;
     //$console.info(this.Mod);
-    this.DataGetter = new DataGetter();
   }
   initUi() {
     //$ui.success("run");
     new Main(this.Mod).init();
   }
-  getData(version) {
-    return new Promise((resolve, reject) => {
-      this.DataGetter.getScoopData().then(result => {
-        $console.info(result);
-        if (result) {
-          resolve(this.DataGetter.scoopToTaobao(result));
-        } else {
-          reject({
-            message: "空白结果"
-          });
-        }
-      });
-    });
-  }
-  getFileName() {
-    return "Git-TaobaoMirror.json";
-  }
-  getUpdateNote(version) {
-    return new Promise((resolve, reject) => {
-      this.DataGetter.getScoopData()
-        .then(result => {
-          resolve(`Git-TaobaoMirror: Update to v${result.version}`);
-        })
-        .catch(reject);
-    });
-  }
-  getVersionList() {
-    if (this.hasMultipleVersion() === true) {
-      return ["1"];
-    } else {
-      return undefined;
-    }
-  }
-  hasMultipleVersion() {
-    return false;
-  }
 }
-module.exports = ScoopGit;
+module.exports = ScoopPowershell;
