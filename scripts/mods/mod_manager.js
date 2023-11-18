@@ -54,7 +54,6 @@ class ModManager extends ModCore {
       coreVersion: 9,
       useSqlite: false
     });
-    this.$ = $;
     this.Http = $.http;
     this.Storage = Next.Storage;
     this.managerCore = new ManagerCore(app);

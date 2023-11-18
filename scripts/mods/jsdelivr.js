@@ -104,32 +104,6 @@ class GithubCore {
     }
     return data;
   }
-  parseRawUrl(url) {
-    const reRaw = /https?:\/\/raw.githubusercontent.com\/([^/]+)\/([^/]+)\/([^/]+)\/(.+)/;
-    const match = url.match(reRaw);
-    $console.info(match);
-    return match
-      ? {
-          owner: match[1],
-          resp: match[2],
-          version: match[3],
-          path: match[4]
-        }
-      : undefined;
-  }
-  parseWebUrl(url) {
-    const reWebUrl = /https:\/\/github.com\/([^/]+)\/([^/]+)\/(blob|tree)\/([^/]+)\/(.+)/;
-    const match = url.match(reWebUrl);
-    $console.info(match);
-    return match
-      ? {
-          owner: match[1],
-          resp: match[2],
-          version: match[4],
-          path: match[5]
-        }
-      : undefined;
-  }
 }
 class JsDelivr extends ModCore {
   constructor(app) {

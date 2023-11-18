@@ -142,16 +142,9 @@ class Viewer extends ModCore {
   run() {
     try {
       //this.runSqlite();
+      const defaultImg = "https://api.likepoems.com/img/bing";
       new ViewerCore().openImage({
-        urlList: [
-          "https://help.ys7.com/ys7_helpcenter_h5/assets/desktopGuide/banner.png",
-          "https://help.ys7.com/ys7_helpcenter_h5/assets/desktopGuide/step1.png",
-          "https://help.ys7.com/ys7_helpcenter_h5/assets/desktopGuide/banner.png",
-          "https://ci.xiaohongshu.com/24f80c55-7e06-e459-f420-95f46648ef89?imageView2/2/w/1080/format/jpg",
-          "https://help.ys7.com/ys7_helpcenter_h5/assets/desktopGuide/step1.png",
-          "https://help.ys7.com/ys7_helpcenter_h5/assets/desktopGuide/banner.png",
-          "https://help.ys7.com/ys7_helpcenter_h5/assets/desktopGuide/step1.png"
-        ]
+        urlList: [defaultImg, defaultImg, defaultImg, defaultImg, defaultImg]
       });
     } catch (error) {
       $console.error(error);
