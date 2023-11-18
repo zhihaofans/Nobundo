@@ -35,6 +35,13 @@ class HttpExample {
       }
     });
   }
+  getThen({ url, params }) {
+    return this.Http.get({
+      url,
+      params,
+      header: this.HEADER
+    });
+  }
   async post({ url, params, body }) {
     return await this.Http.post({
       url,
@@ -61,6 +68,14 @@ class HttpExample {
       }
     });
   }
+  postThen({ url, params, body }) {
+    return this.Http.post({
+      url,
+      params,
+      body,
+      header: this.HEADER
+    });
+  }
 }
 class Example extends ModCore {
   constructor(app) {
@@ -68,7 +83,7 @@ class Example extends ModCore {
       app,
       modId: "example",
       modName: "例子",
-      version: "10",
+      version: "11",
       author: "zhihaofans",
       coreVersion: 13,
       useSqlite: true,
