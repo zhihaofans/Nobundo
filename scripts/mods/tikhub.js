@@ -3,40 +3,9 @@ const LOGO =
 const { ModCore, ModuleLoader } = require("CoreJS"),
   $ = require("$"),
   { Http, Storage } = require("Next");
-let APP_VERSION = "0.0.1",
-  APP_NAME = "tikhub-api";
-class HttpCore {
-  constructor(apiToken) {
-    this.Http = new Http(5);
-    this.HEADER = {
-      "User-Agent": `${APP_NAME}(${APP_VERSION})`,
-      "Content-Type": "application/x-www-form-urlencoded",
-      cookie: `Authorization=${apiToken}`
-    };
-  }
-  setApiToken(apiToken) {
-    this.HEADER.cookie = `Authorization=${apiToken}`;
-  }
-  getThen(url, params) {
-    return this.Http.get({
-      url,
-      params,
-      header: this.HEADER
-    });
-  }
-  postThen(url, body, params) {
-    return this.Http.post({
-      url,
-      body,
-      params,
-      header: this.HEADER
-    });
-  }
-}
 class TikHubApi {
-  constructor(apiToken) {
-    this.Http = new HttpCore(apiToken);
-    this.API_HOST = "https://api.tikhub.io/";
+  constructor(mod) {
+    this.Http = mod.HttpCore;
   }
   login(username, password) {
     const tokenMinutes = 30 * 24 * 60,
@@ -50,7 +19,7 @@ class TikHubApi {
           username,
           password
         };
-      this.Http.postThen(this.API_HOST + "user/login", body, params)
+      this.Http.postThen(this.Http.API_HOST + "user/login", body, params)
         .then(resp => {
           $console.info(resp);
           const { statusCode } = resp.response;
@@ -98,7 +67,7 @@ class TikHubApi {
   }
   dailyCheckin() {
     return new Promise((resolve, reject) => {
-      this.Http.getThen(this.API_HOST + "promotion/daily_check_in")
+      this.Http.getThen(this.Http.API_HOST + "promotion/daily_check_in")
         .then(resp => {
           $console.info(resp);
           const { statusCode } = resp.response;
@@ -126,105 +95,21 @@ class TikHubApi {
         });
     });
   }
-  xhsGetNoteData(url) {
-    return new Promise((resolve, reject) => {
-      if ($.hasString(url)) {
-        this.Http.getThen(this.API_HOST + "xhs/get_note_data/", {
-          url: $text.URLEncode(url)
-        })
-          .then(resp => {
-            $console.info(resp);
-            const { statusCode } = resp.response;
-            const result = resp.data;
-            $console.info(statusCode);
-            if (statusCode === 200) {
-              resolve({
-                success: result.status === true,
-                message: result.message
-              });
-            } else {
-              reject({
-                success: false,
-                code: statusCode,
-                message: result.message || `Http code:${statusCode}`
-              });
-            }
-          })
-          .catch(fail => {
-            $console.error(fail);
-            reject({
-              success: false,
-              message: fail.message || "fail"
-            });
-          });
-      } else {
-        reject({
-          success: false,
-          message: "need url"
-        });
-      }
-    });
-  }
-  reloadApiToken(newApiToken) {
-    this.Http = new HttpCore(newApiToken);
-  }
 }
-class TikHubCore {
-  constructor(sqlite) {
-    this.SQL_KEY = {
-      API_TOKEN: "api_token",
-      API_TOKEN_EXPIRED: "api_token_expired",
-      USERNAME: "username"
-    };
-    this.SQLITE = sqlite;
-  }
-  hasTable() {
-    return this.SQLITE.hasTable() === true;
-  }
-  getApiToken() {
-    return this.SQLITE.getItem(this.SQL_KEY.API_TOKEN);
-  }
-  setApiToken(token) {
-    return this.SQLITE.setItem(this.SQL_KEY.API_TOKEN, token);
-  }
-  removeApiToken() {
-    return this.SQLITE.deleteItem(this.SQL_KEY.API_TOKEN);
-  }
-  getApiTokenExpired() {
-    return this.SQLITE.getItem(this.SQL_KEY.API_TOKEN_EXPIRED).toInt() || 0;
-  }
-  setApiTokenExpired(time) {
-    if ($.isNumber(time) && time > 0) {
-      return this.SQLITE.setItem(
-        this.SQL_KEY.API_TOKEN_EXPIRED,
-        time.toString()
-      );
-    } else {
-      $console.error({
-        setApiTokenExpired: time,
-        message: "time is not number or time<=0"
-      });
-      return false;
-    }
-  }
-  getUserName() {
-    return this.SQLITE.getItem(this.SQL_KEY.USERNAME);
-  }
-  setUserName(username) {
-    return this.SQLITE.setItem(this.SQL_KEY.USERNAME, username);
-  }
-}
+
 class TikHubView {
   constructor(mod) {
-    this.Core = new TikHubCore(mod.SQLITE);
-    this.Api = new TikHubApi(this.Core.getApiToken());
-    const XHS = mod.ModuleLoader.getModule("tikhub.xhs");
+    this.Http = mod.HttpCore;
+    this.Api = new TikHubApi(mod);
+    this.XHS = mod.ModuleLoader.getModule("tikhub.xhs");
+    this.Douyin=mod.ModuleLoader.getModule("tikhub.douyin")
+    $console.info(this.XHS);
   }
   login() {
     $input.text({
       type: $kbType.text,
       placeholder: "账号",
-      text: this.Core.getUserName() || "",
+      text: this.Http.getUserName() || "",
       handler: username => {
         if ($.hasString(username)) {
           $input.text({
@@ -240,13 +125,13 @@ class TikHubView {
                     if (result.success === true) {
                       const apiToken = result.api_token,
                         deadTime = result.deadTime;
-                      this.Core.setUserName(username);
+                      this.Http.setUserName(username);
                       if ($.hasString(apiToken)) {
-                        const setTokenSu = this.Core.setApiToken(apiToken);
+                        const setTokenSu = this.Http.setApiToken(
+                          apiToken,
+                          deadTime
+                        );
                         if (setTokenSu === true) {
-                          this.Api.reloadApiToken(apiToken);
-                          this.Core.setApiTokenExpired(deadTime);
-
                           this.initView();
                           $ui.success("登录成功");
                         } else {
@@ -313,10 +198,9 @@ class TikHubView {
     });
   }
   init() {
-    if (this.Core.hasTable()) {
-      if (!$.hasString(this.Core.getApiToken())) {
-        this.Core.removeApiToken();
-        this.login();
+    if (this.Http.hasTable()) {
+      if (!$.hasString(this.Http.getApiToken())) {
+        this.loginExpired();
       } else {
         this.initView();
       }
@@ -333,7 +217,7 @@ class TikHubView {
         {
           type: "list",
           props: {
-            data: ["每日签到", "xhs"]
+            data: ["每日签到", "xhs", "抖音"]
           },
           layout: $layout.fill,
           events: {
@@ -343,9 +227,12 @@ class TikHubView {
                 case 0:
                   this.dailyCheckin();
                   break;
-                  case 1:
-                  this.getXhs()
-                  break
+                case 1:
+                  this.getXhs();
+                  break;
+                case 2:
+                  this.Douyin.getVideoData()
+                  break;
                 default:
               }
             }
@@ -411,13 +298,13 @@ class TikHubView {
   }
   getXhs() {
     $input.text({
-      type: $kbType.url,
-      placeholder: "/www.xiaohongshu.com/explore/****",
-      text: "",
-      handler: url => {
+      type: $kbType.text,
+      placeholder: "647f377b0000000013002982",
+      text: "647f377b0000000013002982",
+      handler: id => {
         $.startLoading();
-        if ($.isLink(url)) {
-          this.Api.xhsGetNoteData(url)
+        if ($.hasString(id)) {
+          this.XHS.getNoteData(id)
             .then(result => {})
             .catch(fail => {
               $.stopLoading();
@@ -438,13 +325,13 @@ class TikHubView {
               });
             });
         } else {
-          $ui.error("请输入小红书链接");
+          $ui.error("请输入小红书id");
         }
       }
     });
   }
   loginExpired() {
-    this.Core.removeApiToken();
+    this.Http.removeApiToken();
     this.login();
   }
 }
@@ -465,11 +352,14 @@ class TikHub extends ModCore {
     //    APP_VERSION = app.AppInfo.version;
     //    APP_NAME = app.AppInfo.name;
     this.ModuleLoader = new ModuleLoader(this);
-        this.ModuleLoader.addModule("tikhub.xhs.js");
+    this.ModuleLoader.addModule("tikhub.http.js");
+
+    this.ModuleLoader.addModule("tikhub.xhs.js");
+    this.ModuleLoader.addModule("tikhub.douyin.js");
+    this.HttpCore = this.ModuleLoader.getModule("tikhub.http");
   }
   run() {
     try {
-      //this.runSqlite();
       new TikHubView(this).init();
     } catch (error) {
       $console.error(error);

@@ -1,159 +1,59 @@
 const { ModModule } = require("CoreJS"),
   Next = require("Next"),
+  $ = require("$"),
   ListViewKit = new Next.ListView();
-  class XHSCore{
-      constructor(){
-        
-      }
-      getRealUrl(shortLink){
-        return new Promise((resolve, reject) => {
-     if($.hasString(shortLink)){
-       
-     }else{
-       reject()
-     }
-   })
-      }
-    }
-class Main {
+class XHSCore {
   constructor(mod) {
-    this.Mod = mod;
+    this.Http = mod.ModuleLoader.getModule("tikhub.http");
   }
-  multListTest() {
-    const listData = [
-      {
-        title: "标题1",
-        subTitle: "2022/07/22 内容1"
-      },
-      {
-        title: "标题2",
-        subTitle: "内容2"
+  getRealUrl(shortLink) {
+    return new Promise((resolve, reject) => {
+      if ($.hasString(shortLink)) {
+      } else {
+        reject();
       }
-    ];
-    ListViewKit.pushTwoLineList({
-      title: "example 1",
-      items: listData
     });
   }
-  gridViewTest() {
-    $ui.push({
-      props: {
-        title: ""
-      },
-      views: [
-        {
-          type: "matrix",
-          props: {
-            columns: 3,
-            itemHeight: 100,
-            spacing: 5,
-            template: {
-              props: {},
-              views: [
-                {
-                  type: "stack",
-                  props: {
-                    axis: $stackViewAxis.vertical,
-                    spacing: 5,
-                    distribution: $stackViewDistribution.fillProportionally,
-                    stack: {
-                      views: [
-                        {
-                          type: "image",
-                          props: {
-                            id: "icon"
-                          },
-                          layout: function (make, view) {
-                            make.center.equalTo(view.super);
-                            make.size.equalTo($size(50, 50));
-                          }
-                        },
-                        {
-                          type: "label",
-                          props: {
-                            id: "label",
-
-                            align: $align.left,
-                            font: $font(24)
-                          },
-                          layout: make => {
-                            make.height.equalTo(20);
-                            make.left.top.right.inset(0);
-                          }
-                        }
-                      ]
-                    }
-                  },
-                  layout: $layout.fill
-                }
-              ]
-            },
-            data: [
-              {
-                label: {
-                  text: "example 1"
-                },
-                icon: {
-                  src:
-                    "https://images.apple.com/v/ios/what-is/b/images/performance_large.jpg"
-                }
-              },
-              {
-                label: {
-                  text: "example 1"
-                },
-                icon: {
-                  src:
-                    "https://images.apple.com/v/ios/what-is/b/images/performance_large.jpg"
-                }
-              },
-              {
-                icon: {
-                  icon: $icon("005", $color("red"), $size(12, 12))
-                }
-              },
-              {
-                label: {
-                  text: "example 1"
-                }
-              },
-              {
-                label: {
-                  text: "example 1"
-                }
-              }
-            ]
-          },
-          layout: $layout.fill
-        }
-      ]
-    });
-  }
-  init() {
-    const mainViewList = ["example 1", "example 2"],
-      didSelect = index => {
-        switch (index) {
-          case 0:
-            this.multListTest();
-            break;
-          case 1:
-            this.gridViewTest();
-            break;
-          default:
-            $ui.alert({
-              title: index,
-              message: mainViewList[index],
-              actions: [
-                {
-                  title: "OK",
-                  disabled: false, // Optional
-                  handler: () => {}
-                }
-              ]
+  getNoteDataById(id) {
+    return new Promise((resolve, reject) => {
+      if ($.hasString(id)) {
+        this.Http.getThen(this.Http.API_HOST + "xhs/get_note_data/", {
+          note_id: id
+        })
+          .then(resp => {
+            $console.info(resp);
+            const { statusCode } = resp.response;
+            const result = resp.data,
+              data = result.data;
+            $console.info(statusCode);
+            if (statusCode === 200 && data.success === true) {
+              resolve({
+                success: data.success === true,
+                message: data.msg
+              });
+            } else {
+              reject({
+                success: false,
+                httpCode: statusCode,
+                code: data.code,
+                message: data.msg || result.message || `Http code:${statusCode}`
+              });
+            }
+          })
+          .catch(fail => {
+            $console.error(fail);
+            reject({
+              success: false,
+              message: fail.message || "fail"
             });
-        }
-      };
-    ListViewKit.pushSimpleText(this.Mod.MOD_INFO.NAME, mainViewList, didSelect);
+          });
+      } else {
+        reject({
+          success: false,
+          message: "need url"
+        });
+      }
+    });
   }
 }
 
@@ -167,11 +67,11 @@ class ExampleModule extends ModModule {
       //author: "zhihaofans"
     });
     //this.Mod = mod;
-    $console.info(this.Mod);
+    this.Http = mod.ModuleLoader.getModule("tikhub.http");
+    this.XHS = new XHSCore(mod);
   }
-  initUi() {
-    //$ui.success("run");
-    new Main(this.Mod).init();
+  getNoteData(id) {
+    return this.XHS.getNoteDataById(id);
   }
 }
 module.exports = ExampleModule;
