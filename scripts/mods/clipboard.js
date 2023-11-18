@@ -1,123 +1,34 @@
 const { ModCore } = require("CoreJS"),
   $ = require("$"),
-  Next = require("Next");
+  ClipLib = require("ClipboardLib");
 class ClipboardCore {
   constructor(mod) {
     this.Mod = mod;
-    this.Sqlite = mod.SQLITE;
-    this.SQLITE_KEY = {
-      item_list: "clipboard_item_list"
-    };
+    this.Lib = new ClipLib();
   }
   addItem(text) {
-    const itemList = this.getAllItem();
-    itemList.push(text);
-    return this.setItemList(itemList);
+    return this.Lib.addItem(text);
   }
   clearItemList() {
-    return this.Sqlite.deleteItem(this.SQLITE_KEY.item_list);
+    return this.Lib.removeData();
   }
   getAllItem() {
-    const sqliteResult = this.Sqlite.getItem(this.SQLITE_KEY.item_list);
-    if (sqliteResult == undefined || sqliteResult.length == 0) {
-      return [];
-    } else {
-      try {
-        return JSON.parse(sqliteResult);
-      } catch (error) {
-        $console.error(error);
-        return [];
-      }
-    }
+    return this.Lib.getList();
   }
   removeItem(index, text) {
-    let itemList = this.getAllItem();
-    if (
-      itemList.length == 0 ||
-      index == undefined ||
-      index < 0 ||
-      text == undefined ||
-      text.length == 0 ||
-      index >= itemList.length
-    ) {
-      $console.error({
-        _: "removeItem",
-        message: "itemList,text"
-      });
+    return false;
+    const oldList = this.getAllItem();
+    if (index >= oldList.length) {
       return false;
-    }
-    $console.info({
-      itemList
-    });
-    if (itemList[index] == text) {
-      switch (index) {
-        case 0:
-          itemList.shift();
-          break;
-        case itemList.length - 1:
-          itemList.pop();
-          break;
-        default:
-          itemList = itemList
-            .slice(0, index + 1)
-            .concat(itemList.slice(index, itemList.length - 1));
-      }
-      $console.info({
-        itemList
-      });
-      if (itemList.length == 0) {
-        const result = this.clearItemList();
-        if (result.result != true) {
-          $console.info({
-            _: "removeItem",
-            result
-          });
-        }
-        return result.result;
-      } else {
-        return this.setItemList(itemList);
-      }
     } else {
-      $console.error({
-        _: "removeItem",
-        message: "itemList[index] != text"
+      const newList = oldList.filter((element, idx, array) => {
+        return idx !== index && text !== element;
       });
-      return false;
+      return this.setItemList(newList);
     }
   }
   setItemList(itemListData) {
-    $console.info({
-      itemListData
-    });
-    if (itemListData == undefined) {
-      $console.error({
-        _: "setItemList",
-        message: "length"
-      });
-      return false;
-    } else if (itemListData.length == 0) {
-      return this.clearItemList();
-    } else {
-      try {
-        const result = this.Sqlite.setItem(
-          this.SQLITE_KEY.item_list,
-          JSON.stringify(itemListData)
-        );
-        $console.info({
-          result,
-          itemListData
-        });
-        if (result) {
-          if ($ui.get("list_item") != undefined) {
-            $ui.get("list_item").data = itemListData;
-          }
-        }
-        return result;
-      } catch (error) {
-        $console.error(error);
-        return false;
-      }
-    }
+    return this.Lib.setList(itemListData);
   }
 }
 class ClipboardView {
@@ -159,7 +70,7 @@ class ClipboardView {
           {
             title: "添加",
             handler: () => {
-              this.inputText();
+              this.inputText($.paste());
             }
           }
         ]
@@ -238,16 +149,14 @@ class Clipboard extends ModCore {
       app,
       modId: "clipboard",
       modName: "剪切板",
-      version: "1",
+      version: "3",
       author: "zhihaofans",
-      coreVersion: 10,
+      coreVersion: 13,
       useSqlite: true,
       allowWidget: true,
-      allowApi: true
+      allowApi: true,
+      iconName: "doc.on.clipboard"
     });
-    this.$ = $;
-    this.Http = $.http;
-    this.Storage = Next.Storage;
     this.Ui = new ClipboardView(this);
   }
   run() {
