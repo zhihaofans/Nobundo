@@ -19,6 +19,13 @@ class KeyBoardCore {
     }
     this.playClickSound();
   }
+  addSpaceInEveryText() {
+    const oldText = $keyboard.selectedText;
+    if (oldText.length > 0) {
+      this.addText(oldText.split("").join(" "));
+    }
+    this.playClickSound();
+  }
   playClickSound() {
     $keyboard.playInputClick();
   }
@@ -336,7 +343,8 @@ class KeyBoardView {
                   "数学计算",
                   "数学计算并替换为结果",
                   "剪切板",
-                  "收起键盘⬇️"
+                  "收起键盘⬇️",
+                  "空格说话模式"
                 ]
               }
             ]
@@ -369,6 +377,9 @@ class KeyBoardView {
                 case 4:
                   $keyboard.dismiss();
                   break;
+                case 5:
+                  this.Mod.Core.addSpaceInEveryText();
+                  break;
                 default:
               }
             }
@@ -385,12 +396,12 @@ class KeyBoard extends ModCore {
       app,
       modId: "keyboard",
       modName: "键盘输入法",
-      version: "2",
+      version: "3",
       author: "zhihaofans",
       allowKeyboard: true,
+      iconName: "keyboard",
       coreVersion: 9
     });
-    this.$ = $;
     this.Http = $.http;
     this.Storage = Next.Storage;
     this.Core = new KeyBoardCore(this);
