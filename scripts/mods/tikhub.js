@@ -102,7 +102,7 @@ class TikHubView {
     this.Http = mod.HttpCore;
     this.Api = new TikHubApi(mod);
     this.XHS = mod.ModuleLoader.getModule("tikhub.xhs");
-    this.Douyin=mod.ModuleLoader.getModule("tikhub.douyin")
+    this.Douyin = mod.ModuleLoader.getModule("tikhub.douyin");
     $console.info(this.XHS);
   }
   login() {
@@ -199,7 +199,10 @@ class TikHubView {
   }
   init() {
     if (this.Http.hasTable()) {
-      if (!$.hasString(this.Http.getApiToken())) {
+      if (
+        $.getTimestamp() > this.Http.getApiTokenExpired() ||
+        !$.hasString(this.Http.getApiToken())
+      ) {
         this.loginExpired();
       } else {
         this.initView();
@@ -225,13 +228,16 @@ class TikHubView {
               const { section, row } = indexPath;
               switch (row) {
                 case 0:
-                  this.dailyCheckin();
+                  sender.cell(indexPath).startLoading();
+                  this.dailyCheckin().then(result => {
+                    sender.cell(indexPath).stopLoading();
+                  });
                   break;
                 case 1:
                   this.getXhs();
                   break;
                 case 2:
-                  this.Douyin.getVideoData()
+                  this.Douyin.getVideoData();
                   break;
                 default:
               }
@@ -242,59 +248,62 @@ class TikHubView {
     });
   }
   dailyCheckin() {
-    $.startLoading();
-    this.Api.dailyCheckin()
-      .then(result => {
-        $.stopLoading();
-        $console.info(result);
-        if (result.success) {
-          $ui.alert({
-            title: "签到成功",
-            message: result.message,
-            actions: [
-              {
-                title: "OK",
-                disabled: false, // Optional
-                handler: () => {}
-              }
-            ]
-          });
-        } else {
-          $ui.alert({
-            title: "签到失败",
-            message: result.message,
-            actions: [
-              {
-                title: "OK",
-                disabled: false, // Optional
-                handler: () => {}
-              }
-            ]
-          });
-        }
-      })
-      .catch(fail => {
-        $.stopLoading();
-        $ui.alert({
-          title: "签到错误",
-          message: fail.message,
-          actions: [
-            {
-              title: "OK",
-              disabled: false, // Optional
-              handler: () => {
-                if (fail.code === 401) {
-                  this.loginExpired();
+    return new Promise((resolve, reject) => {
+      $.startLoading();
+      this.Api.dailyCheckin()
+        .then(result => {
+          resolve();
+          $.stopLoading();
+          $console.info(result);
+          if (result.success) {
+            $ui.alert({
+              title: "签到成功",
+              message: result.message,
+              actions: [
+                {
+                  title: "OK",
+                  disabled: false, // Optional
+                  handler: () => {}
                 }
+              ]
+            });
+          } else {
+            $ui.alert({
+              title: "签到失败",
+              message: result.message,
+              actions: [
+                {
+                  title: "OK",
+                  disabled: false, // Optional
+                  handler: () => {}
+                }
+              ]
+            });
+          }
+        })
+        .catch(fail => {
+          $.stopLoading();
+          $ui.alert({
+            title: "签到错误",
+            message: fail.message,
+            actions: [
+              {
+                title: "OK",
+                disabled: false, // Optional
+                handler: () => {
+                  if (fail.code === 401) {
+                    this.loginExpired();
+                  }
+                }
+              },
+              {
+                title: "Cancel",
+                handler: () => {}
               }
-            },
-            {
-              title: "Cancel",
-              handler: () => {}
-            }
-          ]
+            ]
+          });
         });
-      });
+    });
   }
   getXhs() {
     $input.text({

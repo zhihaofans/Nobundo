@@ -52,13 +52,14 @@ class DataCore {
     return this.SQLITE.setItem(this.SQL_KEY.API_TOKEN, token);
   }
   removeApiToken() {
+    this.setApiTokenExpired(0);
     return this.SQLITE.deleteItem(this.SQL_KEY.API_TOKEN);
   }
   getApiTokenExpired() {
-    return this.SQLITE.getItem(this.SQL_KEY.API_TOKEN_EXPIRED).toInt() || 0;
+    return this.SQLITE.getItem(this.SQL_KEY.API_TOKEN_EXPIRED)?.toInt() || 0;
   }
   setApiTokenExpired(time) {
-    if ($.isNumber(time) && time > 0) {
+    if ($.isNumber(time) && time >= 0) {
       return this.SQLITE.setItem(
         this.SQL_KEY.API_TOKEN_EXPIRED,
         time.toString()
@@ -96,6 +97,9 @@ class ExampleModule extends ModModule {
   hasTable() {
     return this.DataCore.hasTable();
   }
+  getUserName() {
+    return this.DataCore.getUserName();
+  }
   getApiToken() {
     return this.DataCore.getApiToken();
   }
@@ -105,6 +109,9 @@ class ExampleModule extends ModModule {
   }
   getApiTokenExpired() {
     return this.DataCore.getApiTokenExpired();
+  }
+  removeApiToken() {
+    this.DataCore.removeApiToken();
   }
   getThen(url, params) {
     return this.HttpCore.getThen(url, params);

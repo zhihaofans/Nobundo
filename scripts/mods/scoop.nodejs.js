@@ -417,12 +417,12 @@ class ScoopModule extends ModModule {
       });
     });
   }
-  getFileName(version) {
-    return "Everything-installer.json";
+  getFileName(version, site) {
+    return this.DataGetter.VersionData[version + "-" + site];
   }
   getUpdateNote(version) {
     return new Promise((resolve, reject) => {
-      resolve("scoop: Update to v1");
+      resolve("nodejs: Update to v"+version);
     });
   }
   getVersionList() {
@@ -433,7 +433,7 @@ class ScoopModule extends ModModule {
     }
   }
   hasMultipleVersion() {
-    return true
+    return true;
   }
 }
 module.exports = ScoopModule;
