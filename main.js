@@ -19,6 +19,13 @@ try {
           handler: () => {
             $app.close();
           }
+        },
+        {
+          title: "不理直接使用",
+          disabled: false, // Optional
+          handler: () => {
+            require("./scripts/app").run();
+          }
         }
       ]
     });
@@ -40,7 +47,7 @@ try {
   });
 }
 function libVersionCheck() {
-  const libList = { CoreJS: 13, $: 1, Next: 2 },
+  const libList = { CoreJS: 15, $: 2, Next: 3 },
     checkResult = {};
   Object.keys(libList).map(libId => {
     const lib = require(libId);
