@@ -7,7 +7,9 @@ class DataGetter {
     this.Mod = mod;
   }
   genJsonData(channelVersion, windowsdesktopData) {
-    const { version, x64hash, x86hash } = this.getHashData(windowsdesktopData);
+    const { version, x64hash, x86hash, arm64hash } = this.getHashData(
+      windowsdesktopData
+    );
     $console.info({
       windowsdesktopData,
       version,
@@ -45,6 +47,17 @@ class DataGetter {
             ]
           ],
           "post_install": ['&"$dir\\windowsdesktop-runtime-win-x86.exe"']
+        },
+        "arm64": {
+          "url": `https://dotnetcli.blob.core.windows.net/dotnet/WindowsDesktop/${version}/windowsdesktop-runtime-${version}-win-arm64.exe#/windowsdesktop-runtime-win-arm64.exe`,
+          "hash": `sha512:${arm64hash}`,
+          "shortcuts": [
+            [
+              "windowsdesktop-runtime-win-arm64.exe",
+              `Install .NET ${channelVersion} Desktop Runtime (arm64)`
+            ]
+          ],
+          "post_install": ['&"$dir\\windowsdesktop-runtime-win-arm64.exe"']
         }
       }
     };
@@ -57,7 +70,9 @@ class DataGetter {
       x64hash: undefined,
       x64url: undefined,
       x86hash: undefined,
-      x86url: undefined
+      x86url: undefined,
+      arm64hash: undefined,
+      arm64url: undefined
     };
     try {
       windowsdesktopData.files.map(file => {
@@ -70,6 +85,10 @@ class DataGetter {
           case "windowsdesktop-runtime-win-x86.exe":
             result.x86hash = hash;
             result.x86url = url;
+            break;
+          case "windowsdesktop-runtime-win-arm64.exe":
+            result.arm64hash = hash;
+            result.arm64url = url;
             break;
           default:
         }
@@ -224,6 +243,10 @@ class ScoopModule extends ModModule {
       "8.0": {
         FILE_NAME: "DotNetDesktopRuntime8-installer.json",
         UPDATE_NOTE_NAME: "DotNetDesktopRuntime8-installer"
+      },
+      "9.0": {
+        FILE_NAME: "DotNetDesktopRuntime9-installer.json",
+        UPDATE_NOTE_NAME: "DotNetDesktopRuntime9-installer"
       }
     };
   }
@@ -287,7 +310,7 @@ class ScoopModule extends ModModule {
   }
   getVersionList() {
     if (this.hasMultipleVersion() === true) {
-      return ["8.0", "7.0", "6.0"];
+      return ["9.0", "8.0", "7.0", "6.0"];
     } else {
       return undefined;
     }

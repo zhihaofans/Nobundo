@@ -52,6 +52,7 @@ class ModManager extends ModCore {
       version: "1",
       author: "zhihaofans",
       coreVersion: 9,
+      iconName:"square.grid.3x2",
       useSqlite: false
     });
     this.Http = $.http;

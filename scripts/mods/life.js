@@ -110,13 +110,12 @@ class YPP {
         //params,
         //header: this.HEADER
       }).then(resp => {
-        const result=resp.data
-       if(result!=undefined&&result.code===0){
-         const cityData=result.data
-         
-       }else{
-         reject(resp)
-       }
+        const result = resp.data;
+        if (result != undefined && result.code === 0) {
+          const cityData = result.data;
+        } else {
+          reject(resp);
+        }
       });
     });
   }
@@ -148,7 +147,7 @@ class Example extends ModCore {
   run() {
     try {
       if ($location.available) {
-        this.init()
+        this.init();
       } else {
         $ui.alert({
           title: "初始化失败",

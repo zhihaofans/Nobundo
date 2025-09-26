@@ -47,7 +47,7 @@ try {
   });
 }
 function libVersionCheck() {
-  const libList = { CoreJS: 15, $: 2, Next: 3 },
+  const libList = { CoreJS: 17, $: 2, Next: 3 },
     checkResult = {};
   Object.keys(libList).map(libId => {
     const lib = require(libId);

@@ -422,7 +422,7 @@ class ScoopModule extends ModModule {
   }
   getUpdateNote(version) {
     return new Promise((resolve, reject) => {
-      resolve("nodejs: Update to v"+version);
+      resolve("nodejs: Update to v" + version);
     });
   }
   getVersionList() {

@@ -101,7 +101,8 @@ class WebBrowser extends ModCore {
       version: "1",
       author: "zhihaofans",
       coreVersion: 10,
-      allowApi: true
+      allowApi: true,
+      iconName:"globe"
     });
     this.$ = $;
     this.Http = $.http;
