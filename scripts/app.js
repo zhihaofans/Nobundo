@@ -20,7 +20,8 @@ const { AppKernel, ModLoader } = require("CoreJS"),
     "jsdelivr.js",
     "search.js",
     "tikhub.js",
-    "config.js"
+    "config.js",
+    "bilibili.js"
   ];
 
 class App extends AppKernel {
