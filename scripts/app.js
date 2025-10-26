@@ -1,29 +1,8 @@
 const { AppKernel, ModLoader } = require("CoreJS"),
   $ = require("$"),
-  coreModList = [
-    "jsbox_version.js",
-    "wallhaven.js",
-    "downloader.js",
-    "daymaster.js",
-    "example.js",
-    "action_extension.js",
-    "datacenter.js",
-    "content_box.js",
-    "keyboard.js",
-    "network_api.js",
-    "mod_manager.js",
-    "web_browser.js",
-    "clipboard.js",
-    "scoop.js",
-    "xiaohongshu.js",
-    "viewer.js",
-    "jsdelivr.js",
-    "search.js",
-    "tikhub.js",
-    "config.js",
-    "bilibili.js"
-  ];
-
+  modsConfig = require("./mods.js"),
+  coreModList = modsConfig["mods"];
+$console.info(modsConfig);
 class App extends AppKernel {
   constructor({ appId, modDir, l10nPath }) {
     super({ appId, modDir, l10nPath });
@@ -61,7 +40,7 @@ function run() {
   try {
     const app = new App({
       appId: "zhihaofans.nobundo",
-      modDir: "/scripts/mods/",
+      modDir: modsConfig.modDir,
       l10nPath: "/strings/l10n.js"
     });
     app.init();
