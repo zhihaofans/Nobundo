@@ -47,14 +47,15 @@ try {
   });
 }
 function libVersionCheck() {
-  const libList = { CoreJS: 17, $: 2, Next: 3 },
+  const libList = { CoreJS: 18, $: 2, Next: 3 },
     checkResult = {};
   Object.keys(libList).map(libId => {
     const lib = require(libId);
     if (lib == undefined) {
       checkResult[libId] = false;
     } else {
-      checkResult[libId] = lib.VERSION == libList[libId];
+      const resu = lib.VERSION == libList[libId];
+      checkResult[libId] = resu ? "最新" : "需要更新";
     }
   });
   return checkResult;

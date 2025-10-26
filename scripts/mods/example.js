@@ -1,47 +1,24 @@
 const { ModCore, ModuleLoader } = require("CoreJS"),
   $ = require("$"),
+  HttpLib = require("HttpLib"),
   { Http, Storage } = require("Next");
 let APP_VERSION = "",
   APP_NAME = "";
 class HttpExample {
   constructor() {
-    this.Http = new Http(5);
+    this.Http = new HttpLib();
     this.HEADER = {
       "User-Agent": `${APP_NAME}(${APP_VERSION})`,
       cookie: ""
     };
+    this.Http.header(this.HEADER);
   }
-  async get({ url, params }) {
-    return await this.Http.get({
-      url,
-      params,
-      header: this.HEADER
-    });
+  get({ url, params }) {
+    this.Http.url(url);
+    this.Http.params(params);
+    return this.Http.get();
   }
-  getAsync({ url, params, callback }) {
-    this.Http.getAsync({
-      url,
-      params,
-      header: this.HEADER,
-      handler: resp => {
-        $console.info({
-          resp
-        });
-        if (resp.error) {
-          callback(undefined);
-        } else {
-          callback(resp.data);
-        }
-      }
-    });
-  }
-  getThen({ url, params }) {
-    return this.Http.get({
-      url,
-      params,
-      header: this.HEADER
-    });
-  }
+
   async post({ url, params, body }) {
     return await this.Http.post({
       url,
@@ -85,7 +62,7 @@ class Example extends ModCore {
       modName: "例子",
       version: "11",
       author: "zhihaofans",
-      coreVersion: 13,
+      coreVersion: 18,
       useSqlite: true,
       allowWidget: true,
       allowApi: true,
