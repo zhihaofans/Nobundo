@@ -1,21 +1,70 @@
 const { ModModule } = require("CoreJS"),
   $ = require("$"),
-  Next = require("Next"),
-  ListViewKit = new Next.ListView();
+  Next = require("Next");
 const APP_VERSION = "0.0.1",
   APP_NAME = "tikhub-api";
-const API_HOST = "https://api.tikhub.io/";
+const API_HOST = "https://api.tikhub.dev/";
+class TKResult {
+  constructor(json) {
+    //this.json = JSON.parse(result);
+    this.code = json.code;
+    this.message = json.message_zh || json.message;
+    this.share_url = json.params.share_url;
+    this.video_id = json.params.aweme_id;
+    this.data = json.data;
+  }
+}
 class HttpCore {
   constructor(_module) {
     this.Module = _module;
     this.Http = new Next.Http(5);
   }
   getHeader() {
+    const token = this.Module.DataCore.getApiToken();
+    $console.info({
+      token
+    });
     return {
       "User-Agent": `${APP_NAME}(${APP_VERSION})`,
-      "Content-Type": "application/x-www-form-urlencoded",
-      cookie: `Authorization=${this.Module.DataCore.getApiToken()}`
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token,
+      "Cookie": "Authorization=Bearer " + token
     };
+  }
+  get(url, params) {
+    return new Promise((resolve, reject) => {
+      this.Http.get({
+        url,
+        params,
+        header: this.getHeader()
+      }).then(
+        resp => {
+          $console.info(resp);
+          const { statusCode } = resp.response;
+          const result = resp.data;
+          const tkRe = new TKResult(
+            result || {
+              code: statusCode,
+              message: "no resp.data"
+            }
+          );
+          if (statusCode !== 200) {
+            tkRe.url = url;
+            tkRe.params = params;
+          }
+          resolve(tkRe);
+        },
+        fail => {
+          const result = new TKResult({
+            code: -1,
+            message: "http.get fail",
+            url,
+            params
+          });
+          fail(result);
+        }
+      );
+    });
   }
   getThen(url, params) {
     return this.Http.get({
@@ -89,7 +138,6 @@ class ExampleModule extends ModModule {
       //author: "zhihaofans"
     });
     //this.Mod = mod;
-    $console.info(this.Mod);
     this.DataCore = new DataCore(mod);
     this.HttpCore = new HttpCore(this);
     this.API_HOST = API_HOST;
@@ -103,15 +151,14 @@ class ExampleModule extends ModModule {
   getApiToken() {
     return this.DataCore.getApiToken();
   }
-  setApiToken(apiToken, expiredTime) {
+  setApiToken(apiToken) {
     this.DataCore.setApiToken(apiToken);
-    this.DataCore.setApiTokenExpired(expiredTime);
-  }
-  getApiTokenExpired() {
-    return this.DataCore.getApiTokenExpired();
   }
   removeApiToken() {
     this.DataCore.removeApiToken();
+  }
+  get(url, params) {
+    return this.HttpCore.get(url, params);
   }
   getThen(url, params) {
     return this.HttpCore.getThen(url, params);

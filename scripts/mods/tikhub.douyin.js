@@ -2,6 +2,26 @@ const { ModModule } = require("CoreJS"),
   Next = require("Next"),
   $ = require("$"),
   ListViewKit = new Next.ListView();
+class TKDYData {
+  constructor(data) {
+    this.isError = data == undefined;
+    if (data != undefined) {
+      try {
+        this.title = data.preview_title;
+        this.desc = data.desc;
+        this.region = data.region; // 国家/地区
+        this.author_name = data.author.nickname;
+        this.author_id = data.author.short_id;
+        this.author_signature = data.author.signature;
+        this.author_avatar = data.author.avatar_uri;
+      } catch (error) {
+        $console.error(error);
+        this.isError = true;
+      } finally {
+      }
+    }
+  }
+}
 class DYCore {
   constructor(mod) {
     this.Http = mod.ModuleLoader.getModule("tikhub.http");
@@ -14,12 +34,42 @@ class DYCore {
       }
     });
   }
+  getVideoByUrl(url) {
+    $console.info({
+      tikhub: "douyin.getVideoByUrl",
+      url
+    });
+    return new Promise((resolve, reject) => {
+      if ($.hasString(url)) {
+        const apiUrl =
+          this.Http.API_HOST +
+          "api/v1/douyin/app/v3/fetch_one_video_by_share_url/";
+        this.Http.get(apiUrl, {
+          share_url: url
+        }).then(
+          result => {
+            if (result.code == 200 && result.data != undefined) {
+              resolve(result);
+            } else {
+              reject(result);
+            }
+          },
+          fail => reject(fail)
+        );
+      } else {
+        reject("no url");
+      }
+    });
+  }
   getVideoDataById(id) {
     return new Promise((resolve, reject) => {
       if ($.hasString(id)) {
-        this.Http.getThen(this.Http.API_HOST + "douyin/video_data/", {
-          video_id: id
-        })
+        this.Http.getThen(
+          this.Http.API_HOST + "api/v1/douyin/app/v3/fetch_one_video/",
+          {
+            aweme_id: id
+          }
+        )
           .then(resp => {
             $console.info(resp);
             const { statusCode } = resp.response;
@@ -76,7 +126,58 @@ class DYCore {
     });
   }
 }
-
+class DouyinView {
+  constructor() {}
+  showResult(tkResult) {
+    if (tkResult == undefined) {
+      $ui.alert({
+        title: "错误",
+        message: "空白结果",
+        actions: [
+          {
+            title: "OK",
+            disabled: false, // Optional
+            handler: () => {}
+          }
+        ]
+      });
+    } else if (tkResult.code != 200) {
+      $ui.alert({
+        title: "错误" + tkResult.code,
+        message: tkResult.message,
+        actions: [
+          {
+            title: "OK",
+            disabled: false, // Optional
+            handler: () => {}
+          }
+        ]
+      });
+    } else {
+      const DYdata = new TKDYData(result.data);
+      const result = [];
+      $ui.push({
+        props: {
+          title: "douyin:tk"
+        },
+        views: [
+          {
+            type: "list",
+            props: {
+              data: ["itemList"]
+            },
+            layout: $layout.fill,
+            events: {
+              didSelect: (sender, indexPath, data) => {
+                const { section, row } = indexPath;
+              }
+            }
+          }
+        ]
+      });
+    }
+  }
+}
 class ExampleModule extends ModModule {
   constructor(mod) {
     super({
@@ -88,6 +189,41 @@ class ExampleModule extends ModModule {
     });
     //this.Mod = mod;
     this.Core = new DYCore(mod);
+  }
+  init() {
+    $ui.menu({
+      items: ["通过链接", "通过id"],
+      handler: (title, idx) => {
+        switch (idx) {
+          case 0:
+            $.inputText("https://v.douyin.com/59vOUVNvoe8/").then(url => {
+              if ($.hasString(url)) {
+                this.Core.getVideoByUrl(url).then(
+                  resu => {
+                    new DouyinView().showResult(resu);
+                  },
+                  fail => {
+                    $ui.alert({
+                      title: "错误",
+                      message: fail,
+                      actions: [
+                        {
+                          title: "OK",
+                          disabled: false, // Optional
+                          handler: () => {}
+                        }
+                      ]
+                    });
+                  }
+                );
+              } else {
+              }
+            });
+            break;
+          default:
+        }
+      }
+    });
   }
   getVideoData() {
     $input.text({

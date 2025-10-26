@@ -7,6 +7,7 @@ class TikHubApi {
   constructor(mod) {
     this.Http = mod.HttpCore;
   }
+
   login(username, password) {
     const tokenMinutes = 30 * 24 * 60,
       deadTime = $.getTimestamp() + tokenMinutes * 60 * 1000;
@@ -103,106 +104,44 @@ class TikHubView {
     this.Api = new TikHubApi(mod);
     this.XHS = mod.ModuleLoader.getModule("tikhub.xhs");
     this.Douyin = mod.ModuleLoader.getModule("tikhub.douyin");
-    $console.info(this.XHS);
+  }
+  inputToken() {
+    $.inputText("", "TOKEN").then(token => {
+      if ($.hasString(token)) {
+        this.Http.setApiToken(token);
+        this.initView();
+      } else {
+        $ui.alert({
+          title: "error",
+          message: "no token",
+          actions: [
+            {
+              title: "OK",
+              disabled: false, // Optional
+              handler: () => {}
+            }
+          ]
+        });
+      }
+    });
   }
   login() {
     $input.text({
       type: $kbType.text,
-      placeholder: "账号",
-      text: this.Http.getUserName() || "",
-      handler: username => {
-        if ($.hasString(username)) {
-          $input.text({
-            type: $kbType.password,
-            placeholder: "",
-            text: "",
-            handler: pw => {
-              if ($.hasString(pw)) {
-                $.startLoading();
-                this.Api.login(username, pw)
-                  .then(result => {
-                    $.stopLoading();
-                    if (result.success === true) {
-                      const apiToken = result.api_token,
-                        deadTime = result.deadTime;
-                      this.Http.setUserName(username);
-                      if ($.hasString(apiToken)) {
-                        const setTokenSu = this.Http.setApiToken(
-                          apiToken,
-                          deadTime
-                        );
-                        if (setTokenSu === true) {
-                          this.initView();
-                          $ui.success("登录成功");
-                        } else {
-                          $ui.error("保存ApiToken失败");
-                        }
-                      } else {
-                        $ui.alert({
-                          title: "登录成功",
-                          message: "但是得到的Api Token为空",
-                          actions: [
-                            {
-                              title: "OK",
-                              disabled: false, // Optional
-                              handler: () => {}
-                            }
-                          ]
-                        });
-                      }
-                    } else {
-                      $ui.alert({
-                        title: "登录失败",
-                        message: result.message,
-                        actions: [
-                          {
-                            title: "OK",
-                            disabled: false, // Optional
-                            handler: () => {}
-                          },
-                          {
-                            title: "Cancel",
-                            handler: () => {}
-                          }
-                        ]
-                      });
-                    }
-                  })
-                  .catch(fail => {
-                    $.stopLoading();
-                    $ui.alert({
-                      title: "login.fail",
-                      message: fail.message,
-                      actions: [
-                        {
-                          title: "OK",
-                          disabled: false, // Optional
-                          handler: () => {}
-                        },
-                        {
-                          title: "Cancel",
-                          handler: () => {}
-                        }
-                      ]
-                    });
-                  });
-              } else {
-                $ui.error("请输入密码");
-              }
-            }
-          });
+      placeholder: "Token",
+      text: "",
+      handler: token => {
+        if ($.hasString(token)) {
+          this.Http.setApiToken();
         } else {
-          $ui.error("请输入账号");
+          $ui.error("请输入Token");
         }
       }
     });
   }
   init() {
     if (this.Http.hasTable()) {
-      if (
-        $.getTimestamp() > this.Http.getApiTokenExpired() ||
-        !$.hasString(this.Http.getApiToken())
-      ) {
+      if (!$.hasString(this.Http.getApiToken())) {
         this.loginExpired();
       } else {
         this.initView();
@@ -237,7 +176,7 @@ class TikHubView {
                   this.getXhs();
                   break;
                 case 2:
-                  this.Douyin.getVideoData();
+                  this.Douyin.init();
                   break;
                 default:
               }
@@ -341,7 +280,7 @@ class TikHubView {
   }
   loginExpired() {
     this.Http.removeApiToken();
-    this.login();
+    this.inputToken();
   }
 }
 class TikHub extends ModCore {
