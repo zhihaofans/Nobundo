@@ -1,15 +1,22 @@
 const { ModCore, ModuleLoader } = require("CoreJS"),
   $ = require("$");
 const COLOR = require("../color");
-const moduleList = ["bilibili.auth.js", "bilibili.login.js"];
+const moduleList = [
+  "bilibili.auth.js",
+  "bilibili.login.js",
+  "bilibili.checkin.js"
+];
 class MainView {
   constructor(mod) {
     this.ModuleLoader = mod.ModuleLoader;
   }
+  openConfig(){
+    
+  }
   init() {
     try {
       const title = "哔哩哔哩(已登录)",
-        textList = ["设置", "test"],
+        textList = ["设置", "test", "签到"],
         didSelect = (indexPath, sender) => {
           const index = indexPath.row;
           switch (index) {
@@ -20,7 +27,16 @@ class MainView {
               //require("./test.view").init();
               $ui.error("没做");
               break;
-
+            case 2:
+              try {
+                const checkIn = this.ModuleLoader.getModule("bilibili.checkin");
+                checkIn.init();
+              } catch (error) {
+                $console.error(error);
+                $.stopLoading();
+                $ui.error("跳转失败");
+              }
+              break;
             default:
               $ui.error("?");
           }
