@@ -11,7 +11,7 @@ class TKResult {
     this.message = json.message_zh || json.message;
     this.share_url = json.params.share_url;
     this.video_id = json.params.aweme_id;
-    this.data = json.data;
+    this.data = json.data.aweme_detail;
   }
 }
 class HttpCore {
@@ -52,6 +52,9 @@ class HttpCore {
             tkRe.url = url;
             tkRe.params = params;
           }
+          $console.info({
+            tkRe
+          });
           resolve(tkRe);
         },
         fail => {

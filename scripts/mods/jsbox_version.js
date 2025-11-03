@@ -66,9 +66,9 @@ class UiTest {
         }
       ]
     });
-    $console.warn($("progress1").value);
+    $console.warn($.$("progress1").value);
     $("progress1").value = 0.9;
-    $console.warn($("progress1").value);
+    $console.warn($.$("progress1").value);
   }
 }
 

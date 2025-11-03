@@ -1,4 +1,4 @@
-module.exports={
+module.exports = {
   modDir: "/scripts/mods/",
   mods: [
     "jsbox_version.js",
@@ -23,4 +23,4 @@ module.exports={
     "config.js",
     "bilibili.js"
   ]
-}
+};

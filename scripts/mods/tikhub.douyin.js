@@ -129,7 +129,10 @@ class DYCore {
 class DouyinView {
   constructor() {}
   showResult(tkResult) {
-    if (tkResult == undefined) {
+    const DYdata = new TKDYData(result.data);
+    $console.info(DYdata);
+    $.stopLoading();
+    if (tkResult == undefined || DYdata.isError) {
       $ui.alert({
         title: "错误",
         message: "空白结果",
@@ -154,9 +157,8 @@ class DouyinView {
         ]
       });
     } else {
-      const DYdata = new TKDYData(result.data);
-      const result = [];
-      $ui.push({
+      const result = ["@" + DYdata.author_name];
+      $.showView({
         props: {
           title: "douyin:tk"
         },
@@ -164,7 +166,7 @@ class DouyinView {
           {
             type: "list",
             props: {
-              data: ["itemList"]
+              data: result || ["itemList"]
             },
             layout: $layout.fill,
             events: {
@@ -198,6 +200,7 @@ class ExampleModule extends ModModule {
           case 0:
             $.inputText("https://v.douyin.com/59vOUVNvoe8/").then(url => {
               if ($.hasString(url)) {
+                $.startLoading();
                 this.Core.getVideoByUrl(url).then(
                   resu => {
                     new DouyinView().showResult(resu);
