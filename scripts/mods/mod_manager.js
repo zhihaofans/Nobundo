@@ -1,6 +1,6 @@
 const { ModCore } = require("CoreJS"),
   $ = require("$"),
-  Next = require("Next");
+  { KeychainKit } = require("DataKit");
 class ManagerCore {
   constructor(app) {
     this.App = app;
@@ -9,36 +9,44 @@ class ManagerCore {
   getModList() {
     return this.ModLoader.getModList();
   }
-  updateModKeychainDomain(modId) {
-    const thisMod = this.ModLoader.getMod(modId);
-    if (thisMod == undefined) {
-      return undefined;
-    } else {
-      const oldKeychain = new Next.Storage.Keychain(
-          thisMod.MOD_INFO.KEYCHAIN_DOMAIN_OLD
-        ),
-        newKeychain = new Next.Storage.Keychain(
-          thisMod.MOD_INFO.KEYCHAIN_DOMAIN_NEW
-        ),
-        keyList = oldKeychain.getKeyList();
-      $console.info({
-        old_id: thisMod.MOD_INFO.KEYCHAIN_DOMAIN_OLD,
-        new_id: thisMod.MOD_INFO.KEYCHAIN_DOMAIN_NEW,
-        old: oldKeychain.getAll(),
-        new: newKeychain.getAll()
-      });
-      if (keyList == undefined || keyList.length == 0) {
-        return false;
+
+  getKeychainList(modId) {
+    try {
+      const thisMod = this.ModLoader.getMod(modId);
+
+      const Keychain = thisMod.Keychain;
+      if (thisMod == undefined || Keychain == undefined) {
+        $ui.error("undefined");
       } else {
-        const itemList = {};
-        itemList[modId] = oldKeychain.getAll();
-        keyList.map(key => {
-          const itemValue = oldKeychain.getValue(key);
-          newKeychain.setValue(key, itemValue);
-          oldKeychain.remove(key);
+        const keyList = Keychain.getKeyList() || [];
+        $ui.push({
+          props: {
+            title: thisMod.MOD_INFO.NAME + ":" + keyList.length
+          },
+          views: [
+            {
+              type: "list",
+              props: {
+                data: keyList
+              },
+              layout: $layout.fill,
+              events: {
+                didSelect: (a, b, key) => {
+                  const value = Keychain.get(key);
+                  if ($.hasString(value)) {
+                    $.inputText(value);
+                  } else {
+                    $ui.error("空白值或读取失败");
+                  }
+                }
+              }
+            }
+          ]
         });
-        return true;
       }
+    } catch (error) {
+      $console.error(error);
+      $ui.error("加载失败");
     }
   }
 }
@@ -51,12 +59,10 @@ class ModManager extends ModCore {
       modName: "模组管理器",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 9,
+      coreVersion: 18,
       iconName: "square.grid.3x2",
       useSqlite: false
     });
-    this.Http = $.http;
-    this.Storage = Next.Storage;
     this.managerCore = new ManagerCore(app);
   }
   run() {
@@ -86,41 +92,11 @@ class ModManager extends ModCore {
                   row = indexPath.row,
                   thisModId = modList.id[row];
                 $ui.menu({
-                  items: ["更新模组Keychain域名"],
+                  items: ["获取Keychain列表"],
                   handler: (title, idx) => {
                     switch (idx) {
                       case 0:
-                        $ui.loading(true);
-                        const result = this.managerCore.updateModKeychainDomain(
-                          thisModId
-                        );
-                        $ui.loading(false);
-                        if (result == undefined) {
-                          $ui.alert({
-                            title: "更新失败",
-                            message: "可能是找不到该模组id",
-                            actions: [
-                              {
-                                title: "OK",
-                                disabled: false, // Optional
-                                handler: () => {}
-                              }
-                            ]
-                          });
-                        } else {
-                          $ui.alert({
-                            title: "更新完毕",
-                            message: result ? "更新成功" : "不需要更新",
-                            actions: [
-                              {
-                                title: "OK",
-                                disabled: false, // Optional
-                                handler: () => {}
-                              }
-                            ]
-                          });
-                        }
-
+                        this.managerCore.getKeychainList(thisModId);
                         break;
                     }
                   }
