@@ -1,6 +1,211 @@
 const { ModCore, ModuleLoader } = require("CoreJS"),
   $ = require("$");
-const moduleList = ["bilibili.auth.js"];
+const COLOR = require("../color");
+const moduleList = ["bilibili.auth.js", "bilibili.login.js"];
+class MainView {
+  constructor(mod) {
+    this.ModuleLoader = mod.ModuleLoader;
+  }
+  init() {
+    try {
+      const title = "哔哩哔哩(已登录)",
+        textList = ["设置", "test"],
+        didSelect = (indexPath, sender) => {
+          const index = indexPath.row;
+          switch (index) {
+            case 0:
+              $prefs.open();
+              break;
+            case 1:
+              //require("./test.view").init();
+              $ui.error("没做");
+              break;
+
+            default:
+              $ui.error("?");
+          }
+        };
+      const navList = [
+          {
+            title: "主页",
+            icon: "house.fill",
+            selected: true,
+            func: () => {}
+          },
+          {
+            title: "动态",
+            icon: "rectangle.grid.3x2",
+            func: () => {
+              //              const { DynamicView } = require("./dynamic.view");
+              //              new DynamicView().init();
+              $ui.error("没做");
+            }
+          },
+          {
+            title: "我的",
+            icon: "person.fill",
+            func: () => {
+              //require("./aboutme.view").init();
+              $ui.error("没做");
+            }
+          }
+        ],
+        navData = navList.map(item => {
+          return {
+            menu_image: {
+              symbol: item.icon,
+              tintColor: item.selected
+                ? COLOR.navSelectedIconColor
+                : COLOR.navIconColor
+            },
+            menu_label: {
+              text: item.title,
+              textColor: item.selected
+                ? COLOR.navSelectedTextColor
+                : COLOR.navTextColor
+            }
+          };
+        });
+      const ViewData = [
+        {
+          type: "list",
+          props: {
+            data: textList
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (sender, indexPath, data) => didSelect(indexPath, sender)
+          }
+        },
+        {
+          type: "matrix",
+          props: {
+            id: "tab",
+            columns: 3,
+            itemHeight: 50,
+            spacing: 0,
+            scrollEnabled: false,
+            //bgcolor: $color("clear"),
+            template: [
+              {
+                type: "view",
+                props: {
+                  id: "view_item"
+                },
+                layout: (make, view) => {
+                  make.size.equalTo(view.super);
+                  make.center.equalTo(view.super);
+                },
+                views: [
+                  {
+                    type: "image",
+                    props: {
+                      id: "menu_image",
+                      resizable: true,
+                      clipsToBounds: false
+                    },
+                    layout: (make, view) => {
+                      make.centerX.equalTo(view.super);
+                      make.size.equalTo($size(25, 25));
+                      make.top.inset(6);
+                    }
+                  },
+                  {
+                    type: "label",
+                    props: {
+                      id: "menu_label",
+                      font: $font(10)
+                    },
+                    layout: (make, view) => {
+                      var preView = view.prev;
+                      make.centerX.equalTo(preView);
+                      make.bottom.inset(5);
+                    }
+                  }
+                ]
+              }
+            ],
+            data: navData || [
+              {
+                menu_image: {
+                  symbol: "square.grid.2x2.fill",
+                  tintColor: $color("gray")
+                },
+                menu_label: {
+                  text: "应用",
+                  textColor: $color("gray")
+                }
+              },
+              {
+                menu_image: {
+                  symbol: "person.icloud",
+                  tintColor: $color("gray")
+                },
+                menu_label: {
+                  text: "大会员",
+                  textColor: $color("gray")
+                }
+              },
+              {
+                menu_image: {
+                  symbol: "person.fill",
+                  tintColor: $color("gray")
+                },
+                menu_label: {
+                  text: "我的",
+                  textColor: $color("gray")
+                }
+              }
+            ]
+          },
+          layout: (make, view) => {
+            make.bottom.inset(0);
+            if ($device.info.screen.width > 500) {
+              make.width.equalTo(500);
+            } else {
+              make.left.right.equalTo(0);
+            }
+            make.centerX.equalTo(view.super);
+            make.height.equalTo(50);
+          },
+          events: {
+            didSelect(sender, indexPath, data) {
+              const navItem = navList[indexPath.row];
+              if (
+                navItem.func !== undefined &&
+                typeof navItem.func === "function"
+              ) {
+                try {
+                  navItem.func();
+                } catch (error) {
+                  $console.error(error);
+                  //TODO:showErrorAlertAndExit(error.message);
+                }
+              } else {
+                $console.info(indexPath.row);
+              }
+            }
+          }
+        }
+      ];
+      $.showView({
+        props: {
+          title
+        },
+        views: [
+          {
+            type: "view",
+            layout: $layout.fillSafeArea,
+            views: ViewData
+          }
+        ]
+      });
+    } catch (error) {
+      $console.error(error);
+      //TODO:showErrorAlertAndExit(error.message);
+    }
+  }
+}
 class Bilibili extends ModCore {
   constructor(app) {
     super({
@@ -15,12 +220,21 @@ class Bilibili extends ModCore {
       allowApi: true,
       iconName: "bold"
     });
-    this.Storage = Storage;
     this.ModuleLoader = new ModuleLoader(this);
     this.ModuleLoader.addModulesByList(moduleList);
   }
   run() {
     try {
+      const login = this.ModuleLoader.getModule("bilibili.login");
+      login.checkLogin().then(
+        su => {
+          // 已登录
+          new MainView(this).init();
+        },
+        fail => {
+          $ui.error("登录失败或取消登录");
+        }
+      );
     } catch (error) {
       $console.error(error);
     }
@@ -45,10 +259,6 @@ class Bilibili extends ModCore {
       callback
     });
     switch (apiId) {
-      case "example.ui":
-        this.ModuleLoader.getModule("example.ui").initUi();
-
-        break;
       default:
     }
   }

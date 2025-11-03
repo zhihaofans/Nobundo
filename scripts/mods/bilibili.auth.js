@@ -1,31 +1,29 @@
 const { ModModule } = require("CoreJS"),
-  Next = require("Next"),
-  HttpLib = require("HttpLib"),
   $ = require("$");
 
 class AuthData {
-  constructor() {}
-}
-class QrcodeLogin {
-  constructor() {}
-  isLogin() {}
-  getWebKey() {
-    return new Promise((resolve, reject) => {
-      const url =
-        "https://passport.bilibili.com/x/passport-login/web/qrcode/generate";
-      new HttpLib(url).get().then(resp => {
-        if (resp.isError != false) {
-          reject(resp.errorMessage || "未知错误");
-        } else {
-          const result = resp.data;
-          if (result.code === 0 && $.hasString(result.data.qrcode_key)) {
-            resolve(result.data.qrcode_key);
-          } else {
-            reject(result.message || "未知错误");
-          }
-        }
-      });
-    });
+  constructor(KeychainKit) {
+    this.Keychain = KeychainKit;
+    this.data_key = {
+      cookie: "bilibili.cookie",
+      SESSDATA: "bilibili.cookie.sessdata"
+    };
+  }
+  isLogin() {
+    return $.hasString(this.getCookie()) && $.hasString(this.getSESSDATA());
+  }
+  getCookie() {
+    return this.Keychain.get(this.data_key.cookie);
+  }
+  getSESSDATA() {
+    return this.Keychain.get(this.data_key.SESSDATA);
+  }
+  setCookie(cookie) {
+    const cookieSu = this.Keychain.set(this.data_key.cookie, cookie);
+    return cookieSu;
+  }
+  setSESSDATA(value) {
+    return this.Keychain.set(this.data_key.SESSDATA, value);
   }
 }
 class BiliModule extends ModModule {
@@ -33,10 +31,26 @@ class BiliModule extends ModModule {
     super({
       mod,
       id: "bilibili.auth",
-      name: "哔哩哔哩认证",
+      name: "哔哩哔哩登录数据",
       version: "1"
     });
+    this.Data = new AuthData(mod.Keychain);
   }
-  checkLogin() {}
+
+  getCookie() {
+    return this.Data.getCookie();
+  }
+  getSESSDATA() {
+    return this.Data.getSESSDATA();
+  }
+  isLogin() {
+    return this.Data.isLogin();
+  }
+  setCookie(cookie) {
+    return this.Data.setCookie(cookie);
+  }
+  setSESSDATA(value) {
+    return this.Data.setSESSDATA(value);
+  }
 }
 module.exports = BiliModule;
