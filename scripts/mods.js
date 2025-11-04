@@ -2,7 +2,6 @@ module.exports = {
   modDir: "/scripts/mods/",
   mods: [
     "jsbox_version.js",
-    "wallhaven.js",
     "downloader.js",
     "daymaster.js",
     "example.js",
