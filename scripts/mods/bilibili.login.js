@@ -279,9 +279,7 @@ class BiliModule extends ModModule {
             buttonTwoTapped = sender => {
               //这里加个调用哔哩哔哩浏览器
               //BiliService.openWebBrowser(loginUrl);
-              $app.openURL(
-                `bilibili://browser/?url=${$text.URLEncode(loginUrl)}`
-              );
+              this.ModuleLoader.getModule("bilibili.auth").openBrowser();
             };
 
           this.ImageView.showImageAndTwoButton({

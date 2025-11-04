@@ -16,7 +16,7 @@ class CheckIn {
           } else {
             const result = resp.data;
             if (result.code === 0) {
-              resolve(result.msg);
+              resolve(result.msg || `code${result.code}`);
             } else {
               reject(result.msg || "未知错误");
             }

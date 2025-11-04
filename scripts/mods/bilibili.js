@@ -4,15 +4,14 @@ const COLOR = require("../color");
 const moduleList = [
   "bilibili.auth.js",
   "bilibili.login.js",
-  "bilibili.checkin.js"
+  "bilibili.checkin.js",
+  "bilibili.app.js"
 ];
 class MainView {
   constructor(mod) {
     this.ModuleLoader = mod.ModuleLoader;
   }
-  openConfig(){
-    
-  }
+  openConfig() {}
   init() {
     try {
       const title = "哔哩哔哩(已登录)",
