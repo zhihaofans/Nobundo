@@ -5,6 +5,35 @@ class CheckIn {
   constructor(mod) {
     this.Auth = mod.ModuleLoader.getModule("bilibili.auth");
   }
+  liveCheckIn() {
+    return new Promise((resolve, reject) => {
+      const url = "https://api.live.bilibili.com/rc/v1/Sign/doSign";
+      try {
+        $console.info("trystart");
+        const http = new HttpLib(url);
+        http.setCookie(this.Auth.getCookie());
+        http
+          .get()
+          .then(resp => {
+            if (resp.isError != false) {
+              reject(resp.errorMessage || "未知错误");
+            } else {
+              const result = resp.data;
+              if (result.code === 0) {
+                resolve(result.msg || `code${result.code}`);
+              } else {
+                reject(result.msg || "未知错误");
+              }
+            }
+          })
+          .catch(fail => reject(fail));
+        $console.info("try");
+      } catch (error) {
+        $console.error(error);
+        reject(error);
+      }
+    });
+  }
   mangaCheckIn() {
     return new Promise((resolve, reject) => {
       const url =
@@ -53,8 +82,7 @@ class BiliModule extends ModModule {
           layout: $layout.fill,
           events: {
             didSelect: (sender, indexPath, data) => {
-              const { section, row } = indexPath;
-              switch (row) {
+              switch (indexPath.row) {
                 case 0:
                   $.startLoading();
                   this.CheckIn.mangaCheckIn().then(

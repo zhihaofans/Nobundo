@@ -5,7 +5,8 @@ const moduleList = [
   "bilibili.auth.js",
   "bilibili.login.js",
   "bilibili.checkin.js",
-  "bilibili.app.js"
+  "bilibili.app.js",
+  "bilibili.user.js"
 ];
 class MainView {
   constructor(mod) {
@@ -61,7 +62,8 @@ class MainView {
             icon: "person.fill",
             func: () => {
               //require("./aboutme.view").init();
-              $ui.error("没做");
+              //              $ui.error("没做");
+              this.ModuleLoader.getModule("bilibili.user").init();
             }
           }
         ],
