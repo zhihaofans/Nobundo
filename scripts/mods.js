@@ -14,7 +14,6 @@ module.exports = {
     "web_browser.js",
     "clipboard.js",
     "scoop.js",
-    "xiaohongshu.js",
     "viewer.js",
     "jsdelivr.js",
     "search.js",
