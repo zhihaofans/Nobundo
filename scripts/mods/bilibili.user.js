@@ -11,12 +11,9 @@ class LiveCore {
         "https://api.live.bilibili.com/xlive/web-ucenter/user/get_user_info";
       try {
         $console.info("trystart");
-
-        const http = new HttpLib(url);
-        http.cookie(this.Auth.getCookie());
-        http
+        new HttpLib(url)
+          .cookie(this.Auth.getCookie())
           .get()
-
           .then(resp => {
             if (resp.isError) {
               reject(resp.errorMessage);

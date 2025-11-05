@@ -6,7 +6,9 @@ const moduleList = [
   "bilibili.login.js",
   "bilibili.checkin.js",
   "bilibili.app.js",
-  "bilibili.user.js"
+  "bilibili.user.js",
+  "bilibili.dynamic.js",
+  "bilibili.template.js"
 ];
 class MainView {
   constructor(mod) {
@@ -52,9 +54,7 @@ class MainView {
             title: "动态",
             icon: "rectangle.grid.3x2",
             func: () => {
-              //              const { DynamicView } = require("./dynamic.view");
-              //              new DynamicView().init();
-              $ui.error("没做");
+              this.ModuleLoader.getModule("bilibili.dynamic").init();
             }
           },
           {

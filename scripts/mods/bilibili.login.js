@@ -189,7 +189,6 @@ class QrcodeLogin {
           } catch (error) {
             $console.error(error);
             reject(error.message);
-          } finally {
           }
         }
       });

@@ -39,18 +39,21 @@ class CheckIn {
       const url =
         "https://manga.bilibili.com/twirp/activity.v1.Activity/ClockIn?platform=android";
       try {
-        new HttpLib(url).post().then(resp => {
-          if (resp.isError != false) {
-            reject(resp.errorMessage || "未知错误");
-          } else {
-            const result = resp.data;
-            if (result.code === 0) {
-              resolve(result.msg || `code${result.code}`);
+        new HttpLib(url)
+          .cookie(this.Auth.getCookie())
+          .post()
+          .then(resp => {
+            if (resp.isError != false) {
+              reject(resp.errorMessage || "未知错误");
             } else {
-              reject(result.msg || "未知错误");
+              const result = resp.data;
+              if (result.code === 0) {
+                resolve(result.msg || `code${result.code}`);
+              } else {
+                reject(result.msg || "未知错误");
+              }
             }
-          }
-        });
+          });
       } catch (error) {
         $console.error(error);
         reject(error.message);
