@@ -14,14 +14,16 @@ class LiveCore {
         new HttpLib(url)
           .cookie(this.Auth.getCookie())
           .get()
-          .then(resp => {
-            if (resp.isError) {
-              reject(resp.errorMessage);
-            } else {
-              resolve(resp.data);
-            }
-          })
-          .catch(fail => reject(fail));
+          .then(
+            resp => {
+              if (resp.isError) {
+                reject(resp.errorMessage);
+              } else {
+                resolve(resp.data);
+              }
+            },
+            fail => reject(fail)
+          );
         $console.info("try");
       } catch (error) {
         $console.error(error);

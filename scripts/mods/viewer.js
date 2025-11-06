@@ -108,7 +108,7 @@ class Viewer extends ModCore {
       modName: "内容查看器",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 12,
+      coreVersion: 18,
       useSqlite: true,
       allowWidget: true,
       allowApi: true,
