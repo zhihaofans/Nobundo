@@ -11,6 +11,59 @@ class BiliModule extends ModModule {
       version: "1"
     });
   }
+  buttonTemplate({
+    id,
+    props,
+    title,
+    layout,
+    events,
+    tapped,
+    titleColor,
+    type
+  }) {
+    return {
+      type: "button",
+      props: props || {
+        id,
+        title,
+        align: $align.center,
+        titleColor,
+        type
+      },
+      layout,
+      events: events || {
+        tapped
+      }
+    };
+  }
+  imageTemplate({ id, props, src, layout, events, tapped }) {
+    return {
+      type: "image",
+      props: props || {
+        id,
+        src
+      },
+      layout,
+      events: events || {
+        tapped
+      }
+    };
+  }
+  labelTemplate({ id, props, text, layout, events, tapped, lines }) {
+    return {
+      type: "label",
+      props: props || {
+        id,
+        text,
+        align: $align.center,
+        lines: lines || 1
+      },
+      layout,
+      events: events || {
+        tapped
+      }
+    };
+  }
   singlePostTemplate() {
     return {
       props: {

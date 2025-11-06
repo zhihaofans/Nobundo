@@ -8,7 +8,8 @@ const moduleList = [
   "bilibili.app.js",
   "bilibili.user.js",
   "bilibili.dynamic.js",
-  "bilibili.template.js"
+  "bilibili.template.js",
+  "bilibili.video.js"
 ];
 class MainView {
   constructor(mod) {
@@ -237,6 +238,7 @@ class Bilibili extends ModCore {
       allowApi: true,
       iconName: "bold"
     });
+    this.ApiManager = app.ModLoader.ApiManager;
     this.ModuleLoader = new ModuleLoader(this);
     this.ModuleLoader.addModulesByList(moduleList);
   }

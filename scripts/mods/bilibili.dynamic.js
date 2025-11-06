@@ -62,6 +62,7 @@ class NewDynamicItemData {
           JSON.parse(this.modules.module_dynamic.major.live_rcmd.content) || {};
         //$console.warn(this.content);
         this.text = "[直播]" + this.content.live_play_info.title;
+        this.cover = this.content.live_play_info.cover;
         break;
       case "DYNAMIC_TYPE_AV":
         this.text = this.modules.module_dynamic.major.archive.title;
@@ -128,6 +129,7 @@ class DynamicView {
   constructor(mod) {
     this.Core = new DynamicCore(mod);
     this.Template = mod.ModuleLoader.getModule("bilibili.template");
+    this.Video = mod.ModuleLoader.getModule("bilibili.video");
     this.dynamicList = [];
     this.hasMore = true;
     this.OFFSET_ID = "";
@@ -164,14 +166,16 @@ class DynamicView {
     });
   }
   showSingleList() {
-    const didSelect = (section, row) => {
+    const didSelect = row => {
       const dynamicItem = this.dynamicList[row];
+      $console.info(dynamicItem);
       switch (dynamicItem.type) {
         case "DYNAMIC_TYPE_DRAW":
           //this.DynamicDetailView.showImageDynamic(dynamicItem);
           break;
         case "DYNAMIC_TYPE_AV":
           //TODO: new PostDetailView().showVideoDetail(dynamicItem.bvid);
+          this.Video.getVideoInfo(dynamicItem.bvid);
           break;
         default:
       }
@@ -215,8 +219,7 @@ class DynamicView {
           },
           layout: $layout.fill,
           events: {
-            didSelect: (sender, indexPath, data) =>
-              didSelect(indexPath.section, indexPath.row),
+            didSelect: (sender, indexPath, data) => didSelect(indexPath.row),
             /*
             didReachBottom: sender => {
               if (this.loadingNew == true) {
