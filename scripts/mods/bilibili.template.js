@@ -28,7 +28,8 @@ class BiliModule extends ModModule {
         title,
         align: $align.center,
         titleColor,
-        type
+        type,
+        contentEdgeInsets: $insets(10, 10, 10, 10)
       },
       layout,
       events: events || {
@@ -123,11 +124,19 @@ class BiliModule extends ModModule {
           },
           layout: (make, view) => {
             //make.centerX.equalTo(view.super);
-            make.right.equalTo(5);
+            make.right.equalTo(-5);
             make.left.equalTo(5);
             make.top.equalTo($ui.get("labelTitle").bottom);
             make.height.equalTo(220);
             //make.bottom.equalTo(5)
+          },
+          events: {
+            ready: sender => {
+              if (!$.hasString(sender.src)) {
+                $console.info(sender);
+                sender.size = $size(0, 0);
+              }
+            }
           }
         }
       ]
