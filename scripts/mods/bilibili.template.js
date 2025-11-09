@@ -108,7 +108,7 @@ class BiliModule extends ModModule {
             id: "labelTitle",
             align: $align.left,
             font: $font(16),
-            lines: 3,
+            lines: 2,
             textColor: colorData.titleTextColor
           },
           layout: (make, view) => {
@@ -133,7 +133,7 @@ class BiliModule extends ModModule {
           events: {
             ready: sender => {
               if (!$.hasString(sender.src)) {
-                $console.info(sender);
+                sender.hidden = true;
                 sender.size = $size(0, 0);
               }
             }

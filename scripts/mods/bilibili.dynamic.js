@@ -30,18 +30,28 @@ class NewDynamicItemData {
     this.modules = item.modules;
     this.id_str = item.id_str;
     this.type = item.type;
+    this.major_type = item.modules.module_dynamic?.major?.type;
     this.type_str = TYPE_STR_LIST_NEW[item.type] || item.type;
     this.visible = item.visible;
     this.author_id = item.modules.module_author.mid;
 
     this.author_face = item.modules.module_author.face;
+    if (this.major_type == "MAJOR_TYPE_OPUS") {
+      this.opus = item.modules.module_dynamic?.major?.opus;
+    }
     //this.cover = this.author_face;
     switch (item.type) {
       //带图动态
       case "DYNAMIC_TYPE_DRAW":
-        this.text = this.modules.module_dynamic?.desc?.text || item.type;
+        this.draw = this.modules.module_dynamic.major?.draw;
+        this.text =
+          this.modules.module_dynamic?.desc?.text ||
+          this.opus.title ||
+          this.opus.summary.text ||
+          item.type;
         this.images =
-          this.modules.module_dynamic.major?.draw?.items?.map(it => it.src) ||
+          this.draw?.items?.map(it => it.src) ||
+          this.opus.pics.map(it => it.url) ||
           [];
         this.cover = this.images[0];
         break;
@@ -71,16 +81,25 @@ class NewDynamicItemData {
         this.bvid = this.modules.module_dynamic.major.archive.bvid;
         break;
       case "DYNAMIC_TYPE_PGC_UNION":
-        this.text = this.modules.module_dynamic.major.pgc.title;
+        this.badge = this.modules.module_dynamic.major.pgc.badge.text;
+        this.text =
+          `[${this.badge}]` + this.modules.module_dynamic.major.pgc.title;
+        this.cover = this.modules.module_dynamic.major.pgc.cover;
         break;
       case "DYNAMIC_TYPE_WORD":
         this.text = this.modules.module_dynamic.desc.text;
         break;
       case "DYNAMIC_TYPE_ARTICLE":
-        this.text = this.modules.module_dynamic.major.article.title;
-        this.url = this.modules.module_dynamic.major.article.jump_url;
-        this.images = this.modules.module_dynamic.major.article.covers;
+        this.article = this.modules.module_dynamic.major?.article;
+        this.text = this.article?.title || this.opus.title;
+        this.url = this.article?.jump_url || this.opus.jump_url;
+        this.images = this.article?.covers || this.opus.pics.map(it => it.url);
+
+        this.cover = this.images[0];
         break;
+    }
+    if ($.startsWith(this.url, "//")) {
+      this.url = "https:" + this.url;
     }
     //this.cover =this.modules.module_dynamic?.additional?.common?.cover ||
     //this.text=this.modules.module_dynamic?.desc.text
@@ -103,10 +122,16 @@ class DynamicCore {
   }
   getDynamicList(_offset = "") {
     return new Promise((resolve, reject) => {
-      const url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/all?_offset=${_offset}`;
+      const url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/all`,
+        params = {
+          platform: "web",
+          offset: _offset,
+          features: "itemOpusStyle,listOnlyfans,onlyfansVote,onlyfansAssetsV2"
+        };
       try {
         $console.info("trystart");
         new HttpLib(url)
+          .params(params)
           .cookie(this.Auth.getCookie())
           .get()
           .then(resp => {
@@ -160,7 +185,7 @@ class DynamicView {
           //+ "\n" + `[${typeStr}]`
         },
         imageCover: {
-          src: dynamicItem.cover
+          src: $.hasString(dynamicItem.cover) ? dynamicItem.cover : ""
         }
       };
     });
@@ -239,58 +264,63 @@ class DynamicView {
     });
   }
   loadNewDynamic(sender) {
-    this.loadingNew = true;
-    $.startLoading();
-    $console.info({
-      hasMore: this.hasMore,
-      offset_id: this.OFFSET_ID
-    });
-    if (this.hasMore) {
-      this.Core.getDynamicList(this.OFFSET_ID).then(
-        result => {
-          $console.info(result);
-          if (result.code === 0) {
-            if (result.data.offset === this.OFFSET_ID) {
-              $.stopLoading();
-              $ui.error("没有旧动态了!");
-              this.loadingNew = false;
-            } else {
-              this.OFFSET_ID = result.data.offset;
-              this.hasMore = result.data.has_more;
-              sender.endFetchingMore();
+    try {
+      this.loadingNew = true;
+      $.startLoading();
+      $console.info({
+        hasMore: this.hasMore,
+        offset_id: this.OFFSET_ID
+      });
+      if (this.hasMore) {
+        this.Core.getDynamicList(this.OFFSET_ID).then(
+          result => {
+            if (result.code === 0) {
+              if (result.data.offset === this.OFFSET_ID) {
+                $.stopLoading();
+                $ui.error("没有旧动态了!");
+                this.loadingNew = false;
+              } else {
+                this.OFFSET_ID = result.data.offset;
+                this.hasMore = result.data.has_more;
+                sender.endFetchingMore();
 
-              const newDynamicList = result.data.items.map(item => {
-                try {
-                  const _result = new NewDynamicItemData(item);
-                  return _result;
-                } catch (error) {
-                  $console.error("===发生错误");
-                  $console.error(error);
-                  $console.error(item);
-                  $console.error("错误结束===");
-                  return undefined;
-                }
-              });
-              this.dynamicList = this.dynamicList.concat(newDynamicList);
-              this.reloadDynamicList();
+                const newDynamicList = result.data.items.map(item => {
+                  try {
+                    const _result = new NewDynamicItemData(item);
+                    return _result;
+                  } catch (error) {
+                    $console.error("===发生错误");
+                    $console.error(error);
+                    $console.error(item);
+                    $console.error("错误结束===");
+                    return undefined;
+                  }
+                });
+                this.dynamicList = this.dynamicList.concat(newDynamicList);
+                this.reloadDynamicList();
+              }
+            } else {
+              $ui.error(result.message);
+              this.loadingNew = false;
             }
-          } else {
-            $ui.error(result.message);
+          },
+          fail => {
+            $.stopLoading();
+            $console.error(fail);
+            this.hasMore = false;
+            $ui.error(fail || "未知错误");
             this.loadingNew = false;
           }
-        },
-        fail => {
-          $.stopLoading();
-          $console.error(fail);
-          this.hasMore = false;
-          $ui.error(fail || "未知错误");
-          this.loadingNew = false;
-        }
-      );
-    } else {
+        );
+      } else {
+        $.stopLoading();
+        $ui.error("没有旧动态了");
+        this.loadingNew = false;
+      }
+    } catch (error) {
+      $console.error(error);
+      $ui.error(error.message);
       $.stopLoading();
-      $ui.error("没有旧动态了");
-      this.loadingNew = false;
     }
   }
   reloadDynamicList() {
