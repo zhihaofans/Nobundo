@@ -53,6 +53,36 @@ class PublishItemData {
     this.uri = videoData.uri;
   }
 }
+class HistoryCore {
+  constructor(auth) {
+    this.Auth = auth;
+  }
+  getList(pageSize = 30) {
+    return new Promise((resolve, reject) => {
+      const url = `https://api.bilibili.com/x/web-interface/history/cursor?ps=${pageSize}`;
+      try {
+        $console.info("trystart");
+        new HttpLib(url)
+          .cookie(this.Auth.getCookie())
+          .get()
+          .then(
+            resp => {
+              if (resp.isError) {
+                reject(resp.errorMessage);
+              } else {
+                resolve(resp.data);
+              }
+            },
+            fail => reject(fail)
+          );
+        $console.info("try");
+      } catch (error) {
+        $console.error(error);
+        reject(error);
+      }
+    });
+  }
+}
 class LaterWatchCore {
   constructor(auth) {
     this.Auth = auth;
@@ -87,8 +117,11 @@ class View {
   constructor(mod) {
     this.Auth = mod.ModuleLoader.getModule("bilibili.auth");
     this.Template = mod.ModuleLoader.getModule("bilibili.template");
+    this.Video = mod.ModuleLoader.getModule("bilibili.video");
+    this.App = mod.ModuleLoader.getModule("bilibili.app");
   }
   showResultList(title, videoList, isHistory = false) {
+    $.stopLoading();
     const itemList = videoList.map(thisVideo => {
         //      $console.info({
         //        thisVideo
@@ -134,20 +167,20 @@ class View {
         if (isHistory === true) {
           switch (videoItem.business) {
             case "pgc":
-              BiliService.openBangumi(videoItem.kid);
+              this.App.openBangumi(videoItem.kid);
               break;
             case "article":
-              BiliService.openArticle(videoItem.kid);
+              this.App.openArticle(videoItem.kid);
               break;
             case "live":
               $console.info(videoItem);
               $app.openURL(videoItem.uri);
               break;
             default:
-              BiliService.openVideo(videoItem.bvid);
+              this.App.openVideo(videoItem.bvid);
           }
         } else {
-          BiliService.openVideo(videoItem.bvid);
+          this.App.openVideo(videoItem.bvid);
         }
       };
     const later2watchNavMenu = [
@@ -209,7 +242,7 @@ class View {
           events: {
             didSelect: (sender, indexPath, data) =>
               didSelect(indexPath.section, indexPath.row),
-            didLongPress: function (sender, indexPath, data) {
+            didLongPress: (sender, indexPath, data) => {
               $console.info(indexPath);
               const selectItem = videoList[indexPath.row];
               $ui.menu({
@@ -224,7 +257,7 @@ class View {
                       break;
                     case 1:
                       if (selectItem.business === "archive") {
-                        new PostDetailView().showVideoDetail(selectItem.bvid);
+                        this.Video.getVideoInfo(selectItem.bvid);
                       } else {
                         $ui.warning("开发中");
                       }
@@ -239,6 +272,41 @@ class View {
         }
       ]
     });
+  }
+  showHistory() {
+    $.startLoading();
+    new HistoryCore(this.Auth).getList().then(
+      result => {
+        if (result.code == 0) {
+          try {
+            const list = result.data.list;
+            $console.info({
+              result,
+              list
+            });
+            const historyList = list.map(item => new PublishItemData(item));
+            $console.info({
+              list,
+              historyList
+            });
+            this.showResultList("历史观看", historyList, true);
+          } catch (error) {
+            $console.error(error);
+            $.stopLoading();
+            $ui.error(error.message);
+          } finally {
+            $console.info("showLaterToWatch.finally");
+          }
+        } else {
+          $.stopLoading();
+          $ui.error(result.message || `code:${result.code}`);
+        }
+      },
+      fail => {
+        $.stopLoading();
+        $ui.error("fail:" + fail || "稍后再看出现未知错误");
+      }
+    );
   }
   showLaterToWatch() {
     $.startLoading();
@@ -281,10 +349,13 @@ class BiliModule extends ModModule {
     super({
       mod,
       id: "bilibili.history",
-      name: "哔哩哔哩历史与稍后再看",
+      name: "哔哩哔哩收藏历史与稍后再看",
       version: "1"
     });
     this.View = new View(mod);
+  }
+  showHistory() {
+    this.View.showHistory();
   }
   showLaterToWatch() {
     this.View.showLaterToWatch();
