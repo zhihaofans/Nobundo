@@ -69,6 +69,7 @@ class UserView {
     this.Live = new LiveCore(mod);
   }
   initView(resultData) {
+    const History = this.ModuleLoader.getModule("bilibili.history");
     const moneyTemplate = [
         {
           type: "label",
@@ -209,20 +210,19 @@ class UserView {
         },
         {
           text: "稍后再看",
-          icon: "eye.fill"
-          //func: () => HistoryView.showLaterToView()
+          icon: "eye.fill",
+          func: () => History.showLaterToWatch()
         },
         {
           text: "历史",
-          icon: "gobackward"
-          //func: () => HistoryView.showHistory()
+          icon: "gobackward",
+          func: () => History.showHistory()
         },
         {
           text: "动态",
           icon: "list.dash",
           func: () => {
-            const { DynamicView } = require("./dynamic.view");
-            new DynamicView().init();
+            this.ModuleLoader.getModule("bilibili.dynamic").init();
           }
         },
         {
@@ -356,6 +356,7 @@ class UserView {
   }
   init() {
     $ui.loading(true);
+
     this.Live.getUserInfo()
       .then(result => {
         $ui.loading(false);

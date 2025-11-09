@@ -9,7 +9,8 @@ const moduleList = [
   "bilibili.user.js",
   "bilibili.dynamic.js",
   "bilibili.template.js",
-  "bilibili.video.js"
+  "bilibili.video.js",
+  "bilibili.history.js"
 ];
 class MainView {
   constructor(mod) {
