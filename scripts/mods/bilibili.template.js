@@ -92,7 +92,7 @@ class BiliModule extends ModModule {
             id: "labelAuthor",
             align: $align.left,
             font: $font(24),
-            lines: 3,
+            lines: 1,
             text: "@",
             textColor: colorData.titleTextColor
           },
@@ -114,7 +114,8 @@ class BiliModule extends ModModule {
           layout: (make, view) => {
             make.top.equalTo($ui.get("labelAuthor").bottom).offset(10);
             make.left.equalTo(5);
-            make.right.equalTo(5);
+            make.right.equalTo(0).offset(-5);
+            make.height.equalTo(40);
           }
         },
         {
@@ -132,6 +133,7 @@ class BiliModule extends ModModule {
           },
           events: {
             ready: sender => {
+              $console.info(sender);
               if (!$.hasString(sender.src)) {
                 sender.hidden = true;
                 sender.size = $size(0, 0);

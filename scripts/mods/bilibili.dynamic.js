@@ -64,6 +64,11 @@ class NewDynamicItemData {
           );
           this.type_str += "\n" + this.origin_dynamic_data.type_str;
           this.cover = this.origin_dynamic_data.cover || this.cover;
+          this.text +=
+            "//@" +
+            this.origin_dynamic_data.author_name +
+            ":" +
+            this.origin_dynamic_data.text;
         }
 
         break;
@@ -113,6 +118,9 @@ class NewDynamicItemData {
       this.cover.indexOf("@1q.webp") < 0
     ) {
       this.cover += "@1q.webp";
+    }
+    if ($.startsWith(this.cover, "http://")) {
+      this.cover = this.cover.replace("http://", "https://");
     }
   }
 }
@@ -244,6 +252,19 @@ class DynamicView {
           },
           layout: $layout.fill,
           events: {
+            itemSize: (sender, indexPath) => {
+              const idx = indexPath.row,
+                dynamicItem = this.dynamicList[idx];
+
+              const width = sender.size.width;
+
+              if (!$.hasString(dynamicItem.cover)) {
+                return $size(width, 100);
+              } else {
+                return $size(width, 300);
+              }
+            },
+
             didSelect: (sender, indexPath, data) => didSelect(indexPath.row),
             /*
             didReachBottom: sender => {
