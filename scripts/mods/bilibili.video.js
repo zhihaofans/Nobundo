@@ -41,7 +41,7 @@ class VideoView {
   constructor(mod) {
     this.Core = new VideoCore(mod);
     this.Template = mod.ModuleLoader.getModule("bilibili.template");
-    this.ApiManager = mod.ApiManager;
+    this.History = mod.ModuleLoader.getModule("bilibili.history");
   }
   showVideoInfo(videoId) {
     if ($.hasString(videoId)) {
@@ -65,11 +65,6 @@ class VideoView {
                 tapped: sender => {
                   $console.info(videoInfo.pic);
                   //TODO:修复api调用
-                  this.ApiManager.runApi({
-                    apiId: "zhihaofans.viewer.open.image",
-                    data: { images: [videoInfo.pic] },
-                    callback: index => {}
-                  });
                 }
               }),
               this.Template.labelTemplate({
@@ -114,6 +109,20 @@ class VideoView {
                 tapped: () => {
                   //this.Downloader.startDownload(videoInfo);
                 }
+              }),
+              this.Template.buttonTemplate({
+                id: "buttonLaterWatch",
+
+                title: "添加到稍后再看",
+                layout: (make, view) => {
+                  make.top
+                    .greaterThanOrEqualTo($ui.get("buttonDownload").bottom)
+                    .offset(10);
+                  make.centerX.equalTo(view.super);
+                },
+                tapped: () => {
+                  this.History.addLaterToWatch(videoId);
+                }
               })
             ]
           });
@@ -136,10 +145,10 @@ class BiliModule extends ModModule {
       name: "哔哩哔哩视频",
       version: "1"
     });
-    this.View = new VideoView(mod);
+    this.Mod = mod;
   }
   getVideoInfo(videoId) {
-    this.View.showVideoInfo(videoId);
+    new VideoView(this.Mod).showVideoInfo(videoId);
   }
 }
 module.exports = BiliModule;

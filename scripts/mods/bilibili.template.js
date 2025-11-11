@@ -97,8 +97,23 @@ class BiliModule extends ModModule {
             textColor: colorData.titleTextColor
           },
           layout: (make, view) => {
-            make.left.equalTo($ui.get("imageFace").right).offset(10);
-            make.right.equalTo(5);
+            make.left.equalTo($ui.get("imageFace").right).offset(2);
+            make.right.equalTo($ui.get("labelTime")).offset(-10);
+            make.top.equalTo($ui.get("imageFace").top).offset(-2);
+          }
+        },
+        {
+          type: "label",
+          props: {
+            id: "labelTime",
+            align: $align.left,
+            font: $font(16),
+            lines: 1,
+            text: "刚刚",
+            textColor: colorData.titleTextColor
+          },
+          layout: (make, view) => {
+            make.right.equalTo(10).offset(-20);
             make.top.equalTo($ui.get("imageFace").top).offset(-2);
           }
         },
@@ -115,7 +130,7 @@ class BiliModule extends ModModule {
             make.top.equalTo($ui.get("labelAuthor").bottom).offset(10);
             make.left.equalTo(5);
             make.right.equalTo(0).offset(-5);
-            make.height.equalTo(40);
+            //make.height.equalTo(40);
           }
         },
         {
@@ -133,7 +148,6 @@ class BiliModule extends ModModule {
           },
           events: {
             ready: sender => {
-              $console.info(sender);
               if (!$.hasString(sender.src)) {
                 sender.hidden = true;
                 sender.size = $size(0, 0);

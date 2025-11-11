@@ -87,6 +87,38 @@ class LaterWatchCore {
   constructor(auth) {
     this.Auth = auth;
   }
+  addItem(bvid) {
+    return new Promise((resolve, reject) => {
+      try {
+        const url = "https://api.bilibili.com/x/v2/history/toview/add";
+        $console.info("trystart");
+        $console.info({
+          auth: this.Auth,
+          bvid
+        });
+        new HttpLib(url)
+          //.cookie(this.Auth.getCookie())
+          .post({
+            bvid,
+            csrf: this.Auth.getCsrf()
+          })
+          .then(
+            resp => {
+              if (resp.isError) {
+                reject(resp.errorMessage);
+              } else {
+                resolve(resp.data);
+              }
+            },
+            fail => reject(fail)
+          );
+        $console.info("try");
+      } catch (error) {
+        $console.error(error);
+        reject(error);
+      }
+    });
+  }
   getList() {
     return new Promise((resolve, reject) => {
       const url = "https://api.bilibili.com/x/v2/history/toview";
@@ -120,6 +152,28 @@ class View {
     this.Video = mod.ModuleLoader.getModule("bilibili.video");
     this.App = mod.ModuleLoader.getModule("bilibili.app");
   }
+  addLaterToWatch(bvid) {
+    if ($.hasString(bvid)) {
+      $.startLoading();
+      new LaterWatchCore(this.Auth).addItem(bvid).then(
+        result => {
+          $console.info(result);
+          $.stopLoading();
+          if (result.code == 0) {
+            $ui.success(`code ${result.code}:${result.message}`);
+          } else {
+            $ui.error(`code ${result.code}:${result.message}`);
+          }
+        },
+        fail => {
+          $.stopLoading();
+          $ui.error(fail);
+        }
+      );
+    } else {
+      $ui.error("空白vid");
+    }
+  }
   showResultList(title, videoList, isHistory = false) {
     $.stopLoading();
     const itemList = videoList.map(thisVideo => {
@@ -133,10 +187,10 @@ class View {
         }
         switch (thisVideo.business) {
           case "pgc":
-            authorTitle = thisVideo.show_title + viewProgress;
+            authorTitle = thisVideo.show_title;
             break;
           case "archive":
-            authorTitle = "@" + thisVideo.author_name + viewProgress;
+            authorTitle = thisVideo.author_name;
             break;
           default:
             authorTitle = thisVideo.author_name;
@@ -156,6 +210,9 @@ class View {
           },
           imageFace: {
             src: thisVideo.author_face + "@1q.webp"
+          },
+          labelTime: {
+            text: viewProgress
           }
         };
       }),
@@ -353,6 +410,9 @@ class BiliModule extends ModModule {
       version: "1"
     });
     this.View = new View(mod);
+  }
+  addLaterToWatch(bvid) {
+    this.View.addLaterToWatch(bvid);
   }
   showHistory() {
     this.View.showHistory();
