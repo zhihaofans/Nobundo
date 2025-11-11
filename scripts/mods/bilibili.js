@@ -10,7 +10,8 @@ const moduleList = [
   "bilibili.dynamic.js",
   "bilibili.template.js",
   "bilibili.video.js",
-  "bilibili.history.js"
+  "bilibili.history.js",
+  "bilibili.ranking.js"
 ];
 class MainView {
   constructor(mod) {
@@ -20,7 +21,7 @@ class MainView {
   init() {
     try {
       const title = "哔哩哔哩(已登录)",
-        textList = ["设置", "test", "签到"],
+        textList = ["设置", "排行榜", "热门推荐"],
         didSelect = (indexPath, sender) => {
           const index = indexPath.row;
           switch (index) {
@@ -28,18 +29,8 @@ class MainView {
               $prefs.open();
               break;
             case 1:
-              //require("./test.view").init();
-              $ui.error("没做");
-              break;
-            case 2:
-              try {
-                const checkIn = this.ModuleLoader.getModule("bilibili.checkin");
-                checkIn.init();
-              } catch (error) {
-                $console.error(error);
-                $.stopLoading();
-                $ui.error("跳转失败");
-              }
+              this.ModuleLoader.getModule("bilibili.ranking").getRankingList();
+
               break;
             default:
               $ui.error("?");
