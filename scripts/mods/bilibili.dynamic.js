@@ -36,6 +36,7 @@ class NewDynamicItemData {
     this.author_id = item.modules.module_author.mid;
 
     this.author_face = item.modules.module_author.face;
+    this.pushTime = item.modules.module_author.pub_time;
     if (this.major_type == "MAJOR_TYPE_OPUS") {
       this.opus = item.modules.module_dynamic?.major?.opus;
     }
@@ -70,7 +71,7 @@ class NewDynamicItemData {
             ":" +
             this.origin_dynamic_data.text;
         }
-
+        this.pushTime += "转发";
         break;
       case "DYNAMIC_TYPE_LIVE_RCMD":
         this.content =
@@ -78,6 +79,7 @@ class NewDynamicItemData {
         //$console.warn(this.content);
         this.text = "[直播]" + this.content.live_play_info.title;
         this.cover = this.content.live_play_info.cover;
+        this.pushTime = this.content.live_play_info.area_name;
         break;
       case "DYNAMIC_TYPE_AV":
         this.text = this.modules.module_dynamic.major.archive.title;
@@ -194,6 +196,9 @@ class DynamicView {
         },
         imageCover: {
           src: $.hasString(dynamicItem.cover) ? dynamicItem.cover : ""
+        },
+        labelTime: {
+          text: dynamicItem.pushTime
         }
       };
     });

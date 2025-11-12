@@ -1,19 +1,13 @@
 const { ModCore } = require("CoreJS"),
   $ = require("$"),
   Next = require("Next"),
-  ListView = new Next.ListView();
+  HttpLib = require("HttpLib");
 class ApiTest {
   constructor(mod) {
     this.Http = mod.Http;
   }
   init() {
     this.pickImage();
-  }
-  async httpHead() {
-    const result = await this.Http.head({
-      url: "https://www.httpbin.org/get"
-    });
-    $console.warn(result.response);
   }
   pickImage() {
     $photo.pick({
@@ -311,7 +305,23 @@ class Main {
           );
         versionClass[thisVer.index]();
       };
-    ListView.pushSimpleText(this.Mod.MOD_NAME, main_view_list, didSelect);
+    $ui.push({
+      props: {
+        title: this.Mod.MOD_NAME
+      },
+      views: [
+        {
+          type: "list",
+          props: {
+            data: main_view_list
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: didSelect
+          }
+        }
+      ]
+    });
   }
 }
 
@@ -323,10 +333,9 @@ class Version extends ModCore {
       modName: "JSBox新功能测试",
       version: "3a",
       author: "zhihaofans",
-      coreVersion: 9
+      coreVersion: 18,
+      iconName: "j.square.fill"
     });
-    this.$ = $;
-    this.Http = $.http;
     this.Storage = Next.Storage;
   }
   run() {
