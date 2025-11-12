@@ -72,7 +72,7 @@ class ScoopCore {
     this.SiteList = {
       dotnet: this.ModuleLoader.getModule("scoop.dotnet"),
       everything: this.ModuleLoader.getModule("scoop.everything"),
-      git: this.ModuleLoader.getModule("scoop.git"),
+
       nodejs: this.ModuleLoader.getModule("scoop.nodejs")
     };
   }

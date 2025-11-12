@@ -71,6 +71,31 @@ class RankingCore {
         );
     });
   }
+  getPrecious() {
+    //入站必刷
+    return new Promise((resolve, reject) => {
+      const url = "https://api.bilibili.com/x/web-interface/popular/precious";
+      new HttpLib(url)
+        //.cookie(this.Auth.getCookie())
+        .get()
+        .then(
+          resp => {
+            $console.info(resp);
+            if (resp.isError) {
+              reject(resp.errorMessage);
+            } else {
+              const result = resp.data;
+              if (result.code == 0 && result.data != undefined) {
+                resolve(result.data);
+              } else {
+                reject(`code ${result.code}:${result.message}`);
+              }
+            }
+          },
+          fail => reject(fail)
+        );
+    });
+  }
 }
 class RankingView {
   constructor(mod) {
@@ -201,6 +226,32 @@ class RankingView {
         $ui.error(fail);
       };
   }
+  getPreciousList() {
+    $.startLoading();
+    this.Core.getPrecious().then(data => {
+      $.stopLoading();
+      const rankingList = data.list;
+      $console.info({
+        data
+      });
+      if (rankingList.length > 0) {
+        try {
+          this.showResult(
+            data.title,
+            rankingList.map(v => new VideoInfo(v))
+          );
+        } catch (error) {
+          $console.error(error);
+        }
+      } else {
+        $ui.error("入站必刷数量为零");
+      }
+    }),
+      fail => {
+        $.stopLoading();
+        $ui.error(fail);
+      };
+  }
 }
 class BiliModule extends ModModule {
   constructor(mod) {
@@ -211,6 +262,9 @@ class BiliModule extends ModModule {
       version: "1"
     });
     this.Mod = mod;
+  }
+  getPreciousList() {
+    new RankingView(this.Mod).getPreciousList();
   }
   getRankingList() {
     new RankingView(this.Mod).getRankingList();

@@ -21,7 +21,7 @@ class MainView {
   init() {
     try {
       const title = "哔哩哔哩(已登录)",
-        textList = ["设置", "排行榜", "热门推荐"],
+        textList = ["设置", "排行榜", "入站必刷"],
         didSelect = (indexPath, sender) => {
           const index = indexPath.row;
           switch (index) {
@@ -29,8 +29,15 @@ class MainView {
               $prefs.open();
               break;
             case 1:
-              this.ModuleLoader.getModule("bilibili.ranking").getRankingList();
+              this.ModuleLoader.getModule("bilibili.ranking").getRankingList(
+                sender
+              );
 
+              break;
+            case 2:
+              this.ModuleLoader.getModule("bilibili.ranking").getPreciousList(
+                sender
+              );
               break;
             default:
               $ui.error("?");

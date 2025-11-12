@@ -37,8 +37,12 @@ class NewDynamicItemData {
 
     this.author_face = item.modules.module_author.face;
     this.pushTime = item.modules.module_author.pub_time;
+    this.onlyFans = item.basic.is_only_fans || false;
     if (this.major_type == "MAJOR_TYPE_OPUS") {
       this.opus = item.modules.module_dynamic?.major?.opus;
+    }
+    if (this.major_type == "MAJOR_TYPE_BLOCKED") {
+      this.blockedData = item.modules.module_dynamic?.major?.blocked;
     }
     //this.cover = this.author_face;
     switch (item.type) {
@@ -49,10 +53,11 @@ class NewDynamicItemData {
           this.modules.module_dynamic?.desc?.text ||
           this.opus.title ||
           this.opus.summary.text ||
-          item.type;
+          this.blockedData.title + "/n" + this.blockedData.hint_message;
+        item.type;
         this.images =
           this.draw?.items?.map(it => it.src) ||
-          this.opus.pics.map(it => it.url) ||
+          this.opus?.pics?.map(it => it.url) ||
           [];
         this.cover = this.images[0];
         break;
@@ -129,6 +134,34 @@ class NewDynamicItemData {
 class DynamicCore {
   constructor(mod) {
     this.Auth = mod.ModuleLoader.getModule("bilibili.auth");
+  }
+  getDynamicDetail(id) {
+    return new Promise((resolve, reject) => {
+      const url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/all`,
+        params = {
+          id,
+          features: "itemOpusStyle,listOnlyfans,onlyfansVote,onlyfansAssetsV2"
+        };
+      try {
+        $console.info("trystart");
+        new HttpLib(url)
+          .params(params)
+          .cookie(this.Auth.getCookie())
+          .get()
+          .then(resp => {
+            if (resp.isError) {
+              reject(resp.errorMessage);
+            } else {
+              resolve(resp.data);
+            }
+          })
+          .catch(fail => reject(fail));
+        $console.info("try");
+      } catch (error) {
+        $console.error(error);
+        reject(error);
+      }
+    });
   }
   getDynamicList(_offset = "") {
     return new Promise((resolve, reject) => {
