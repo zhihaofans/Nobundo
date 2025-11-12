@@ -97,7 +97,10 @@ class LaterWatchCore {
           bvid
         });
         new HttpLib(url)
-          //.cookie(this.Auth.getCookie())
+          .cookie(this.Auth.getCookie())
+          .header({
+            "Content-Type": "application/x-www-form-urlencoded"
+          })
           .post({
             bvid,
             csrf: this.Auth.getCsrf()

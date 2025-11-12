@@ -83,14 +83,15 @@ class VideoView {
               this.Template.labelTemplate({
                 id: "labelVideoTitle",
                 text: videoInfo.title,
-                lines: 0,
+                lines: 3,
                 layout: (make, view) => {
-                  make.left.right.inset(10);
+                  make.left.equalTo(10);
+                  make.right.equalTo(0).offset(-5);
                   make.top.greaterThanOrEqualTo(
                     $ui.get("labelUserName").bottom
                   );
                   //make.width.equalTo(view.width);
-                  make.height.equalTo(30);
+                  //make.height.equalTo(30);
                 },
                 tapped: sender => {
                   $console.info(sender.text);

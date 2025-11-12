@@ -29,14 +29,6 @@ function timeDiffToString(oldTime) {
     return "错乱时空";
   }
 }
-class VideoPartInfo {
-  constructor(data) {
-    this.id = data.cid;
-    this.index = data.page; //分P序号，从1开始
-    this.title = data.part;
-    this.duration = data.duration; //时间
-  }
-}
 class VideoInfo {
   constructor(data) {
     this.aid = data.aid;
@@ -45,7 +37,6 @@ class VideoInfo {
     this.video_count = data.videos; //稿件分P总数
     this.cover = data.pic;
     this.title = data.title;
-    //没有:this.parts = data.parts.map(p => new VideoPartInfo(p));
     this.datetime = data.pubdate;
     this.author_id = data.owner.mid;
     this.author_face = data.owner.face;
@@ -90,10 +81,6 @@ class RankingView {
   }
   showResult(title, videoList) {
     const itemList = videoList.map(thisVideo => {
-        $console.info({
-          thisVideo
-        });
-
         return {
           labelTitle: {
             text: thisVideo.title
@@ -114,16 +101,8 @@ class RankingView {
       }),
       didSelect = (section, row) => {
         const videoItem = videoList[row];
-        $console.info({
-          videoItem
-        });
-
         this.Video.getVideoInfo(videoItem.bvid);
       };
-    $console.info({
-      showResult: title,
-      itemList
-    });
     $ui.push({
       props: {
         title
