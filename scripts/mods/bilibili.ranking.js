@@ -200,10 +200,12 @@ class RankingView {
       ]
     });
   }
-  getRankingList() {
+  getRankingList(senderIndex) {
+    $.startListItemLoading(senderIndex.sender, senderIndex.indexPath);
     $.startLoading();
     this.Core.getRanking().then(data => {
       $.stopLoading();
+      $.stopListItemLoading(senderIndex.sender, senderIndex.indexPath);
       const rankingList = data.list;
       $console.info({
         data
@@ -223,13 +225,16 @@ class RankingView {
     }),
       fail => {
         $.stopLoading();
+        $.stopListItemLoading(senderIndex.sender, senderIndex.indexPath);
         $ui.error(fail);
       };
   }
-  getPreciousList() {
-    $.startLoading();
+  getPreciousList(senderIndex) {
+    $.startListItemLoading(senderIndex.sender, senderIndex.indexPath);
+    $.startList;
     this.Core.getPrecious().then(data => {
       $.stopLoading();
+      $.stopListItemLoading(senderIndex.sender, senderIndex.indexPath);
       const rankingList = data.list;
       $console.info({
         data
@@ -249,6 +254,7 @@ class RankingView {
     }),
       fail => {
         $.stopLoading();
+        $.stopListItemLoading(senderIndex.sender, senderIndex.indexPath);
         $ui.error(fail);
       };
   }
@@ -263,11 +269,11 @@ class BiliModule extends ModModule {
     });
     this.Mod = mod;
   }
-  getPreciousList() {
-    new RankingView(this.Mod).getPreciousList();
+  getPreciousList(senderIndex) {
+    new RankingView(this.Mod).getPreciousList(senderIndex);
   }
-  getRankingList() {
-    new RankingView(this.Mod).getRankingList();
+  getRankingList(senderIndex) {
+    new RankingView(this.Mod).getRankingList(senderIndex);
   }
 }
 module.exports = BiliModule;

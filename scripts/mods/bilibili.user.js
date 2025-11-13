@@ -226,14 +226,6 @@ class UserView {
           }
         },
         {
-          text: "订阅",
-          icon: "yensign.circle.fill",
-          func: () => {
-            const SubscribeView = require("./subscribe.view");
-            new SubscribeView().init();
-          }
-        },
-        {
           text: "签到",
           icon: "pencil",
           func: () => {

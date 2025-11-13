@@ -13,6 +13,13 @@ const moduleList = [
   "bilibili.history.js",
   "bilibili.ranking.js"
 ];
+class SenderIndex {
+  constructor(sender, indexPath) {
+    this.sender = sender;
+    this.indexPath = indexPath;
+    this.row = indexPath.row;
+  }
+}
 class MainView {
   constructor(mod) {
     this.ModuleLoader = mod.ModuleLoader;
@@ -21,8 +28,28 @@ class MainView {
   init() {
     try {
       const title = "哔哩哔哩(已登录)",
-        textList = ["设置", "排行榜", "入站必刷"],
-        didSelect = (indexPath, sender) => {
+        menuData = [
+          {
+            title: "登录配置",
+            func: () => {}
+          },
+          {
+            title: "排行榜",
+            func: senderIndex =>
+              this.ModuleLoader.getModule("bilibili.ranking").getRankingList(
+                senderIndex
+              )
+          },
+          {
+            title: "入站必刷",
+            func: senderIndex =>
+              this.ModuleLoader.getModule("bilibili.ranking").getPreciousList(
+                senderIndex
+              )
+          }
+        ],
+        textListOld = ["设置", "排行榜", "入站必刷"],
+        didSelectOld = (indexPath, sender) => {
           const index = indexPath.row;
           switch (index) {
             case 0:
@@ -30,13 +57,15 @@ class MainView {
               break;
             case 1:
               this.ModuleLoader.getModule("bilibili.ranking").getRankingList(
-                sender
+                sender,
+                indexPath
               );
 
               break;
             case 2:
               this.ModuleLoader.getModule("bilibili.ranking").getPreciousList(
-                sender
+                sender,
+                indexPath
               );
               break;
             default:
@@ -87,11 +116,21 @@ class MainView {
         {
           type: "list",
           props: {
-            data: textList
+            data: menuData.map(m => m.title)
           },
           layout: $layout.fill,
           events: {
-            didSelect: (sender, indexPath, data) => didSelect(indexPath, sender)
+            didSelect: (sender, indexPath, data) => {
+              try {
+                $console.info(sender);
+                menuData[indexPath.row].func(
+                  new SenderIndex(sender, indexPath)
+                );
+              } catch (error) {
+                $console.error(error);
+                $ui.error(error.message);
+              }
+            }
           }
         },
         {
@@ -142,38 +181,7 @@ class MainView {
                 ]
               }
             ],
-            data: navData || [
-              {
-                menu_image: {
-                  symbol: "square.grid.2x2.fill",
-                  tintColor: $color("gray")
-                },
-                menu_label: {
-                  text: "应用",
-                  textColor: $color("gray")
-                }
-              },
-              {
-                menu_image: {
-                  symbol: "person.icloud",
-                  tintColor: $color("gray")
-                },
-                menu_label: {
-                  text: "大会员",
-                  textColor: $color("gray")
-                }
-              },
-              {
-                menu_image: {
-                  symbol: "person.fill",
-                  tintColor: $color("gray")
-                },
-                menu_label: {
-                  text: "我的",
-                  textColor: $color("gray")
-                }
-              }
-            ]
+            data: navData
           },
           layout: (make, view) => {
             make.bottom.inset(0);
@@ -220,6 +228,7 @@ class MainView {
     } catch (error) {
       $console.error(error);
       //TODO:showErrorAlertAndExit(error.message);
+      $ui.error(error.message);
     }
   }
 }
