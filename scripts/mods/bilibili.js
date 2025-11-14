@@ -31,7 +31,28 @@ class MainView {
         menuData = [
           {
             title: "登录配置",
-            func: () => {}
+            func: () => {
+              $ui.menu({
+                items: ["编辑AccessKey"],
+                handler: (title, idx) => {
+                  switch (idx) {
+                    case 0:
+                      this.Auth = this.ModuleLoader.getModule("bilibili.auth");
+                      $.inputText(this.Auth.getAccessKey(), "Access Key").then(
+                        text => {
+                          const su = this.Auth.setAccessKey(text);
+                          $console.info({
+                            setAccessKey: su,
+                            access_key: text
+                          });
+                        }
+                      );
+                      break;
+                    default:
+                  }
+                }
+              });
+            }
           },
           {
             title: "排行榜",
@@ -46,32 +67,18 @@ class MainView {
               this.ModuleLoader.getModule("bilibili.ranking").getPreciousList(
                 senderIndex
               )
+          },
+          {
+            title: "跳转视频",
+            func: () => {
+              $.inputText("", "bvid").then(bvid => {
+                this.ModuleLoader.getModule("bilibili.video").getVideoInfo(
+                  bvid
+                );
+              });
+            }
           }
-        ],
-        textListOld = ["设置", "排行榜", "入站必刷"],
-        didSelectOld = (indexPath, sender) => {
-          const index = indexPath.row;
-          switch (index) {
-            case 0:
-              $prefs.open();
-              break;
-            case 1:
-              this.ModuleLoader.getModule("bilibili.ranking").getRankingList(
-                sender,
-                indexPath
-              );
-
-              break;
-            case 2:
-              this.ModuleLoader.getModule("bilibili.ranking").getPreciousList(
-                sender,
-                indexPath
-              );
-              break;
-            default:
-              $ui.error("?");
-          }
-        };
+        ];
       const navList = [
           {
             title: "主页",
@@ -82,18 +89,12 @@ class MainView {
           {
             title: "动态",
             icon: "rectangle.grid.3x2",
-            func: () => {
-              this.ModuleLoader.getModule("bilibili.dynamic").init();
-            }
+            func: () => this.ModuleLoader.getModule("bilibili.dynamic").init()
           },
           {
             title: "我的",
             icon: "person.fill",
-            func: () => {
-              //require("./aboutme.view").init();
-              //              $ui.error("没做");
-              this.ModuleLoader.getModule("bilibili.user").init();
-            }
+            func: () => this.ModuleLoader.getModule("bilibili.user").init()
           }
         ],
         navData = navList.map(item => {
