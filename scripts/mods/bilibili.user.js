@@ -205,8 +205,8 @@ class UserView {
       historyTabMenu = [
         {
           text: "收藏",
-          icon: "star.fill"
-          //func: () => HistoryView.getFavoriteList()
+          icon: "star.fill",
+          func: () => History.showFav()
         },
         {
           text: "稍后再看",

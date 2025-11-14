@@ -30,7 +30,7 @@ class PublishItemData {
     }
     this.bvid = videoData.bvid || videoData.history?.bvid;
     this.copyright = videoData.copyright; //1：原创 2：转载
-    this.cover_image = videoData.pic || videoData.cover || videoData.covers[0]; //视频封面
+    this.cover = videoData.pic || videoData.cover || videoData.covers[0]; //视频封面
     this.desc = videoData.desc; //简介
     this.kid = videoData.kid;
     this.parts_count = videoData.videos; //稿件分P总数
@@ -51,6 +51,65 @@ class PublishItemData {
     this.tname = videoData.tname; //子分区名称
     this.upload_time = videoData.ctime; //投稿时间戳
     this.uri = videoData.uri;
+  }
+}
+class FavItem {
+  constructor(item) {
+    this.author_face = item.upper.face;
+    this.author_name = item.upper.name;
+    this.author_mid = item.upper.mid;
+    this.cover = item.cover.replace("http://", "https://");
+    this.title = item.title || item.intro || "未知标题";
+    this.type = item.otype;
+    this.url = item.link;
+    this.avid = item.oid;
+    switch (item.otype) {
+      case 2:
+        this.type_str = "视频";
+        this.desc = item.playback_desc + "/" + item.left_text + "播放";
+        this.business = "archive";
+        break;
+      case 302:
+        this.type_str = "图文";
+        this.desc = item.otype_desc;
+        this.business = "article";
+        break;
+    }
+  }
+}
+class FavCore {
+  constructor(auth) {
+    this.Auth = auth;
+  }
+  getFavContentList() {
+    return new Promise((resolve, reject) => {
+      const url = `https://api.bilibili.com/x/v3/fav/tab/fav`,
+        params = {
+          access_key: this.Auth.getAccessKey(),
+          tab_id: "101",
+          appkey: "27eb53fc9058f8c3"
+        };
+      try {
+        $console.info("trystart");
+        new HttpLib(url, params)
+          .cookie(this.Auth.getCookie())
+          .get()
+          .then(
+            resp => {
+              if (resp.isError) {
+                reject(resp.errorMessage);
+              } else {
+                resolve(resp.data);
+              }
+            },
+            fail => reject(fail)
+          );
+        $console.info("try");
+      } catch (error) {
+        $console.error(error);
+        reject(error);
+      }
+    });
   }
 }
 class HistoryCore {
@@ -78,7 +137,7 @@ class HistoryCore {
         $console.info("try");
       } catch (error) {
         $console.error(error);
-        reject(error);
+        reject(error.message);
       }
     });
   }
@@ -118,7 +177,7 @@ class LaterWatchCore {
         $console.info("try");
       } catch (error) {
         $console.error(error);
-        reject(error);
+        reject(error.message);
       }
     });
   }
@@ -143,7 +202,7 @@ class LaterWatchCore {
         $console.info("try");
       } catch (error) {
         $console.error(error);
-        reject(error);
+        reject(error.message);
       }
     });
   }
@@ -177,7 +236,7 @@ class View {
       $ui.error("空白vid");
     }
   }
-  showResultList(title, videoList, isHistory = false) {
+  showResultList(title, videoList, type) {
     $.stopLoading();
     const itemList = videoList.map(thisVideo => {
         //      $console.info({
@@ -198,7 +257,10 @@ class View {
           default:
             authorTitle = thisVideo.author_name;
         }
-        if (thisVideo.badge) {
+        if (type.toLowerCase() == "fav") {
+          viewProgress = thisVideo.desc;
+        }
+        if ($.hasString(thisVideo.badge)) {
           authorTitle += `[${thisVideo.badge}]`;
         }
         return {
@@ -209,7 +271,7 @@ class View {
             text: authorTitle
           },
           imageCover: {
-            src: thisVideo.cover_image + "@1q.webp"
+            src: thisVideo.cover + "@1q.webp"
           },
           imageFace: {
             src: thisVideo.author_face + "@1q.webp"
@@ -224,7 +286,7 @@ class View {
         $console.info({
           videoItem
         });
-        if (isHistory === true) {
+        if (type.toLowerCase() === "history") {
           switch (videoItem.business) {
             case "pgc":
               this.App.openBangumi(videoItem.kid);
@@ -264,7 +326,8 @@ class View {
     $ui.push({
       props: {
         title,
-        navButtons: isHistory !== true ? later2watchNavMenu : undefined
+        navButtons:
+          type.toLowerCase() === "later2watch" ? later2watchNavMenu : undefined
       },
       views: [
         {
@@ -333,6 +396,41 @@ class View {
       ]
     });
   }
+  showFavList() {
+    $.startLoading();
+    new FavCore(this.Auth).getFavContentList().then(
+      result => {
+        if (result.code == 0) {
+          try {
+            const list = result.data.list;
+            $console.info({
+              result,
+              list
+            });
+            const favList = list.map(item => new FavItem(item));
+            $console.info({
+              list,
+              favList
+            });
+            this.showResultList("收藏夹", favList, "fav");
+          } catch (error) {
+            $console.error(error);
+            $.stopLoading();
+            $ui.error(error.message);
+          } finally {
+            $console.info("showFavList.finally");
+          }
+        } else {
+          $.stopLoading();
+          $ui.error(result.message || `code:${result.code}`);
+        }
+      },
+      fail => {
+        $.stopLoading();
+        $ui.error("fail:" + fail || "收藏夹出现未知错误");
+      }
+    );
+  }
   showHistory() {
     $.startLoading();
     new HistoryCore(this.Auth).getList().then(
@@ -349,7 +447,7 @@ class View {
               list,
               historyList
             });
-            this.showResultList("历史观看", historyList, true);
+            this.showResultList("历史观看", historyList, "history");
           } catch (error) {
             $console.error(error);
             $.stopLoading();
@@ -384,7 +482,7 @@ class View {
               list,
               historyList
             });
-            this.showResultList("稍后再看", historyList);
+            this.showResultList("稍后再看", historyList, "later2watch");
           } catch (error) {
             $console.error(error);
             $.stopLoading();
@@ -416,6 +514,9 @@ class BiliModule extends ModModule {
   }
   addLaterToWatch(bvid) {
     this.View.addLaterToWatch(bvid);
+  }
+  showFav() {
+    this.View.showFavList();
   }
   showHistory() {
     this.View.showHistory();
