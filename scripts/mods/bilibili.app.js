@@ -21,6 +21,10 @@ class BiliModule extends ModModule {
     }
   }
   openVideo(bvid) {
+    $console.info({
+      "bilibili.app": "openVideo",
+      bvid
+    });
     if ($.hasString(bvid)) {
       $app.openURL(`bilibili://video/${bvid}`);
     }

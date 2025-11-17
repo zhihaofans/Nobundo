@@ -146,6 +146,37 @@ class QrcodeLogin {
       }
     });
   }
+  getTvKey() {
+    return new Promise((resolve, reject) => {
+      const url =
+          "https://passport.bilibili.com/x/passport-tv-login/qrcode/auth_code",
+        params = {
+          local_id: 0,
+          ts: $.getSecondUnixTime(),
+          appkey: "",
+          sign: ""
+        };
+      $console.info("getWebKey");
+      try {
+        new HttpLib(url).get().then(resp => {
+          if (resp.isError != false) {
+            reject(resp.errorMessage || "未知错误");
+          } else {
+            const result = resp.data;
+            if (result.code === 0 && $.hasString(result.data.qrcode_key)) {
+              resolve(result.data.qrcode_key);
+            } else {
+              reject(result.message || "未知错误");
+            }
+          }
+        });
+      } catch (error) {
+        $console.error(error);
+        reject(error.message);
+      } finally {
+      }
+    });
+  }
   loginWeb(qrcode_key) {
     return new Promise((resolve, reject) => {
       const url = `https://passport.bilibili.com/x/passport-login/web/qrcode/poll?qrcode_key=${qrcode_key}`;

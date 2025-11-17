@@ -289,8 +289,8 @@ class UserView {
             historyTabMenu[indexPath.row].func();
           },
           ready: () => {
-            //this.initSecondData();
-            $ui.error("加载B币数据功能完善中");
+            this.initSecondData();
+            //$ui.error("加载B币数据功能完善中");
           }
         }
       },
@@ -348,7 +348,6 @@ class UserView {
   }
   init() {
     $ui.loading(true);
-
     this.Live.getUserInfo()
       .then(result => {
         $ui.loading(false);
@@ -378,6 +377,44 @@ class UserView {
         $console.info(fail);
         $ui.error(fail.message);
       });
+  }
+  initSecondData() {
+    this.User.getNavData().then(
+      result => {
+        $ui.loading(false);
+        $console.info(result);
+        if (result.code === 0) {
+          const bCoin =
+            Number(result.data.wallet.bcoin_balance).toFixed(2) || "加载失败";
+
+          $ui
+            .get("tabMoney")
+            .cell($indexPath(0, 0))
+            .get("labelNumber").text = bCoin;
+        } else {
+          $ui.alert({
+            title: "发生错误",
+            message: result.message || "可能是网络错误",
+            actions: [
+              {
+                title: "OK",
+                disabled: false, // Optional
+                handler: () => {}
+              },
+              {
+                title: "Cancel",
+                handler: () => {}
+              }
+            ]
+          });
+        }
+      },
+      fail => {
+        $ui.loading(false);
+        $console.error(fail);
+        $ui.error(fail);
+      }
+    );
   }
 }
 class BiliModule extends ModModule {

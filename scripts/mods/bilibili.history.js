@@ -286,23 +286,30 @@ class View {
         $console.info({
           videoItem
         });
-        if (type.toLowerCase() === "history") {
-          switch (videoItem.business) {
-            case "pgc":
-              this.App.openBangumi(videoItem.kid);
-              break;
-            case "article":
-              this.App.openArticle(videoItem.kid);
-              break;
-            case "live":
-              $console.info(videoItem);
-              $app.openURL(videoItem.uri);
-              break;
-            default:
-              this.App.openVideo(videoItem.bvid);
+        try {
+          if (type.toLowerCase() === "history") {
+            switch (videoItem.business) {
+              case "pgc":
+                this.App.openBangumi(videoItem.kid);
+                break;
+              case "article":
+                this.App.openArticle(videoItem.kid);
+                break;
+              case "live":
+                $console.info(videoItem);
+                $app.openURL(videoItem.uri);
+                break;
+              default:
+                this.App.openVideo(videoItem.bvid);
+            }
+          } else if (type.toLowerCase() === "fav") {
+            this.App.openWebBrowser(videoItem.url);
+          } else {
+            this.App.openVideo(videoItem.bvid);
           }
-        } else {
-          this.App.openVideo(videoItem.bvid);
+        } catch (error) {
+          $console.error(error);
+          $ui.error(error.message);
         }
       };
     const later2watchNavMenu = [
