@@ -48,7 +48,6 @@ class MainView {
                         }
                       );
                       break;
-                    default:
                   }
                 }
               });
@@ -67,6 +66,11 @@ class MainView {
               this.ModuleLoader.getModule("bilibili.ranking").getPreciousList(
                 senderIndex
               )
+          },
+          {
+            title: "热门视频",
+            func: senderIndex =>
+              this.ModuleLoader.getModule("bilibili.ranking").getHomePageList()
           },
           {
             title: "跳转视频",

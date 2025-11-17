@@ -47,11 +47,11 @@ class RankingCore {
   constructor(mod) {
     this.Auth = mod.ModuleLoader.getModule("bilibili.auth");
   }
-  getRanking() {
+  getPopular(isLogin) {
     return new Promise((resolve, reject) => {
-      const url = `https://api.bilibili.com/x/web-interface/ranking/v2`;
+      const url = "https://api.bilibili.com/x/web-interface/popular";
       new HttpLib(url)
-        //.cookie(this.Auth.getCookie())
+        .cookie(isLogin == true ? this.Auth.getCookie() : "noLogin")
         .get()
         .then(
           resp => {
@@ -75,6 +75,30 @@ class RankingCore {
     //入站必刷
     return new Promise((resolve, reject) => {
       const url = "https://api.bilibili.com/x/web-interface/popular/precious";
+      new HttpLib(url)
+        //.cookie(this.Auth.getCookie())
+        .get()
+        .then(
+          resp => {
+            $console.info(resp);
+            if (resp.isError) {
+              reject(resp.errorMessage);
+            } else {
+              const result = resp.data;
+              if (result.code == 0 && result.data != undefined) {
+                resolve(result.data);
+              } else {
+                reject(`code ${result.code}:${result.message}`);
+              }
+            }
+          },
+          fail => reject(fail)
+        );
+    });
+  }
+  getRanking() {
+    return new Promise((resolve, reject) => {
+      const url = `https://api.bilibili.com/x/web-interface/ranking/v2`;
       new HttpLib(url)
         //.cookie(this.Auth.getCookie())
         .get()
@@ -213,7 +237,7 @@ class RankingView {
       if (rankingList.length > 0) {
         try {
           this.showResult(
-            "热门榜",
+            "排行榜",
             rankingList.map(v => new VideoInfo(v))
           );
         } catch (error) {
@@ -226,6 +250,33 @@ class RankingView {
       fail => {
         $.stopLoading();
         $.stopListItemLoading(senderIndex.sender, senderIndex.indexPath);
+        $ui.error(fail);
+      };
+  }
+  getPopularList() {
+    $.startLoading();
+    this.Core.getPopular(false).then(data => {
+      $.stopLoading();
+      const rankingList = data.list;
+      $console.info({
+        data
+      });
+      if (rankingList.length > 0) {
+        try {
+          this.showResult(
+            "热门视频",
+            rankingList.map(v => new VideoInfo(v))
+          );
+        } catch (error) {
+          $console.error(error);
+        }
+      } else {
+        $ui.error("热门视频数量为零");
+      }
+    }),
+      fail => {
+        $.stopLoading();
+
         $ui.error(fail);
       };
   }
@@ -274,6 +325,9 @@ class BiliModule extends ModModule {
   }
   getRankingList(senderIndex) {
     new RankingView(this.Mod).getRankingList(senderIndex);
+  }
+  getHomePageList() {
+    new RankingView(this.Mod).getPopularList();
   }
 }
 module.exports = BiliModule;
