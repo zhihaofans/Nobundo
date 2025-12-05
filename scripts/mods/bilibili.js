@@ -11,7 +11,8 @@ const moduleList = [
   "bilibili.template.js",
   "bilibili.video.js",
   "bilibili.history.js",
-  "bilibili.ranking.js"
+  "bilibili.ranking.js",
+  "bilibili.content.js"
 ];
 class SenderIndex {
   constructor(sender, indexPath) {
@@ -70,7 +71,9 @@ class MainView {
           {
             title: "热门视频",
             func: senderIndex =>
-              this.ModuleLoader.getModule("bilibili.ranking").getHomePageList()
+              this.ModuleLoader.getModule("bilibili.ranking").getHomePageList(
+                senderIndex
+              )
           },
           {
             title: "跳转视频",

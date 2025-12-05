@@ -42,7 +42,7 @@ class NewDynamicItemData {
       this.opus = item.modules.module_dynamic?.major?.opus;
     }
     if (this.major_type == "MAJOR_TYPE_BLOCKED") {
-      this.blockedData = item.modules.module_dynamic?.major?.blocked;
+      this.opus = item.modules.module_dynamic?.major?.blocked;
     }
     //this.cover = this.author_face;
     switch (item.type) {
@@ -51,9 +51,11 @@ class NewDynamicItemData {
         this.draw = this.modules.module_dynamic.major?.draw;
         this.text =
           this.modules.module_dynamic?.desc?.text ||
-          this.opus.title ||
-          this.opus.summary.text ||
-          this.blockedData.title + "/n" + this.blockedData.hint_message;
+          this.opus?.title ||
+          this.opus?.summary?.text ||
+          this.blockedData?.title + "/n" + this.blockedData?.hint_message ||
+          this.modules.module_dynamic.additional?.reserve?.title ||
+          "未知";
         item.type;
         this.images =
           this.draw?.items?.map(it => it.src) ||
@@ -82,9 +84,9 @@ class NewDynamicItemData {
         this.content =
           JSON.parse(this.modules.module_dynamic.major.live_rcmd.content) || {};
         //$console.warn(this.content);
-        this.text = "[直播]" + this.content.live_play_info.title;
+        this.text = this.content.live_play_info.title;
         this.cover = this.content.live_play_info.cover;
-        this.pushTime = this.content.live_play_info.area_name;
+        this.pushTime = this.content.live_play_info.area_name + "直播";
         break;
       case "DYNAMIC_TYPE_AV":
         this.text = this.modules.module_dynamic.major.archive.title;
@@ -103,9 +105,10 @@ class NewDynamicItemData {
         break;
       case "DYNAMIC_TYPE_ARTICLE":
         this.article = this.modules.module_dynamic.major?.article;
-        this.text = this.article?.title || this.opus.title;
-        this.url = this.article?.jump_url || this.opus.jump_url;
-        this.images = this.article?.covers || this.opus.pics.map(it => it.url);
+        this.text = this.article?.title || this.opus?.title;
+        this.url = this.article?.jump_url || this.opus?.jump_url;
+        this.images =
+          this.article?.covers || this.opus?.pics?.map(it => it.url) || [];
 
         this.cover = this.images[0];
         break;
@@ -134,34 +137,6 @@ class NewDynamicItemData {
 class DynamicCore {
   constructor(mod) {
     this.Auth = mod.ModuleLoader.getModule("bilibili.auth");
-  }
-  getDynamicDetail(id) {
-    return new Promise((resolve, reject) => {
-      const url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/all`,
-        params = {
-          id,
-          features: "itemOpusStyle,listOnlyfans,onlyfansVote,onlyfansAssetsV2"
-        };
-      try {
-        $console.info("trystart");
-        new HttpLib(url)
-          .params(params)
-          .cookie(this.Auth.getCookie())
-          .get()
-          .then(resp => {
-            if (resp.isError) {
-              reject(resp.errorMessage);
-            } else {
-              resolve(resp.data);
-            }
-          })
-          .catch(fail => reject(fail));
-        $console.info("try");
-      } catch (error) {
-        $console.error(error);
-        reject(error);
-      }
-    });
   }
   getDynamicList(_offset = "") {
     return new Promise((resolve, reject) => {
@@ -198,6 +173,7 @@ class DynamicView {
     this.Core = new DynamicCore(mod);
     this.Template = mod.ModuleLoader.getModule("bilibili.template");
     this.Video = mod.ModuleLoader.getModule("bilibili.video");
+    this.Content = mod.ModuleLoader.getModule("bilibili.content");
     this.dynamicList = [];
     this.hasMore = true;
     this.OFFSET_ID = "";
@@ -242,7 +218,7 @@ class DynamicView {
       $console.info(dynamicItem);
       switch (dynamicItem.type) {
         case "DYNAMIC_TYPE_DRAW":
-          //this.DynamicDetailView.showImageDynamic(dynamicItem);
+          this.Content.getDynamicDetail(dynamicItem.id_str);
           break;
         case "DYNAMIC_TYPE_AV":
           //TODO: new PostDetailView().showVideoDetail(dynamicItem.bvid);

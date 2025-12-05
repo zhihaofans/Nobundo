@@ -253,8 +253,9 @@ class RankingView {
         $ui.error(fail);
       };
   }
-  getPopularList() {
+  getPopularList(senderIndex) {
     $.startLoading();
+    $.startListItemLoading(senderIndex.sender, senderIndex.indexPath);
     this.Core.getPopular(false).then(data => {
       $.stopLoading();
       const rankingList = data.list;
@@ -269,14 +270,18 @@ class RankingView {
           );
         } catch (error) {
           $console.error(error);
+          $ui.error(error.message);
+        } finally {
+          $.stopListItemLoading(senderIndex.sender, senderIndex.indexPath);
         }
       } else {
         $ui.error("热门视频数量为零");
+        $.stopListItemLoading(senderIndex.sender, senderIndex.indexPath);
       }
     }),
       fail => {
         $.stopLoading();
-
+        $.stopListItemLoading(senderIndex.sender, senderIndex.indexPath);
         $ui.error(fail);
       };
   }
@@ -326,8 +331,8 @@ class BiliModule extends ModModule {
   getRankingList(senderIndex) {
     new RankingView(this.Mod).getRankingList(senderIndex);
   }
-  getHomePageList() {
-    new RankingView(this.Mod).getPopularList();
+  getHomePageList(senderIndex) {
+    new RankingView(this.Mod).getPopularList(senderIndex);
   }
 }
 module.exports = BiliModule;
