@@ -9,11 +9,9 @@ class ManagerCore {
   getModList() {
     return this.ModLoader.getModList();
   }
-
   getKeychainList(modId) {
     try {
       const thisMod = this.ModLoader.getMod(modId);
-
       const Keychain = thisMod.Keychain;
       if (thisMod == undefined || Keychain == undefined) {
         $ui.error("undefined");
@@ -27,7 +25,30 @@ class ManagerCore {
             {
               type: "list",
               props: {
-                data: keyList
+                data: keyList,
+                actions: [
+                  {
+                    title: "delete",
+                    color: $color("gray"), // default to gray
+                    handler: (sender, indexPath) => {
+                      $ui.alert({
+                        title: "确定删除吗",
+                        message: keyList[indexPath.row],
+                        actions: [
+                          {
+                            title: "删除",
+                            disabled: false, // Optional
+                            handler: () => {}
+                          },
+                          {
+                            title: "Cancel",
+                            handler: () => {}
+                          }
+                        ]
+                      });
+                    }
+                  }
+                ]
               },
               layout: $layout.fill,
               events: {
