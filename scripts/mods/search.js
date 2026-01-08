@@ -1,64 +1,99 @@
 const { ModCore, ModuleLoader } = require("CoreJS"),
   $ = require("$"),
   { Http, Storage } = require("Next");
-let APP_VERSION = "",
-  APP_NAME = "";
-class HttpExample {
-  constructor() {
-    this.Http = new Http(5);
-    this.HEADER = {
-      "User-Agent": `${APP_NAME}(${APP_VERSION})`,
-      cookie: ""
-    };
+class SearchView {
+  constructor(mod) {
+    this.Mod = mod;
+    this.Api = this.Mod.ModuleLoader.getModule("search.api");
+    this.API_SITE_LIST = this.Api.getApiList();
+    this.SEARCH_SITE_ID = this;
+    this.SEARCH_TYPE_LIST = Object.keys(this.API_SITE_LIST).map(site => {
+      return {
+        id: site,
+        title: this.API_SITE_LIST[site].title
+      };
+    }) || [
+      {
+        id: "douyin",
+        title: "抖音_"
+      }
+    ];
+    this.SEARCH_SITE_ID = this.SEARCH_TYPE_LIST[0].id;
   }
-  async get({ url, params }) {
-    return await this.Http.get({
-      url,
-      params,
-      header: this.HEADER
-    });
-  }
-  getAsync({ url, params, callback }) {
-    this.Http.getAsync({
-      url,
-      params,
-      header: this.HEADER,
-      handler: resp => {
-        $console.info({
-          resp
-        });
-        if (resp.error) {
-          callback(undefined);
-        } else {
-          callback(resp.data);
+  init() {
+    const ViewData = [
+      {
+        type: "menu",
+        props: {
+          id: "menu_type",
+          items: this.SEARCH_TYPE_LIST.map(it => it.title),
+          dynamicWidth: true // dynamic item width, default is false
+        },
+        layout: make => {
+          make.left.top.right.equalTo(0);
+          make.height.equalTo(44);
+        },
+        events: {
+          changed: sender => {
+            const items = sender.items;
+            const index = sender.index;
+            this.SEARCH_SITE_ID = this.SEARCH_TYPE_LIST[index].id.toLowerCase();
+          }
+        }
+      },
+      {
+        type: "input",
+        props: {
+          id: "input_search",
+          type: $kbType.search,
+          darkKeyboard: true
+        },
+        layout: (make, view) => {
+          make.top.equalTo($ui.get("menu_type").bottom).offset(10);
+          make.left.equalTo(10);
+          make.right.equalTo(-10);
+          make.height.equalTo(44);
+        },
+        events: {
+          returned: sender => {
+            const keyword = sender.text;
+            if ($.isEmpty(keyword) == false) {
+              $.startLoading();
+              this.Api.Api.search(this.SEARCH_SITE_ID, keyword).then(
+                su => {
+                  $.stopLoading();
+                },
+                fail => {
+                  $.stopLoading();
+                  $ui.alert({
+                    title: "搜索失败",
+                    message: fail,
+                    actions: [
+                      {
+                        title: "OK",
+                        disabled: false, // Optional
+                        handler: () => {}
+                      }
+                    ]
+                  });
+                }
+              );
+            }
+          }
         }
       }
-    });
-  }
-  async post({ url, params, body }) {
-    return await this.Http.post({
-      url,
-      params,
-      body,
-      header: this.HEADER
-    });
-  }
-  postAsync({ url, params, body, callback }) {
-    this.Http.getAsync({
-      url,
-      params,
-      body,
-      header: this.HEADER,
-      handler: resp => {
-        $console.info({
-          resp
-        });
-        if (resp.error) {
-          callback(undefined);
-        } else {
-          callback(resp.data);
+    ];
+    $.showView({
+      props: {
+        title: "搜索"
+      },
+      views: [
+        {
+          type: "view",
+          layout: $layout.fillSafeArea,
+          views: ViewData
         }
-      }
+      ]
     });
   }
 }
@@ -70,7 +105,7 @@ class Search extends ModCore {
       modName: "搜索",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 13,
+      coreVersion: 18,
       useSqlite: false,
       allowWidget: false,
       allowApi: false,
@@ -78,21 +113,12 @@ class Search extends ModCore {
     });
     this.Storage = Storage;
     this.ModuleLoader = new ModuleLoader(this);
-    this.ModuleLoader.addModule("search.music.js");
+    this.ModuleLoader.addModule("search.api.js");
+    this.View = new SearchView(this);
   }
   run() {
     try {
-      const MusicSearch = this.ModuleLoader.getModule("search.music");
-      $input.text({
-        type: $kbType.text,
-        placeholder: "",
-        text: "",
-        handler: keyword => {
-          if (keyword) {
-            MusicSearch.searchNetease(keyword);
-          }
-        }
-      });
+      this.View.init();
     } catch (error) {
       $console.error(error);
     }
