@@ -33,6 +33,8 @@ class App extends AppKernel {
 
     if ($.isKeyboardEnv()) {
       this.modLoader.runKeyboardMod();
+    } else if ($.isActionEnv()) {
+      this.modLoader.runContext();
     } else {
       this.modLoader.showGridModList();
     }

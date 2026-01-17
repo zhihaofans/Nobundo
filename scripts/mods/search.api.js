@@ -17,6 +17,18 @@ class Api {
         type: "url",
         func: keyword =>
           `bilibili://search/?keyword=${$text.URLEncode(keyword)}`
+      },
+      twitter_x: {
+        title: "X",
+        type: "url",
+        func: keyword =>
+          `https://mobile.x.com/search?q=${$text.URLEncode(keyword)}`
+      },
+      instgram: {
+        title: "Instagram",
+        type: "url",
+        func: keyword =>
+          `https://www.instagram.com/explore/?q=${$text.URLEncode(keyword)}`
       }
     };
   }

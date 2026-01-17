@@ -19,6 +19,7 @@ module.exports = {
     "search.js",
     "tikhub.js",
     "config.js",
-    "bilibili.js"
+    "bilibili.js",
+    "qrcode.js"
   ]
 };
