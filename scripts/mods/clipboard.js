@@ -48,6 +48,7 @@ class ClipboardView {
           const result = this.Core.addItem(text);
           if (result) {
             $ui.success("添加成功");
+            $ui.get("list_item").data = this.Core.getAllItem();
           } else {
             $ui.error("添加失败");
           }
@@ -149,9 +150,9 @@ class Clipboard extends ModCore {
       app,
       modId: "clipboard",
       modName: "剪切板",
-      version: "3",
+      version: "4",
       author: "zhihaofans",
-      coreVersion: 13,
+      coreVersion: 18,
       useSqlite: true,
       allowWidget: true,
       allowApi: true,

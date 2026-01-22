@@ -20,6 +20,34 @@ class SearchView {
     ];
     this.SEARCH_SITE_ID = this.SEARCH_TYPE_LIST[0].id;
   }
+  getHistoryData() {
+    try {
+      const historyData = this.Mod.Keychain.get("search.history.list") || "[]";
+      return JSON.parse(historyData);
+    } catch (error) {
+      $console.error(error);
+      return [];
+    }
+  }
+  setHistoryData(newData) {
+    if ($.isArray(newData)) {
+      return this.Mod.Keychain.set(
+        "search.history.list",
+        JSON.stringify(newData)
+      );
+    } else {
+      return false;
+    }
+  }
+  loadHistory() {
+    const hisExp = ["搜索历史1"],
+      his = Array(10)
+        .fill(0)
+        .flatMap(() => hisExp);
+    $console.info(his);
+    $ui.get("list_history").data = this.getHistoryData() || his;
+    $ui.title = `搜索(历史${$ui.get("list_history").data.length})`;
+  }
   init() {
     const ViewData = [
       {
@@ -46,7 +74,8 @@ class SearchView {
         props: {
           id: "input_search",
           type: $kbType.search,
-          darkKeyboard: true
+          darkKeyboard: true,
+          placeholder: "回车搜索"
         },
         layout: (make, view) => {
           make.top.equalTo($ui.get("menu_type").bottom).offset(10);
@@ -59,6 +88,12 @@ class SearchView {
             const keyword = sender.text;
             if ($.isEmpty(keyword) == false) {
               $.startLoading();
+              const oldHistory = this.getHistoryData();
+              if (!oldHistory.includes(keyword)) {
+                oldHistory.push(keyword);
+                this.setHistoryData(oldHistory);
+                this.loadHistory();
+              }
               this.Api.Api.search(this.SEARCH_SITE_ID, keyword).then(
                 su => {
                   $.stopLoading();
@@ -79,6 +114,24 @@ class SearchView {
                 }
               );
             }
+          }
+        }
+      },
+      {
+        type: "list",
+        props: {
+          id: "list_history",
+          data: ["加载中"]
+        },
+        layout: (make, view) => {
+          $console.info(view);
+          make.top.equalTo($ui.get("input_search").bottom).offset(5);
+          make.left.right.equalTo(0);
+          make.bottom.equalTo(view.super.bottom);
+        },
+        events: {
+          ready: () => {
+            this.loadHistory();
           }
         }
       }
@@ -111,7 +164,6 @@ class Search extends ModCore {
       allowApi: false,
       iconName: "command"
     });
-    this.Storage = Storage;
     this.ModuleLoader = new ModuleLoader(this);
     this.ModuleLoader.addModule("search.api.js");
     this.View = new SearchView(this);

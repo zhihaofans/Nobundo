@@ -28,7 +28,7 @@ class Api {
         title: "Instagram",
         type: "url",
         func: keyword =>
-          `https://www.instagram.com/explore/?q=${$text.URLEncode(keyword)}`
+          `https://www.instagram.com/explore/tags/${$text.URLEncode(keyword)}`
       }
     };
   }
