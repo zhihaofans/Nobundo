@@ -1,6 +1,8 @@
 const { ModCore } = require("CoreJS"),
+  { SQLite } = require("DataKit"),
   next = require("Next"),
   $ = require("$");
+
 class ContentData {
   constructor({ id, timestamp, title, type, tag, data, otherData }) {
     this.id = id;
@@ -15,34 +17,41 @@ class ContentData {
 class Database {
   constructor(mod) {
     this.SQLITE_FILE = `${mod.App.DATA_DIR.LOCAL}${mod.MOD_INFO.AUTHOR}.${mod.MOD_INFO.ID}.db`;
-    this.SQLite = next.Storage.SQLite(this.SQLITE_FILE);
-    this.SQL_TABLE_ID = {
-      CONTENT_LIST: "ContentList"
-    };
+    this.SQL_TABLE_ID = "ContentList";
+    this.SQLite = new SQLite(this.SQLITE_FILE);
+  }
+  init() {
+    try {
+      this.createContentListTable();
+    } catch (error) {
+      $console.error(error);
+    }
   }
   addContentItem({ id, timestamp, title, type, tag, data, otherData }) {
     const sql =
         type == "text" || type == "link"
-          ? `INSERT INTO ${this.SQL_TABLE_ID.CONTENT_LIST} (id, timestamp, title, type, tag, text_data, other_data) values(?, ?, ?, ?, ?, ?, ?)`
-          : `INSERT INTO ${this.SQL_TABLE_ID.CONTENT_LIST} (id, timestamp, title, type, tag, blob_data, other_data) values(?, ?, ?, ?, ?, ?, ?)`,
+          ? `INSERT INTO ${this.SQL_TABLE_ID} (id, timestamp, title, type, tag, text_data, other_data) values(?, ?, ?, ?, ?, ?, ?)`
+          : `INSERT INTO ${this.SQL_TABLE_ID} (id, timestamp, title, type, tag, blob_data, other_data) values(?, ?, ?, ?, ?, ?, ?)`,
       args = [id, timestamp, title, type, tag, data, otherData],
       sqlResult = this.SQLite.update(sql, args);
     return sqlResult;
   }
   createContentListTable() {
-    if (!this.SQLite.hasTable(this.SQL_TABLE_ID.CONTENT_LIST)) {
-      const sql = `CREATE TABLE IF NOT EXISTS ${this.SQL_TABLE_ID.CONTENT_LIST}(id TEXT PRIMARY KEY NOT NULL, timestamp INTEGER NOT NULL,title TEXT NOT NULL,type TEXT NOT NULL,tag TEXT,text_data TEXT,blob_data BLOB,other_data TEXT)`,
-        result = this.SQLite.update(sql);
+    if (!this.SQLite.hasTable(this.SQL_TABLE_ID)) {
+      const sql = `CREATE TABLE IF NOT EXISTS ${this.SQL_TABLE_ID}(id TEXT PRIMARY KEY NOT NULL, timestamp INTEGER NOT NULL,title TEXT NOT NULL,type TEXT NOT NULL,tag TEXT,text_data TEXT,blob_data BLOB,other_data TEXT)`;
+      $console.info(sql);
+      const result = this.SQLite.update(sql);
+
       return result;
     }
     return undefined;
   }
   getContentList() {
-    const queryResult = this.SQLite.queryAll(this.SQL_TABLE_ID.CONTENT_LIST);
+    const queryResult = this.SQLite.queryAll(this.SQL_TABLE_ID);
     return queryResult;
   }
   deleteContent(contentId) {
-    const sql = `DELETE FROM ${this.SQL_TABLE_ID.CONTENT_LIST} WHERE id=?`,
+    const sql = `DELETE FROM ${this.SQL_TABLE_ID} WHERE id=?`,
       args = [contentId],
       sqlResult = this.SQLite.update(sql, args);
     return sqlResult;
@@ -53,7 +62,7 @@ class ContentBoxApi {
   constructor(mod) {
     this.Mod = mod;
     this.DB = new Database(mod);
-    this.DB.createContentListTable();
+    this.DB.init();
     this.LASTEST_SORT = false;
   }
   addContent({ title, data, type = "text", otherData = "{}" }) {
@@ -153,12 +162,10 @@ class ContentBoxApi {
 
 class ContentBoxView {
   constructor(mod) {
-    this.Mod = mod;
-    this.$ = mod.$;
-    this.Api = new ContentBoxApi(this.Mod);
+    this.Api = new ContentBoxApi(mod);
     this.ListView = new next.ListView();
   }
-  async init() {
+  init() {
     this.Api.setLatestSortMode(true);
     //    const menuResult = await $ui.menu(["添加", "查看"]);
     //    switch (menuResult.index) {
@@ -198,7 +205,7 @@ class ContentBoxView {
   }
   askToImportClipboard() {
     const clipText = $clipboard.text;
-    if (this.$.hasString(clipText)) {
+    if ($.hasString(clipText)) {
       $ui.alert({
         title: "是否导入剪贴板内容",
         message: clipText,
@@ -430,16 +437,17 @@ class ContentBox extends ModCore {
       app,
       modId: "content_box",
       modName: "内容盒子",
-      version: "2",
+      version: "3",
       author: "zhihaofans",
+      iconName: "doc.richtext",
       allowApi: true,
-      coreVersion: 9
+      coreVersion: 18
     });
-    this.Storage = next.Storage;
+    this.View = new ContentBoxView(this);
   }
   run() {
     try {
-      new ContentBoxView(this).init();
+      this.View.init();
     } catch (error) {
       $console.error(error);
       $ui.alert({
