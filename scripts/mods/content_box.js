@@ -66,61 +66,67 @@ class ContentBoxApi {
     this.LASTEST_SORT = false;
   }
   addContent({ title, data, type = "text", otherData = "{}" }) {
-    const timestamp = $.dateTime.getUnixTime(),
-      id = `${$text.uuid}-${timestamp}`,
-      tag = "[]",
-      sqlResult = this.DB.addContentItem({
-        id,
-        timestamp,
-        title,
-        type,
-        tag,
-        data,
-        otherData
-      });
-    if (sqlResult.result == true && sqlResult.error == undefined) {
-      $ui.success("添加成功");
-    } else {
-      $console.error(sqlResult.error);
+    return new Promise((resolve, reject) => {
+      const timestamp = $.dateTime.getUnixTime(),
+        id = `${$text.uuid}-${timestamp}`,
+        tag = "[]",
+        sqlResult = this.DB.addContentItem({
+          id,
+          timestamp,
+          title,
+          type,
+          tag,
+          data,
+          otherData
+        });
+      if (sqlResult.result == true && sqlResult.error == undefined) {
+        $ui.success("添加成功");
+        resolve();
+      } else {
+        $console.error(sqlResult.error);
+        $ui.alert({
+          title: "SQLITE.ERROR",
+          message: "",
+          actions: [
+            {
+              title: "OK",
+              disabled: false, // Optional
+              handler: () => {}
+            }
+          ]
+        });
+      }
+    });
+  }
+  addLinkContent({ title, link, link_type }) {}
+  deleteContent(contentItem) {
+    return new Promise((resolve, reject) => {
       $ui.alert({
-        title: "SQLITE.ERROR",
-        message: "",
+        title: "确定删除吗？",
+        message: `《${contentItem.title}》`,
         actions: [
           {
             title: "OK",
+            disabled: false, // Optional
+            handler: () => {
+              const deleteResult = this.DB.deleteContent(contentItem.id);
+              if (deleteResult.result) {
+                $console.info(deleteResult);
+                $ui.success("删除成功");
+                resolve();
+              } else {
+                $console.error(deleteResult.error);
+                $ui.error("删除失败");
+              }
+            }
+          },
+          {
+            title: "NO",
             disabled: false, // Optional
             handler: () => {}
           }
         ]
       });
-    }
-  }
-  addLinkContent({ title, link, link_type }) {}
-  deleteContent(contentItem) {
-    $ui.alert({
-      title: "确定删除吗？",
-      message: `《${contentItem.title}》`,
-      actions: [
-        {
-          title: "OK",
-          disabled: false, // Optional
-          handler: () => {
-            const deleteResult = this.DB.deleteContent(contentItem.id);
-            if (deleteResult.result) {
-              $console.info(deleteResult);
-              $ui.success("删除成功");
-            } else {
-              $console.error(deleteResult.error);
-              $ui.error("删除失败");
-            }
-          }
-        },
-        {
-          title: "NO",
-          disabled: false, // Optional
-          handler: () => {}
-        }
-      ]
     });
   }
   getContent(id) {}
@@ -164,6 +170,7 @@ class ContentBoxView {
   constructor(mod) {
     this.Api = new ContentBoxApi(mod);
     this.ListView = new next.ListView();
+    this.contentListData = [];
   }
   init() {
     this.Api.setLatestSortMode(true);
@@ -195,6 +202,8 @@ class ContentBoxView {
                 this.Api.addContent({
                   title,
                   data: textData
+                }).then(() => {
+                  this.loadData();
                 });
               }
             }
@@ -223,6 +232,8 @@ class ContentBoxView {
                     this.Api.addContent({
                       title,
                       data: clipText
+                    }).then(() => {
+                      this.loadData();
                     });
                   }
                 }
@@ -258,6 +269,8 @@ class ContentBoxView {
                 title: text.length > 0 ? text : filename,
                 data,
                 type: "image"
+              }).then(() => {
+                this.loadData();
               });
             }
           });
@@ -280,7 +293,39 @@ class ContentBoxView {
       $ui.error("空白内容");
     }
   }
-  showContentListView(contentListData) {
+  loadData() {
+    const contentListResult = this.Api.getContentList();
+    if (contentListResult.success) {
+      $console.info(contentListResult);
+      this.contentListData = contentListResult.result;
+      $ui.get("listview_contentlist").data = this.contentListData.map(
+        contentItem => {
+          const dateTime = new next.DateTime(),
+            contentType = contentItem.type,
+            dataShowStrList = {
+              image: "[图片]",
+              text: contentItem.data
+            },
+            dataShowStr = dataShowStrList[contentType] || "未知内容";
+          dateTime.setDateTime(contentItem.timestamp);
+          return {
+            labelTitle: {
+              text: contentItem.title
+            },
+
+            labelData: {
+              text: `${dateTime.getShortDateStr()}  ${dataShowStr}`
+            }
+          };
+        }
+      );
+    } else {
+      $ui.error("空白内容");
+      this.contentListData = [];
+    }
+    $console.warn($ui.get("listview_contentlist").data.length);
+  }
+  showContentListView() {
     const navButtons = [
       {
         title: "新增",
@@ -309,7 +354,6 @@ class ContentBoxView {
     ];
     $ui.push({
       props: {
-        id: "listview_contentlist",
         title: this.Api.LASTEST_SORT ? "新▶旧" : "旧▶新",
         navButtons
       },
@@ -317,6 +361,7 @@ class ContentBoxView {
         {
           type: "list",
           props: {
+            id: "listview_contentlist",
             autoRowHeight: true,
             estimatedRowHeight: 20,
             template: {
@@ -367,31 +412,17 @@ class ContentBoxView {
                 }
               ]
             },
-            data: contentListData.map(contentItem => {
-              const dateTime = new next.DateTime(),
-                contentType = contentItem.type,
-                dataShowStrList = {
-                  image: "[图片]",
-                  text: contentItem.data
-                },
-                dataShowStr = dataShowStrList[contentType] || "未知内容";
-              dateTime.setDateTime(contentItem.timestamp);
-              return {
-                labelTitle: {
-                  text: contentItem.title
-                },
-
-                labelData: {
-                  text: `${dateTime.getShortDateStr()}  ${dataShowStr}`
-                }
-              };
-            })
+            data: []
           },
           layout: $layout.fill,
           events: {
+            ready: () => {
+              $console.info("ready");
+              this.loadData();
+            },
             didSelect: (sender, indexPath, data) => {
               const row = indexPath.row,
-                selectedContent = contentListData[row],
+                selectedContent = this.contentListData[row],
                 actions = [
                   {
                     title: "OK",
@@ -402,7 +433,9 @@ class ContentBoxView {
                     title: "删除",
                     disabled: false, // Optional
                     handler: () => {
-                      this.Api.deleteContent(selectedContent);
+                      this.Api.deleteContent(selectedContent).then(() => {
+                        this.loadData();
+                      });
                     }
                   }
                 ];
