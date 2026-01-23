@@ -88,6 +88,7 @@ class SearchView {
             const keyword = sender.text;
             if ($.isEmpty(keyword) == false) {
               $.startLoading();
+              $ui.get("input_search").text = "";
               const oldHistory = this.getHistoryData();
               if (!oldHistory.includes(keyword)) {
                 oldHistory.push(keyword);
@@ -121,6 +122,7 @@ class SearchView {
         type: "list",
         props: {
           id: "list_history",
+
           data: ["加载中"]
         },
         layout: (make, view) => {
@@ -132,13 +134,60 @@ class SearchView {
         events: {
           ready: () => {
             this.loadHistory();
+          },
+          didSelect: (sender, indexPath, data) => {
+            if (!$.isEmpty(data)) {
+              $ui.get("input_search").text = data;
+            }
           }
         }
       }
     ];
     $.showView({
       props: {
-        title: "搜索"
+        title: "搜索",
+        navButtons: [
+          {
+            title: "Title",
+            //image, // Optional
+
+            symbol: "trash", // SF symbols are supported
+            handler: sender => {
+              $ui.alert({
+                title: "确定删除吗？",
+                message: `共${$ui.get("list_history").data.length}个历史`,
+                actions: [
+                  {
+                    title: "OK",
+                    disabled: false, // Optional
+                    handler: () => {
+                      const remove = this.Mod.Keychain.remove(
+                        "search.history.list"
+                      );
+                      $console.info({
+                        remove
+                      });
+                      this.loadHistory();
+                    }
+                  },
+                  {
+                    title: "Cancel",
+                    handler: () => {}
+                  }
+                ]
+              });
+            },
+            menu: {
+              title: "Context Menu",
+              items: [
+                {
+                  title: "Title",
+                  handler: sender => {}
+                }
+              ]
+            } // Pull-Down menu
+          }
+        ]
       },
       views: [
         {

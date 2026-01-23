@@ -19,7 +19,7 @@ class Api {
           `bilibili://search/?keyword=${$text.URLEncode(keyword)}`
       },
       twitter_x: {
-        title: "X",
+        title: "Χ",
         type: "url",
         func: keyword =>
           `https://mobile.x.com/search?q=${$text.URLEncode(keyword)}`
@@ -29,6 +29,12 @@ class Api {
         type: "url",
         func: keyword =>
           `https://www.instagram.com/explore/tags/${$text.URLEncode(keyword)}`
+      },
+      instgram: {
+        title: "📕",
+        type: "url",
+        func: keyword =>
+          `xhsdiscover://search/result?keyword=${$text.URLEncode(keyword)}`
       }
     };
   }
