@@ -12,7 +12,8 @@ const moduleList = [
   "bilibili.video.js",
   "bilibili.history.js",
   "bilibili.ranking.js",
-  "bilibili.content.js"
+  "bilibili.content.js",
+  "bilibili.download.js"
 ];
 class SenderIndex {
   constructor(sender, indexPath) {
@@ -260,16 +261,17 @@ class Bilibili extends ModCore {
   }
   run() {
     try {
-      const login = this.ModuleLoader.getModule("bilibili.login");
-      login.checkLogin().then(
-        su => {
-          // 已登录
-          new MainView(this).init();
-        },
-        fail => {
-          $ui.error("登录失败或取消登录");
-        }
-      );
+      this.ModuleLoader.getModule("bilibili.login")
+        .checkLogin()
+        .then(
+          su => {
+            // 已登录
+            new MainView(this).init();
+          },
+          fail => {
+            $ui.error("登录失败或取消登录");
+          }
+        );
     } catch (error) {
       $console.error(error);
     }

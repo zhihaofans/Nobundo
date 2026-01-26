@@ -102,7 +102,7 @@ class ContentBoxApi {
   deleteContent(contentItem) {
     return new Promise((resolve, reject) => {
       $ui.alert({
-        title: "确定删除吗？",
+        title: `确定删除${contentItem.type}吗？`,
         message: `《${contentItem.title}》`,
         actions: [
           {

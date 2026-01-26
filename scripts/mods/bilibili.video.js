@@ -42,6 +42,7 @@ class VideoView {
     this.Core = new VideoCore(mod);
     this.Template = mod.ModuleLoader.getModule("bilibili.template");
     this.History = mod.ModuleLoader.getModule("bilibili.history");
+    this.Download = mod.ModuleLoader.getModule("bilibili.download");
   }
   showVideoInfo(videoId) {
     if ($.hasString(videoId)) {
@@ -108,7 +109,7 @@ class VideoView {
                   make.centerX.equalTo(view.super);
                 },
                 tapped: () => {
-                  //this.Downloader.startDownload(videoInfo);
+                  this.Download.getVideoInfo(videoInfo);
                 }
               }),
               this.Template.buttonTemplate({
