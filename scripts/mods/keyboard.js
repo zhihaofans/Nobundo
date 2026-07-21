@@ -400,10 +400,8 @@ class KeyBoard extends ModCore {
       author: "zhihaofans",
       allowKeyboard: true,
       iconName: "keyboard",
-      coreVersion: 9
+      coreVersion: 19
     });
-    this.Http = $.http;
-    this.Storage = Next.Storage;
     this.Core = new KeyBoardCore(this);
   }
   run() {

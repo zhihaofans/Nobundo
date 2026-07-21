@@ -54,11 +54,21 @@ class ManagerCore {
               events: {
                 didSelect: (a, b, key) => {
                   const value = Keychain.get(key);
-                  if ($.hasString(value)) {
-                    $.inputText(value);
-                  } else {
-                    $ui.error("空白值或读取失败");
+                  let desc = "";
+                  if (!$.hasString(value)) {
+                    desc = "空白值或读取失败";
                   }
+                  $.inputText(value, desc).then(text => {
+                    if (text != value) {
+                      const su = Keychain.set(key, text);
+                      $console.info({
+                        su,
+                        key,
+                        old: value,
+                        new: text
+                      });
+                    }
+                  });
                 }
               }
             }

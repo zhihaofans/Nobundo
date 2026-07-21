@@ -1,31 +1,8 @@
 const { ModCore } = require("CoreJS"),
   Next = require("Next"),
-  Storage = Next.Storage,
+  { KeychainKit, SQLite } = require("DataKit"),
   $ = require("$");
-class KeychainCore {
-  constructor(domain) {
-    this.DOMAIN = domain;
-  }
-  getAllValue() {
-    const result = {},
-      keys = this.getKeyList();
-    keys.map(k => (result[k] = this.get(k)));
-    return result;
-  }
-  getKeyList() {
-    return $keychain.keys(this.DOMAIN);
-  }
 
-  get(key) {
-    return $keychain.get(key, this.DOMAIN);
-  }
-  remove(key) {
-    return $keychain.remove(key, this.DOMAIN);
-  }
-  set(key, value) {
-    return $keychain.set(key, value, this.DOMAIN);
-  }
-}
 class KeychainView {
   constructor(mod) {
     this.Keychain = mod.Keychain;
@@ -33,13 +10,13 @@ class KeychainView {
   init() {
     $input.text({
       type: $kbType.text,
-      placeholder: "域名",
+      placeholder: "{app.id}.mods.{author}.{modId}",
       text: this.Keychain.get("lastdomain"),
       handler: domain => {
         if (domain != undefined && domain.length > 0) {
           this.Keychain.set("lastdomain", domain);
 
-          const keychainCore = new KeychainCore(domain),
+          const keychainCore = new KeychainKit(domain),
             keys = keychainCore.getKeyList();
           $console.info(keys);
           $ui.push({
@@ -227,10 +204,17 @@ class SQLiteView {
       handler: path => {
         if (path.length > 0) {
           try {
-            const sqliteCore = new SQLiteCore(
-              new this.Mod.Storage.SQLite(path)
-            );
-            this.initView(sqliteCore);
+            const sqliteCore = new SQLite(path);
+            $input.text({
+              type: $kbType.text,
+              placeholder: "table id",
+              text: "",
+              handler: tableId => {
+                if (tableId.length > 0) {
+                  this.initTableView(sqliteCore, tableId);
+                }
+              }
+            });
           } catch (error) {
             $console.error(error);
           }
@@ -240,18 +224,7 @@ class SQLiteView {
       }
     });
   }
-  initView(sqliteCore) {
-    $input.text({
-      type: $kbType.text,
-      placeholder: "table id",
-      text: "bilibili",
-      handler: tableId => {
-        if (tableId.length > 0) {
-          this.initTableView(sqliteCore, tableId);
-        }
-      }
-    });
-  }
+
   queryAll(sqliteCore, tableId) {
     const queryResult = sqliteCore.queryAll(tableId);
     if (queryResult != undefined) {
@@ -405,7 +378,6 @@ class DataCenter extends ModCore {
       author: "zhihaofans",
       coreVersion: 13
     });
-    this.Storage = Next.Storage;
   }
   run() {
     const helperView = new HelperView(this);
