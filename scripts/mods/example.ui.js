@@ -150,10 +150,8 @@ class ExampleModule extends ModModule {
       id: "example.ui",
       name: "例子ui",
       version: "1b"
-      //author: "zhihaofans"
     });
-    //this.Mod = mod;
-    $console.info(this.Mod);
+    this.ModuleLoader = mod.ModuleLoader;
   }
   initUi() {
     //$ui.success("run");
