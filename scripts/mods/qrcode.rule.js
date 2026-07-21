@@ -2,7 +2,8 @@ const { ModModule } = require("CoreJS"),
   $ = require("$");
 
 const RULE_TYPE = {
-    link: "rule_link"
+    link: "rule_link",
+    regex: "rule_regex"
   },
   RULE_LIST = {
     douyin: {
@@ -16,6 +17,12 @@ const RULE_TYPE = {
       func: url => {
         $app.openURL(url);
       }
+    },
+    rednote: {
+      type: RULE_TYPE.regex,
+      title: "小红书解析",
+      regex_list: [],
+      func: url => {}
     }
   };
 class RuleParse {
@@ -26,6 +33,7 @@ class RuleParse {
         id: id,
         type: re.type,
         title: re.title,
+        regex: re.regex,
         func: re.func
       };
     });
