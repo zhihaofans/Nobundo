@@ -30,11 +30,21 @@ class Api {
         func: keyword =>
           `https://www.instagram.com/explore/tags/${$text.URLEncode(keyword)}`
       },
-      instgram: {
+      rednote: {
         title: "📕",
         type: "url",
         func: keyword =>
           `xhsdiscover://search/result?keyword=${$text.URLEncode(keyword)}`
+      },
+      weibo: {
+        title: "微博",
+        type: "url",
+        func: keyword => `sinaweibo://searchall?q=${$text.URLEncode(keyword)}`
+      },
+      zhihu: {
+        title: "知乎",
+        type: "url",
+        func: keyword => `zhihu://search?keyword=${$text.URLEncode(keyword)}`
       }
     };
   }
