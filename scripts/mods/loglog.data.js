@@ -28,7 +28,7 @@ class LogItem {
     this.id = item.id || $text.uuid;
     this.title = item.title || "";
     this.desc = item.desc || "";
-    this.type = item.type; //LogItemType
+    this.type = item.type||LogItemType.TEXT; //LogItemType
     this.group_id = item.group_id;
     this.create_time = item.create_time || $.getUnixTime();
     this.update_time = item.update_time || this.create_time;
@@ -81,6 +81,15 @@ class DataCore {
       }
     });
   }
+  saveLogData(data) {
+    const success = $file.write({
+      data: $data({
+        string: JSON.stringify(data),
+        encoding: 4
+      }),
+      path: this.DATA_FILE_PATH.LOGS_DATA
+    });
+  }
 }
 
 class ExampleModule extends ModModule {
@@ -92,10 +101,14 @@ class ExampleModule extends ModModule {
       version: "1"
     });
     this.Core = new DataCore(mod);
+    
   }
   init() {
     //$ui.success("run");
     this.Core.init();
+  }
+  getNewItem(data){
+    return new LogItem(data)
   }
 }
 module.exports = ExampleModule;
