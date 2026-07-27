@@ -16,7 +16,9 @@ module.exports = {
     "config.js",
     "qrcode.js",
     "webparse.js",
-    "relata_vault.js",
-    "webclip.js"
+    "social.js",
+    "webclip.js",
+    "v2ex.js",
+    "loglog.js"
   ]
 };
