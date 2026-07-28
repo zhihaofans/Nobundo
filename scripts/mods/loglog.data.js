@@ -110,5 +110,9 @@ class ExampleModule extends ModModule {
   getNewItem(data){
     return new LogItem(data)
   }
+  
+  getItemType(){
+    return LogItemType
+  }
 }
 module.exports = ExampleModule;

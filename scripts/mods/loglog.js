@@ -1,41 +1,69 @@
 const { ModCore, ModuleLoader } = require("CoreJS");
 const $ = require("$");
 class EditView {
-  constructor(create_mode) {
+  constructor(data, create_mode) {
+    this.Data = data;
     this.create_mode = create_mode == true;
     this.Item;
+    this.DataList;
+    this.DataType = {
+      STRING: "string",
+      MENU: "menu"
+    };
   }
   loadListData() {
-    const data = [
+    this.DataList = [
       {
+        id: "uuid",
         title: "UUID",
-        rows: [this.Item.id]
+        type: this.DataType.STRING,
+        value: this.Item.id
       },
       {
+        id: "title",
         title: "标题",
-        rows: [this.Item.title]
+        type: this.DataType.STRING,
+        value: this.Item.title
       },
       {
+        id: "desc",
         title: "备注",
-        rows: [this.Item.desc]
+        type: this.DataType.STRING,
+        value: this.Item.desc
       },
       {
+        id: "type",
         title: "类型",
-        rows: [this.Item.type]
+        type: this.DataType.MENU,
+        value: this.Item.type,
+        menu: this.Data.getItemType()
       },
       {
+        id: "group_id",
         title: "分组id",
-        rows: [this.Item.group_id]
+        type: this.DataType.STRING,
+        value: this.Item.group_id
       },
       {
+        id: "create_time",
         title: "创建时间",
-        rows: [this.Item.create_time.toString()]
+        type: this.DataType.STRING,
+        value: this.Item.create_time.toString()
       },
       {
+        id: "update_time",
         title: "最后更新",
-        rows: [this.Item.update_time.toString()]
+        type: this.DataType.STRING,
+        value: this.Item.update_time.toString()
       }
     ];
+    const data = this.DataList.map(it => {
+      return {
+        title: it.title,
+        rows: [it.value]
+      };
+    });
+
     $ui.get("list_edit").data = data;
   }
   editStrItem(name, value) {
@@ -52,6 +80,7 @@ class EditView {
   }
   showEditView(data) {
     this.Item = data;
+    const ItemType = this.Data.getItemType();
     return new Promise((resolve, reject) => {
       $ui.push({
         props: {
@@ -74,6 +103,7 @@ class EditView {
             type: "list",
             props: {
               id: "list_edit",
+              lines: 3,
               data: []
             },
             layout: $layout.fill,
@@ -83,17 +113,66 @@ class EditView {
               },
               didSelect: (sender, indexPath, data) => {
                 const { section, row } = indexPath;
-                switch (section) {
-                  case 1:
+
+                const dataItem = this.DataList[section];
+                $console.info({
+                  idx: section,
+                  data: dataItem
+                });
+                switch (dataItem.id) {
+                  case "title":
                     this.editStrItem("标题", this.Item.title).then(newValue => {
                       this.Item.title = newValue;
                       this.loadListData();
                     });
                     break;
-                  case 2:
+                  case "desc":
                     this.editStrItem("备注", this.Item.desc).then(newValue => {
                       this.Item.desc = newValue;
                       this.loadListData();
+                    });
+                    break;
+                  case "type":
+                    $ui.menu({
+                      items: Object.keys(ItemType),
+                      handler: (title, idx) => {
+                        this.Item.type = ItemType[title];
+                        this.loadListData();
+                      }
+                    });
+                    break;
+                  case "create_time":
+                    $ui.alert({
+                      title: "create_time",
+                      message: $.timestampToTimeStr(this.Item.create_time),
+                      actions: [
+                        {
+                          title: "OK",
+                          disabled: false, // Optional
+                          handler: () => {}
+                        },
+                        {
+                          title: "Cancel",
+                          handler: () => {}
+                        }
+                      ]
+                    });
+                    break;
+                  case "update_time":
+                    $ui.alert({
+                      title: "update_time",
+                      message: $.timestampToTimeStr(this.Item.update_time),
+                      actions: [
+                        {
+                          title: "OK",
+                          disabled: false, // Optional
+                          handler: () => {}
+                        },
+                        {
+                          title: "Cancel",
+                          handler: () => {}
+                        }
+                      ]
                     });
                     break;
                   default:
@@ -122,7 +201,7 @@ class LogLogView {
       desc: "暂时只支持文本类型",
       group_id: "default_group"
     });
-    new EditView(true).showEditView(item).then(data => {
+    new EditView(this.Data, true).showEditView(item).then(data => {
       this.logs.push(data);
       this.Data.Core.saveLogData(this.logs);
       this.loadListData();
@@ -164,11 +243,13 @@ class LogLogView {
           events: {
             didSelect: (sender, indexPath, data) => {
               const { section, row } = indexPath;
-              new EditView().showEditView(this.logs[row]).then(newItem => {
-                this.logs[row] = newItem;
-                this.Data.Core.saveLogData(this.logs);
-                this.loadListData();
-              });
+              new EditView(this.Data)
+                .showEditView(this.logs[row])
+                .then(newItem => {
+                  this.logs[row] = newItem;
+                  this.Data.Core.saveLogData(this.logs);
+                  this.loadListData();
+                });
             },
             ready: sender => {
               this.loadListData();
