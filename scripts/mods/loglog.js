@@ -8,7 +8,8 @@ class EditView {
     this.DataList;
     this.DataType = {
       STRING: "string",
-      MENU: "menu"
+      MENU: "menu",
+      BOOLEAN: "boolean"
     };
   }
   loadListData() {
@@ -57,10 +58,24 @@ class EditView {
         value: this.Item.update_time.toString()
       }
     ];
+    switch (this.Item.type) {
+      case this.Data.getItemType().TEXT:
+        this.Item.json_str = "{}";
+        break;
+      case this.Data.getItemType().CHECK:
+        this.DataList.push({
+          id: "is_check",
+          title: "已完成",
+          type: this.DataType.BOOLEAN,
+          value: this.Item.getJsonItem("is_check", false) ? "✅" : "❌"
+        });
+        break;
+    }
+
     const data = this.DataList.map(it => {
       return {
         title: it.title,
-        rows: [it.value]
+        rows: [it.value.toString()]
       };
     });
 
@@ -175,6 +190,12 @@ class EditView {
                       ]
                     });
                     break;
+                  case "is_check":
+                    const isCheck = this.Item.getJsonItem("is_check");
+                    this.Item.saveJsonItem("is_check", !isCheck);
+                    this.loadListData();
+
+                    break;
                   default:
                 }
               }
@@ -198,7 +219,7 @@ class LogLogView {
   createNewItem() {
     const item = this.Data.getNewItem({
       title: "新建文本",
-      desc: "暂时只支持文本类型",
+      desc: "暂时只支持文本、是否类型",
       group_id: "default_group"
     });
     new EditView(this.Data, true).showEditView(item).then(data => {

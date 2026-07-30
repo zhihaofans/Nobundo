@@ -28,11 +28,29 @@ class LogItem {
     this.id = item.id || $text.uuid;
     this.title = item.title || "";
     this.desc = item.desc || "";
-    this.type = item.type||LogItemType.TEXT; //LogItemType
+    this.type = item.type || LogItemType.TEXT; //LogItemType
     this.group_id = item.group_id;
     this.create_time = item.create_time || $.getUnixTime();
     this.update_time = item.update_time || this.create_time;
-    this.json_str = item.json_str || "[]";
+    this.json_str = item.json_str || "{}";
+  }
+  getJsonData() {
+    try {
+      return JSON.parse(this.json_str);
+    } catch (error) {
+      $console.error(error);
+      return {};
+    }
+  }
+  getJsonItem(key, defaultValue) {
+    const value = this.getJsonData()[key] || defaultValue;
+    this.saveJsonItem(key, value);
+    return value;
+  }
+  saveJsonItem(key, value) {
+    let data = this.getJsonData();
+    data[key] = value;
+    this.json_str = JSON.stringify(data);
   }
 }
 class DataCore {
@@ -69,7 +87,7 @@ class DataCore {
           text = file.toString(4),
           logs = JSON.parse(text);
         if ($.hasArray(logs)) {
-          resolve(logs);
+          resolve(logs.map(log => new LogItem(log)));
         } else {
           reject("不是有效记一下数据格式");
         }
@@ -101,18 +119,17 @@ class ExampleModule extends ModModule {
       version: "1"
     });
     this.Core = new DataCore(mod);
-    
   }
   init() {
     //$ui.success("run");
     this.Core.init();
   }
-  getNewItem(data){
-    return new LogItem(data)
+  getNewItem(data) {
+    return new LogItem(data);
   }
-  
-  getItemType(){
-    return LogItemType
+
+  getItemType() {
+    return LogItemType;
   }
 }
 module.exports = ExampleModule;
