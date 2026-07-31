@@ -1,12 +1,10 @@
-const { AppKernel, ModLoader } = require("CoreJS"),
+const { AppKernel } = require("CoreJS"),
   $ = require("$"),
-  modsConfig = require("./mods.js"),
-  coreModList = modsConfig["mods"];
+  modsConfig = require("./mods.js");
 $console.info(modsConfig);
 class App extends AppKernel {
-  constructor({ appId, modDir, l10nPath }) {
-    super({ appId, modDir, l10nPath });
-    this.modLoader = new ModLoader({ modDir, app: this });
+  constructor({ appId, modDir, modList, l10nPath }) {
+    super({ appId, modDir, l10nPath, modList });
   }
   init() {
     $.startLoading();
@@ -20,11 +18,10 @@ class App extends AppKernel {
     }
   }
   initModList() {
-    this.modLoader.addModsByList(coreModList);
-    this.modLoader.setKeyboardMod("keyboard");
-    this.modLoader.setWidgetMod("example");
-    this.modLoader.setContextMod("action_extension");
-    this.modLoader.WidgetLoader.registerWidget({
+    this.ModLoader.setKeyboardMod("keyboard");
+    this.ModLoader.setWidgetMod("example");
+    this.ModLoader.setContextMod("action_extension");
+    this.ModLoader.WidgetLoader.registerWidget({
       id: "example",
       modId: "example",
       title: "例子",
@@ -32,11 +29,11 @@ class App extends AppKernel {
     });
 
     if ($.isKeyboardEnv()) {
-      this.modLoader.runKeyboardMod();
+      this.ModLoader.runKeyboardMod();
     } else if ($.isActionEnv()) {
-      this.modLoader.runContext();
+      this.ModLoader.runContext();
     } else {
-      this.modLoader.showGridModList();
+      this.ModLoader.showGridModList();
     }
   }
 }
@@ -45,6 +42,7 @@ function run() {
     const app = new App({
       appId: "zhihaofans.nobundo",
       modDir: modsConfig.modDir,
+      modList: modsConfig.mods,
       l10nPath: "/strings/l10n.js"
     });
     app.init();
