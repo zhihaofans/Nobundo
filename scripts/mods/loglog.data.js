@@ -55,9 +55,15 @@ class LogItem {
 }
 class DataCore {
   constructor(mod) {
-    this.DATA_DIR = mod.App.DATA_DIR.ICLOUD + "/loglog/";
+    this.LOGS_DATA_TYPE = mod.Config.getConfigItem("logs_dir");
+    $console.error({
+      LOGS_DATA_TYPE: this.LOGS_DATA_TYPE
+    });
+    this.DATA_DIR =
+      (this.LOGS_DATA_TYPE == 1
+        ? mod.App.DATA_DIR.ICLOUD
+        : mod.App.DATA_DIR.SHARED) + "loglog/";
     this.DATA_FILE_PATH = {
-      CONFIG: this.DATA_DIR + "config.json",
       LOGS_DATA: this.DATA_DIR + "logs.json"
     };
   }
@@ -74,7 +80,6 @@ class DataCore {
         group_id: "default_group"
       })
     ];
-    wirteIfNoExist(this.DATA_FILE_PATH.CONFIG, "{}");
     wirteIfNoExist(
       this.DATA_FILE_PATH.LOGS_DATA,
       JSON.stringify(defaultLogItemList)
@@ -83,13 +88,18 @@ class DataCore {
   loadData() {
     return new Promise((resolve, reject) => {
       try {
-        const file = $file.read(this.DATA_FILE_PATH.LOGS_DATA),
-          text = file.toString(4),
-          logs = JSON.parse(text);
-        if ($.hasArray(logs)) {
-          resolve(logs.map(log => new LogItem(log)));
+        const file = $file.read(this.DATA_FILE_PATH.LOGS_DATA);
+
+        if (file == undefined) {
+          reject("iCloud网络异常或文件格式错误");
         } else {
-          reject("不是有效记一下数据格式");
+          const text = file.toString(4),
+            logs = JSON.parse(text);
+          if ($.hasArray(logs)) {
+            resolve(logs.map(log => new LogItem(log)));
+          } else {
+            reject("不是有效记一下数据格式");
+          }
         }
       } catch (error) {
         $console.error(error);
@@ -107,6 +117,7 @@ class DataCore {
       }),
       path: this.DATA_FILE_PATH.LOGS_DATA
     });
+    return success;
   }
 }
 
@@ -118,10 +129,10 @@ class ExampleModule extends ModModule {
       name: "记一下数据核心",
       version: "1"
     });
-    this.Core = new DataCore(mod);
   }
   init() {
     //$ui.success("run");
+    this.Core = new DataCore(this.Mod);
     this.Core.init();
   }
   getNewItem(data) {

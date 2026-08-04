@@ -272,6 +272,32 @@ class LogLogView {
                   this.loadListData();
                 });
             },
+            didLongPress: (sender, indexPath, data) => {
+              const item = this.logs[indexPath.row];
+              $ui.menu({
+                items: [`复制[${item.title}]`],
+                handler: (title, idx) => {
+                  switch (idx) {
+                    case 0:
+                      const item = this.Data.getNewItem({
+                        title: item.title,
+                        desc: item.desc,
+                        group_id: item.group_id,
+                        type: item.type
+                      });
+                      new EditView(this.Data, true)
+                        .showEditView(item)
+                        .then(data => {
+                          this.logs.push(data);
+                          this.Data.Core.saveLogData(this.logs);
+                          this.loadListData();
+                        });
+                      break;
+                    default:
+                  }
+                }
+              });
+            },
             ready: sender => {
               this.loadListData();
             }
@@ -300,11 +326,7 @@ class LogLogView {
             {
               title: "OK",
               disabled: false, // Optional
-              handler: () => {}
-            },
-            {
-              title: "Cancel",
-              handler: () => {}
+              handler: () => $ui.pop()
             }
           ]
         });
@@ -319,11 +341,24 @@ class Example extends ModCore {
       modName: "记一下",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 20,
+      coreVersion: 21,
       useSqlite: false,
       allowWidget: false,
       allowApi: false,
-      iconName: "pencil"
+      iconName: "pencil",
+      allowConfig: true,
+      configData: [
+        {
+          id: "logs_dir",
+          title: "记录数据目录",
+          placeholder: "没有输入时显示的提示",
+          type: "list",
+          insetGrouped: false,
+          inline: false, // 文本框是否行内编辑
+          items: ["本地", "iCloud(需要网络权限)"],
+          value: 0
+        }
+      ]
     });
     this.ModuleLoader = new ModuleLoader(this);
     this.ModuleLoader.addModule("loglog.data.js");
