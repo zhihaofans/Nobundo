@@ -51,19 +51,23 @@ class ParseView {
 }
 class MainView {
   constructor(mod) {
+    this.Mod = mod;
     this.Rules = mod.ModuleLoader.getModule("qrcode.rule");
     this.ParseView = new ParseView(mod);
     this.QRCODE_TEXT =
-      $prefs.get("history.qrcodetext") ||
+      this.Mod.Config.getConfigItem("history.qrcodetext") ||
       "https://images.apple.com/v/ios/what-is/b/images/performance_large.jpg";
   }
   scanQrcode() {
-    const autoParse = $prefs.get("qrcode.scan.auto_parse") || false;
+    const autoParse = this.Mod.Config.getConfigItem("qrcode.scan.auto_parse");
+    $console.info({
+      autoParse
+    });
     $qrcode.scan(text => {
       $console.info(text);
       if ($.hasString(text)) {
         this.setQrcode(text);
-        if (autoParse) {
+        if (autoParse == true) {
           $ui.success("扫描成功");
           this.ParseView.init(text, true);
         } else {
@@ -81,14 +85,15 @@ class MainView {
   }
   setQrcode(text) {
     if ($.hasString(text)) {
-      $prefs.set("history.qrcodetext", text);
+      this.Mod.Config.setConfigItem("history.qrcodetext", text);
       this.QRCODE_TEXT = text;
       $ui.get("image_qrcode").data = $qrcode.encode(this.QRCODE_TEXT).png;
     }
   }
   init() {
     $console.info("qrcode.init");
-    const autoScan = $prefs.get("qrcode.scan.on_run") === true;
+    const autoScan =
+      this.Mod.Config.getConfigItem("qrcode.scan.auto_scan") === true;
     const navList = [
       {
         title: "扫一扫",
@@ -112,7 +117,11 @@ class MainView {
       {
         title: "设置",
         icon: "gear",
-        func: () => {}
+        func: () => {
+          this.Mod.Config.showConfig().catch(err => {
+            $console.error(err);
+          });
+        }
       }
     ];
     new NavView()
@@ -221,13 +230,40 @@ class Example extends ModCore {
       app,
       modId: "qrcode",
       modName: "二维码",
-      version: "1",
+      version: "2",
       author: "zhihaofans",
-      coreVersion: 18,
+      iconName: "qrcode",
+      coreVersion: 21,
       useSqlite: true,
       allowWidget: true,
       allowApi: true,
-      iconName: "qrcode"
+      allowConfig: true,
+      configData: [
+        {
+          id: "qrcode.scan.auto_scan",
+          title: "启动时自动扫码",
+          placeholder: "没有输入时显示的提示",
+          type: "boolean",
+          default: false
+        },
+        {
+          id: "qrcode.scan.auto_parse",
+          title: "扫码后自动解析",
+          placeholder: "没有输入时显示的提示",
+          
+          type: "boolean",
+          default: false
+        },
+        {
+          id: "history.qrcodetext",
+          title: "最后扫码",
+          placeholder: "没有输入时显示的提示",
+          insetGrouped:true,
+          inline:true,
+          type: "text",
+          default: false
+        }
+      ]
     });
     this.ModuleLoader = new ModuleLoader(this);
     this.ModuleLoader.addModule("qrcode.rule.js");

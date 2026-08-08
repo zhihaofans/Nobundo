@@ -8,6 +8,27 @@ class ShareAction {
     this.hasText = this.getText() != undefined;
   }
   init() {
+    const json = {
+      data: this.hasData,
+      img: this.hasImage,
+      lik: this.hasLink,
+      tex: this.hasText
+    };
+    $ui.alert({
+      title: "Hello",
+      message: JSON.stringify(json),
+      actions: [
+        {
+          title: "OK",
+          disabled: false, // Optional
+          handler: () => {}
+        },
+        {
+          title: "Cancel",
+          handler: () => {}
+        }
+      ]
+    });
     if (this.hasImage) {
       $ui.alert({
         title: "发现图片",
@@ -90,14 +111,23 @@ class ActionExtension extends ModCore {
     this.QUERY = $context.query;
   }
   run() {
-    $ui.alert({
-      title: "启动失败",
-      message: "请通过分享打开本Mod",
-      actions: [
+    $console.info($context.allItems);
+    $ui.push({
+      props: {
+        title: `mode:` + $context.allItems.length
+      },
+      views: [
         {
-          title: "OK",
-          disabled: false, // Optional
-          handler: () => {}
+          type: "list",
+          props: {
+            data: ["itemList"]
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (sender, indexPath, data) => {
+              const { section, row } = indexPath;
+            }
+          }
         }
       ]
     });

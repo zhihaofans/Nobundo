@@ -119,6 +119,25 @@ class DataCore {
     });
     return success;
   }
+  removeLogItem(id) {
+    return new Promise((resolve, reject) => {
+      this.loadData()
+        .then(oldLogs => {
+          const newLogs = oldLogs.filter(log => log.id != id);
+          const result = this.saveLogData(newLogs);
+          if (result == true) {
+            resolve(result);
+          } else {
+            $console.error({
+              saveLogData: result,
+              newLogs
+            });
+            reject("saveLogData false");
+          }
+        })
+        .catch(reject);
+    });
+  }
 }
 
 class ExampleModule extends ModModule {
@@ -135,12 +154,23 @@ class ExampleModule extends ModModule {
     this.Core = new DataCore(this.Mod);
     this.Core.init();
   }
-  getNewItem(data) {
-    return new LogItem(data);
+  getNewItem(item) {
+    return new LogItem({
+      title: item.title,
+      desc: item.desc,
+      type: item.type,
+      group_id: item.group_id,
+      create_time: $.getUnixTime(),
+      update_time: $.getUnixTime(),
+      json_str: item.json_str
+    });
   }
 
   getItemType() {
     return LogItemType;
+  }
+  removeItem(id) {
+    return this.Core.removeLogItem(id)
   }
 }
 module.exports = ExampleModule;

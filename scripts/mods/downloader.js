@@ -16,7 +16,6 @@ class Main {
   constructor(mod) {
     this.Core = mod;
     this.Mod = mod;
-    this.$ = mod.$;
     this.Http = mod.Http;
     this.isShare = $.isActionEnv();
   }
@@ -35,8 +34,8 @@ class Main {
     }
   }
   loadShare() {
-    const shareUrl = this.$.share.getLink(),
-      shareText = this.$.share.getText(),
+    const shareUrl = $.share.getLink(),
+      shareText = $.share.getText(),
       linkList = $detector.link(shareUrl).concat($detector.link(shareText));
     if (linkList.length >= 0) {
       $ui.alert({
@@ -261,16 +260,13 @@ class Downloader extends ModCore {
       modName: "下载器",
       version: "3",
       author: "zhihaofans",
-      coreVersion: 12,
+      coreVersion: 21,
       iconName: "square.and.arrow.down"
     });
-    this.main = new Main(this);
-    this.$ = $;
-    this.Http = $.http;
   }
   run() {
     $ui.success("run");
-    this.main.init();
+    new Main(this).init();
   }
   runApi(id, data) {
     $console.info({

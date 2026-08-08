@@ -2,12 +2,15 @@ const { ModCore } = require("CoreJS"),
   $ = require("$"),
   { KeychainKit } = require("DataKit");
 class ManagerCore {
-  constructor(app) {
-    this.App = app;
-    this.ModLoader = app.modLoader;
+  constructor(mod) {
+    this.ModLoader = mod.App.ModLoader;
+    $console.warn(this.ModLoader);
   }
   getModList() {
-    return this.ModLoader.getModList();
+    return this.ModLoader.getModList().mods;
+  }
+  getModIdList() {
+    return this.ModLoader.getModIdList();
   }
   getKeychainList(modId) {
     try {
@@ -88,13 +91,13 @@ class ModManager extends ModCore {
       app,
       modId: "mod_manager",
       modName: "模组管理器",
-      version: "1",
+      version: "2",
       author: "zhihaofans",
-      coreVersion: 18,
+      coreVersion: 20,
       iconName: "square.grid.3x2",
       useSqlite: false
     });
-    this.managerCore = new ManagerCore(app);
+    
   }
   run() {
     try {
@@ -104,24 +107,42 @@ class ModManager extends ModCore {
     }
   }
   initModListView() {
-    const modList = this.managerCore.getModList();
-    if (modList.id.length > 0) {
+    this.managerCore = new ManagerCore(this);
+        
+    const modIdList = this.App.ModLoader.MOD_LIST.ids,
+      modList = this.managerCore.getModList();
+    modIdList.sort((a, b) => a.localeCompare(b));
+    $console.info(modIdList);
+    if (modIdList.length > 0) {
       $ui.push({
         props: {
-          title: ""
+          title: `已发现${modIdList.length}个Mod`
         },
         views: [
           {
             type: "list",
             props: {
-              data: modList.id
+              data: modIdList.map(id => {
+                const mod = modList[id],
+                  modInfo = mod.MOD_INFO;
+
+                return {
+                  title: id,
+                  rows: [
+                    `名字：${modInfo.NAME}`,
+                    `CORE_VERSION：${modInfo.CORE_VERSION}`,
+                    `NEED_UPDATE_CORE：${modInfo.NEED_UPDATE}`,
+                    `USE_SQLITE：${modInfo.USE_SQLITE}`
+                  ]
+                };
+              })
             },
             layout: $layout.fill,
             events: {
               didSelect: (sender, indexPath, data) => {
                 const section = indexPath.section,
                   row = indexPath.row,
-                  thisModId = modList.id[row];
+                  thisModId = modIdList[section];
                 $ui.menu({
                   items: ["获取Keychain列表"],
                   handler: (title, idx) => {

@@ -1,29 +1,60 @@
-const { ModCore, ModuleLoader } = require("CoreJS"),
-  $ = require("$"),
-  { Http, Storage } = require("Next");
-class ConfigCore {
-  constructor() {}
-  async showConfig(config) {
-    const editedJson = await $prefs.edit(config);
-    return editedJson;
+const { ModCore } = require("CoreJS");
+//$ = require("$"),
+
+class ModConfigView {
+  constructor(mod) {
+    this.Mod = mod;
+    this.ModLoader = mod.App.ModLoader;
   }
-  showOneStringConfig(title, id, defaultValue) {
-    return new Promise((resolve, reject) => {
-      const configData = {
-        "title": "设置",
-        "items": [
-          {
-            "title": title,
-            "type": "string",
-            "key": id,
-            "value": defaultValue,
-            "inline": false // 文本框是否行内编辑
+  init() {
+    $console.info(this.ModLoader);
+    const appInfo = this.Mod.App.AppInfo;
+    let modList = [];
+    try {
+      modList = this.ModLoader.getModListNew().filter(
+        mod => mod.MOD_INFO.ALLOW_CONFIG == true
+      );
+      $console.info(modList);
+    } catch (error) {
+      $console.error(error);
+    }
+    const listData = [
+      {
+        title: appInfo.name,
+        rows: [`版本：${appInfo.version}`, `作者：${appInfo.author}`]
+      },
+      {
+        title: "Mod",
+        rows: modList.map(mod => mod.MOD_INFO.NAME)
+      }
+    ];
+    $ui.push({
+      props: {
+        title: this.Mod.MOD_INFO.NAME
+      },
+      views: [
+        {
+          type: "list",
+          props: {
+            data: listData
+          },
+          layout: $layout.fill,
+          events: {
+            didSelect: (sender, indexPath, data) => {
+              const { section, row } = indexPath;
+              if (section == 1) {
+                const mod = modList[row];
+                try {
+                  mod.Config.showConfig();
+                } catch (error) {
+                  $console.error(error);
+                  $ui.error("打开Mod设置失败");
+                }
+              }
+            }
           }
-        ]
-      };
-      this.showConfig(configData).then(resultJson => {
-        resolve(resultJson.items[0].value);
-      });
+        }
+      ]
     });
   }
 }
@@ -35,37 +66,20 @@ class Example extends ModCore {
       modName: "设置",
       version: "1",
       author: "zhihaofans",
-      coreVersion: 14,
+      coreVersion: 21,
       useSqlite: false,
       allowWidget: false,
       allowApi: true,
       iconName: "gear"
     });
-    this.Core = new ConfigCore();
   }
   run() {
     try {
-      this.Core.showOneStringConfig("测试", "test", "测试一下").then(result => {
-        $console.info(result);
-      });
+      new ModConfigView(this).init();
     } catch (error) {
       $console.error(error);
     }
     //$ui.success("run");
-  }
-  showConfig() {
-    const configData = {
-      "title": "Nobundo设置",
-      "items": [
-        {
-          "title": "title",
-          "type": "string",
-          "key": "id",
-          "value": "defaultValue",
-          "inline": false // 文本框是否行内编辑
-        }
-      ]
-    };
   }
   runApi({ apiId, data, callback }) {
     $console.info({

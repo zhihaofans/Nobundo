@@ -216,12 +216,14 @@ class LogLogView {
     this.Data.init();
     this.initView();
   }
-  createNewItem() {
-    const item = this.Data.getNewItem({
-      title: "新建文本",
-      desc: "暂时只支持文本、是否类型",
-      group_id: "default_group"
-    });
+  createNewItem(oldItem) {
+    const item = this.Data.getNewItem(
+      oldItem || {
+        title: "新建文本",
+        desc: "暂时只支持文本、是否类型",
+        group_id: "default_group"
+      }
+    );
     new EditView(this.Data, true).showEditView(item).then(data => {
       this.logs.push(data);
       this.Data.Core.saveLogData(this.logs);
@@ -258,7 +260,24 @@ class LogLogView {
           type: "list",
           props: {
             id: "list_logs",
-            data: this.logs
+            data: this.logs,
+            actions: [
+              {
+                title: "删除",
+                color: $color("red"), // default to gray
+                handler: (sender, indexPath) => {
+                  this.Data.removeItem(this.logs[indexPath.row].id).then(resu=>{
+                    this.loadListData()
+                  })
+                }
+              },
+              {
+                title: "复制",
+                handler: (sender, indexPath) => {
+                  $ui.error("坏了没修好")
+                }
+              }
+            ]
           },
           layout: $layout.fill,
           events: {
@@ -271,32 +290,6 @@ class LogLogView {
                   this.Data.Core.saveLogData(this.logs);
                   this.loadListData();
                 });
-            },
-            didLongPress: (sender, indexPath, data) => {
-              const item = this.logs[indexPath.row];
-              $ui.menu({
-                items: [`复制[${item.title}]`],
-                handler: (title, idx) => {
-                  switch (idx) {
-                    case 0:
-                      const item = this.Data.getNewItem({
-                        title: item.title,
-                        desc: item.desc,
-                        group_id: item.group_id,
-                        type: item.type
-                      });
-                      new EditView(this.Data, true)
-                        .showEditView(item)
-                        .then(data => {
-                          this.logs.push(data);
-                          this.Data.Core.saveLogData(this.logs);
-                          this.loadListData();
-                        });
-                      break;
-                    default:
-                  }
-                }
-              });
             },
             ready: sender => {
               this.loadListData();

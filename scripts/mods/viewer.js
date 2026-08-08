@@ -3,6 +3,78 @@ const { ModCore, ModuleLoader } = require("CoreJS"),
   { GridView, Storage } = require("Next");
 class ViewerCore {
   constructor() {}
+  showDynamicDetail(resultData) {
+    const viewData = {
+      props: {
+        title: "动态详情"
+      },
+      views: [
+        {
+          type: "scroll",
+          layout: $layout.fill,
+          events: {
+            ready: sender => {}
+          },
+          views: [
+            {
+              type: "image",
+              props: {
+                cornerRadius: 10,
+                smoothCorners: true,
+                src: resultData.author_face,
+                id: "imageUserCover"
+              },
+              layout: (make, view) => {
+                make.size.equalTo($size(40, 40));
+                make.left.top.equalTo(5);
+              },
+              events: {
+                tapped: (sender, indexPath, data) => {
+                  $quicklook.open({
+                    url: resultData.face,
+                    handler: () => {
+                      // Handle dismiss action, optional
+                    }
+                  });
+                }
+              }
+            },
+            {
+              type: "label",
+              props: {
+                id: "labelUname",
+                text: resultData.author_name,
+                align: $align.center,
+                lines: 1,
+                font: $font(24)
+              },
+              layout: (make, view) => {
+                make.left.equalTo($ui.get("imageUserCover").right).offset(10);
+                make.top.equalTo($ui.get("imageUserCover").top).offset(4);
+              }
+            },
+            {
+              type: "label",
+              props: {
+                id: "labelTitle",
+                text: resultData.text,
+                align: $align.left,
+                lines: 10,
+                font: $font(12)
+              },
+              layout: (make, view) => {
+                make.top.equalTo($ui.get("imageUserCover").bottom).offset(4);
+                make.left.equalTo(10);
+                make.right.equalTo(0).offset(-30);
+              }
+            },
+            this.getImageView(resultData)
+          ]
+        }
+      ]
+    };
+    $ui.push(viewData);
+  }
   openImage({ images, urlList, thumbUrlList }) {
     if (urlList) {
       try {
@@ -177,19 +249,15 @@ class Viewer extends ModCore {
           thumbUrlList: data.thumbUrlList
         });
         break;
+      case "zhihaofans.viewer.bilibili.dynamic_detail":
+        new ViewerCore().openImage({
+          urlList: data.images,
+          thumbUrlList: data.thumbUrlList
+        });
+        break;
       default:
         this.run();
     }
-  }
-  runSqlite() {
-    const sqlite_key = "last_run_timestamp",
-      lastRunTimestamp = this.SQLITE.getItem(sqlite_key);
-
-    this.SQLITE.setItem(sqlite_key, new Date().getTime().toString());
-    $console.info({
-      mod: this.MOD_INFO,
-      lastRunTimestamp
-    });
   }
 }
 module.exports = Viewer;

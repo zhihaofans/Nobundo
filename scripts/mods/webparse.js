@@ -73,10 +73,10 @@ class Example extends ModCore {
     this.ModuleLoader.addModule("webparse.api.js");
     this.Api = this.ModuleLoader.getModule("webparse.api");
     this.View = new ParseView(this);
-    this.Api.init();
   }
   run() {
     try {
+      this.Api.init();
       $.inputText(this.Keychain.get(KEY_LAST_URL), "输入解析的链接").then(
         url => {
           if (!$.isEmpty(url)) {

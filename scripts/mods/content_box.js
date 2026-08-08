@@ -56,6 +56,40 @@ class Database {
       sqlResult = this.SQLite.update(sql, args);
     return sqlResult;
   }
+  updateContentItem({ id, timestamp, title, type, tag, data, otherData }) {
+    return new Promise((resolve, reject) => {
+      if ($.isEmpty(id)) {
+        reject("id isEmpty");
+      } else {
+        const fields = [];
+        const values = [];
+
+        if (title !== undefined) {
+          fields.push("title = ?");
+          values.push(title);
+        }
+        if (type.toLowerCase() == "text" && data != undefined) {
+          fields.push("text_data = ?");
+          values.push(data);
+        }
+        if (tag !== undefined) {
+          fields.push("tag = ?");
+          values.push(tag);
+        }
+
+        if (fields.length === 0) {
+          reject("fields.length === 0");
+        } else {
+          const sql = `
+                     UPDATE ${this.SQL_TABLE_ID}
+                     SET ${fields.join(", ")}
+                     WHERE id = ?;
+                   `;
+          values.push(id);
+        }
+      }
+    });
+  }
 }
 
 class ContentBoxApi {
@@ -63,7 +97,8 @@ class ContentBoxApi {
     this.Mod = mod;
     this.DB = new Database(mod);
     this.DB.init();
-    this.LASTEST_SORT = false;
+    this.LASTEST_SORT = ($cache.get("content_sort")==0)||false;
+    $console.error(this.LASTEST_SORT);
   }
   addContent({ title, data, type = "text", otherData = "{}" }) {
     return new Promise((resolve, reject) => {
@@ -161,6 +196,9 @@ class ContentBoxApi {
       };
     }
   }
+  updateContent({}) {
+    return new Promise((resolve, reject) => {});
+  }
   setLatestSortMode(isLatest) {
     this.LASTEST_SORT = isLatest == true;
   }
@@ -168,6 +206,7 @@ class ContentBoxApi {
 
 class ContentBoxView {
   constructor(mod) {
+    this.Config = mod.Config;
     this.Api = new ContentBoxApi(mod);
     this.ListView = new next.ListView();
     this.contentListData = [];
@@ -339,7 +378,8 @@ class ContentBoxView {
             {
               title: "设置",
               handler: sender => {
-                $ui.warning("未完善");
+                //$ui.warning("未完善");
+                this.Config.showConfig();
               }
             },
             {
@@ -473,14 +513,25 @@ class ContentBox extends ModCore {
       version: "3",
       author: "zhihaofans",
       iconName: "doc.richtext",
+      coreVersion: 21,
       allowApi: true,
-      coreVersion: 18
+      allowConfig: true,
+      configData: [
+        {
+          id: "content_sort",
+          title: "排序",
+          placeholder: "没有输入时显示的提示",
+          type: "list",
+          items: ["从新到旧", "从旧到新"],
+          default: 0
+        }
+      ]
     });
-    this.View = new ContentBoxView(this);
+    
   }
   run() {
     try {
-      this.View.init();
+  new ContentBoxView(this).init();
     } catch (error) {
       $console.error(error);
       $ui.alert({

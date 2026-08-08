@@ -8,7 +8,7 @@ class Example extends ModCore {
       modName: "例子",
       version: "12",
       author: "zhihaofans",
-      coreVersion: 18,
+      coreVersion: 19,
       useSqlite: true,
       allowWidget: true,
       allowApi: true,
@@ -20,7 +20,6 @@ class Example extends ModCore {
   }
   run() {
     try {
-      this.runSqlite();
       const ui = this.ModuleLoader.getModule("example.ui");
       ui.initUi();
     } catch (error) {
